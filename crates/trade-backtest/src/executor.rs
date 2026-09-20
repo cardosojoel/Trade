@@ -75,11 +75,26 @@ impl OrderExecutor for SimulatedExecutor {
 
         let bruto: Money = preco * qty;
 
+        // A moeda da taxa depende do lado, e não é detalhe contábil: na compra
+        // ela sai em moeda base, reduzindo o que chega à conta, e é daí que
+        // nasce o resíduo abaixo do passo negociável. Na venda sai em caixa.
+        let (fee, fee_base) = match order.side {
+            Side::Buy => (
+                Decimal::ZERO,
+                trade_domain::quantizar(qty * self.fees.taker_fee_rate),
+            ),
+            Side::Sell => (
+                trade_domain::quantizar(bruto * self.fees.taker_fee_rate),
+                Decimal::ZERO,
+            ),
+        };
+
         Ok(Fill {
             order_ref: order.id,
             price: preco,
             qty,
-            fee: trade_domain::quantizar(bruto * self.fees.taker_fee_rate),
+            fee,
+            fee_base,
             slippage: trade_domain::quantizar(ajuste * qty),
             at: vela.open_time,
         })

@@ -10,6 +10,7 @@
 
 pub mod audit;
 pub mod candle;
+pub mod instrumento;
 pub mod metrics;
 pub mod mode;
 pub mod position;
@@ -19,6 +20,7 @@ pub mod types;
 
 pub use audit::{AuditEvent, AuditKind};
 pub use candle::{Candle, CandleError};
+pub use instrumento::{Instrumento, InstrumentoError};
 pub use metrics::RunMetrics;
 pub use mode::{ExecutionMode, ModeError};
 pub use position::{Position, PositionError};

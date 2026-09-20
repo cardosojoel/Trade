@@ -59,6 +59,12 @@ quantidade solicitada.
 perda: ele MUST ser somado à próxima ordem do mesmo símbolo. O sistema MUST NOT
 montar cada ordem a partir do zero ignorando o resíduo.
 
+**Implementado em 2026-09-20** — `crates/trade-domain/src/instrumento.rs`
+(`truncar_no_passo`, `residuo`, `negociavel`) e `position.rs` (`apply_fill`
+credita a quantidade líquida da taxa em moeda base). Verificado por nove testes;
+o `Fill` passou a carregar `fee` e `fee_base` separados, e a auditoria registra
+os dois porque somá-los tornaria o extrato irreconciliável com a corretora.
+
 Medido em 2026-09-20 sobre BTCUSDT: `qty_step` de 0,000001 BTC vale cerca de
 US$ 0,08, e o resíduo médio por ida e volta é de US$ 0,04. Sobre uma posição de
 US$ 5,88 isso é 0,69% — quase três vezes o custo de taxa e slippage somados.

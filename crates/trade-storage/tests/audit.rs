@@ -67,6 +67,7 @@ fn gravar_cadeia(rec: &mut AuditRecorder<SqliteAuditSink>) {
             price: dec!(63420.00),
             qty: dec!(0.0153),
             fee: dec!(0.97),
+            fee_base: rust_decimal::Decimal::ZERO,
             slippage: dec!(0.32),
             at: t(1),
         }),

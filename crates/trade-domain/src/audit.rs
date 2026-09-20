@@ -139,8 +139,12 @@ impl AuditKind {
                 "order_ref": f.order_ref.0,
                 "price": d(f.price),
                 "qty": d(f.qty),
-                // Discriminados, nunca embutidos no preço (FR-027).
+                // Discriminados, nunca embutidos no preço (FR-027). A taxa
+                // aparece nas duas moedas porque no spot a compra paga em
+                // moeda base e a venda em caixa: somar as duas num campo só
+                // tornaria o extrato irreconciliável com a corretora.
                 "fee": d(f.fee),
+                "fee_base": d(f.fee_base),
                 "slippage": d(f.slippage),
             }),
 
@@ -270,6 +274,7 @@ mod tests {
                 price: dec!(63420.00),
                 qty: dec!(0.015),
                 fee: dec!(0.97),
+                fee_base: dec!(0),
                 slippage: dec!(0.32),
                 at: instante(),
             }),

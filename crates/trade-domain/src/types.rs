@@ -192,7 +192,13 @@ pub struct Fill {
     pub order_ref: OrderId,
     pub price: Money,
     pub qty: Qty,
+    /// Taxa cobrada em caixa. É assim que a venda paga.
     pub fee: Money,
+    /// Taxa cobrada em **moeda base**. É assim que a compra paga no spot: quem
+    /// compra 1 BTC pagando 0,1% recebe 0,999 BTC, e não 1 BTC com um débito
+    /// de caixa. A quantidade recebida deixa de ser múltiplo do passo
+    /// negociável, e a diferença é o resíduo (REQ-BYBIT-004).
+    pub fee_base: Qty,
     pub slippage: Money,
     pub at: DateTime<Utc>,
 }

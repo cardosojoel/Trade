@@ -29,6 +29,21 @@ métrica operacional quando aplicável. Nenhum requisito crítico de Risk,
 Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
+## Evidência
+
+Os primeiros requisitos a sair de `SPECIFIED`. Esta seção é escrita à mão e
+sobrevive à regeneração das tabelas abaixo.
+
+| ID | Módulo Rust | Teste | Estado |
+|---|---|---|---|
+| `REQ-BYBIT-004` | `trade-domain/src/types.rs` — `Fill::fee_base` | `position::tests::compra_credita_a_quantidade_liquida_da_taxa_em_moeda_base` | **TESTED** |
+| `REQ-BYBIT-005` | `trade-domain/src/instrumento.rs` | `position::tests::residuo_acumulado_volta_a_ser_vendavel` | **TESTED** |
+| `REQ-SIZING-004` | `trade-domain/src/position.rs` — `apply_fill` | `position::tests::residuo_abaixo_do_passo_permanece_na_posicao` | **TESTED** |
+
+Nenhum chegou a `VERIFIED`: falta benchmark e métrica de produção, e a regra
+deste documento é explícita em que revisão documental não promove requisito
+crítico.
+
 ## Estado de hoje
 **162 requisitos em 30 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi

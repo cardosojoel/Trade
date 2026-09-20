@@ -137,6 +137,17 @@ impl BacktestEngine {
                         Side::Sell => position.qty(),
                     });
 
+                    // Venda limitada ao que se detém. No spot a taxa da
+                    // compra sai em moeda base, então quem comprou 5 detém
+                    // 4,95: uma estratégia que mande vender 5 está pedindo o
+                    // que não existe. Limitar é o que faz "vender tudo"
+                    // significar tudo — sem isso a posição nunca fecharia, e
+                    // uma recusa por ciclo viraria travamento silencioso.
+                    let qty = match side {
+                        Side::Sell => qty.min(position.qty()),
+                        Side::Buy => qty,
+                    };
+
                     // Quantidade quantizada à escala do ativo: uma ordem de
                     // 0,0170935254328020703426968481 BTC não existe em lugar
                     // nenhum, e simulá-la é simular outro mercado.

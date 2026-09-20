@@ -10,7 +10,10 @@ use trade_domain::Intent;
 #[test]
 fn taxa_e_slippage_aparecem_separados_no_resultado() {
     // Compra 5 a 100 com slippage 0,5% → preço 100,5; bruto 502,50.
-    // Taxa 1% sobre o bruto → 5,025. Slippage discriminado → 0,5 × 5 = 2,50.
+    // A taxa de 1% sai em moeda base: 0,05 unidades, que ao preço da compra
+    // valem 5,025. Quem comprou 5 detém 4,95 — e é isso que pode ser vendido
+    // depois, por mais que a estratégia mande vender 5.
+    // Slippage discriminado: 0,5 × 5 na compra, 0,5 × 4,95 na venda.
     let candles = velas(&[
         (0, dec!(100)),
         (1, dec!(100)),
@@ -48,8 +51,9 @@ fn taxa_e_slippage_aparecem_separados_no_resultado() {
     );
     assert_eq!(
         r.metrics.total_slippage,
-        dec!(5),
-        "0,50 por unidade, 5 na compra e 5 na venda"
+        dec!(4.975),
+        "0,50 por unidade: 2,50 na compra de 5 e 2,475 na venda de 4,95 — \
+         a taxa da compra saiu em moeda base e reduziu o que há para vender"
     );
 }
 

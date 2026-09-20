@@ -50,6 +50,7 @@ pub fn comprado(qty: Money, preco: Money) -> Position {
             price: preco,
             qty,
             fee: Decimal::ZERO,
+            fee_base: Decimal::ZERO,
             slippage: Decimal::ZERO,
             at: at(1, 0),
         },

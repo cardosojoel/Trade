@@ -160,6 +160,7 @@ mod tests {
                 price: dec!(100),
                 qty,
                 fee: Decimal::ZERO,
+                fee_base: Decimal::ZERO,
                 slippage: Decimal::ZERO,
                 at: Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap(),
             },

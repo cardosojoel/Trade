@@ -30,6 +30,8 @@ pub enum PositionError {
     SellExceedsHoldings { held: String, requested: String },
     #[error("quantidade do preenchimento deve ser positiva, veio {0}")]
     NonPositiveQty(String),
+    #[error("taxa em moeda base {fee_base} não pode alcançar a quantidade comprada {qty}")]
+    FeeBaseExcedeQty { qty: String, fee_base: String },
 }
 
 impl Position {
@@ -75,11 +77,26 @@ impl Position {
 
         match side {
             Side::Buy => {
-                let valor_total = self.avg_price * self.qty + fill.price * fill.qty;
-                let nova_qty = self.qty + fill.qty;
+                // No spot a taxa da compra sai em moeda base: credita-se o que
+                // de fato chega à conta, não o que foi pedido. Creditar o
+                // pedido seria registrar posição que não se tem, e a
+                // divergência reapareceria na reconciliação com a corretora.
+                if fill.fee_base >= fill.qty {
+                    return Err(PositionError::FeeBaseExcedeQty {
+                        qty: fill.qty.to_string(),
+                        fee_base: fill.fee_base.to_string(),
+                    });
+                }
+                let recebido = fill.qty - fill.fee_base;
+
+                let valor_total = self.avg_price * self.qty + fill.price * recebido;
+                let nova_qty = self.qty + recebido;
                 self.avg_price = valor_total / nova_qty;
                 self.qty = nova_qty;
-                self.open_fees += fill.fee;
+                // A taxa em moeda base entra no custo pelo valor que tinha no
+                // momento da compra, e não no preço médio: discriminá-la é o
+                // que torna respondível quanto do resultado foi custo.
+                self.open_fees += fill.fee + crate::quantizar(fill.fee_base * fill.price);
                 if self.opened_at.is_none() {
                     self.opened_at = Some(fill.at);
                 }
@@ -158,6 +175,20 @@ mod tests {
             price,
             qty,
             fee,
+            fee_base: Decimal::ZERO,
+            slippage: Decimal::ZERO,
+            at: em(h),
+        }
+    }
+
+    /// Compra no spot: a taxa é cobrada em moeda base, não em caixa.
+    fn compra(price: Money, qty: Qty, fee_base: Qty, h: u32) -> Fill {
+        Fill {
+            order_ref: OrderId(1),
+            price,
+            qty,
+            fee: Decimal::ZERO,
+            fee_base,
             slippage: Decimal::ZERO,
             at: em(h),
         }
@@ -231,6 +262,91 @@ mod tests {
         // Ganho bruto 10, taxa de saída 1, metade da taxa de entrada 1 → 8.
         assert_eq!(t.pnl, dec!(8));
         assert_eq!(t.fees, dec!(2));
+    }
+
+    #[test]
+    fn compra_credita_a_quantidade_liquida_da_taxa_em_moeda_base() {
+        // No spot da Bybit a taxa da compra sai em BTC, não em USDT: quem
+        // compra 1 BTC pagando 0,1% recebe 0,999 BTC. Creditar 1 seria
+        // registrar uma posição que a conta não tem.
+        let mut p = Position::default();
+        p.apply_fill(Side::Buy, &compra(dec!(100), dec!(1), dec!(0.001), 0))
+            .unwrap();
+        assert_eq!(p.qty(), dec!(0.999));
+    }
+
+    #[test]
+    fn taxa_da_compra_entra_no_custo_sem_ser_embutida_no_preco_medio() {
+        // O projeto discrimina taxa e preço de propósito: embutir a taxa no
+        // preço médio torna impossível responder quanto foi custo de
+        // transação sem refazer a conta.
+        let mut p = Position::default();
+        p.apply_fill(Side::Buy, &compra(dec!(100), dec!(1), dec!(0.001), 0))
+            .unwrap();
+        assert_eq!(p.avg_price(), dec!(100), "preço médio não carrega taxa");
+        assert_eq!(
+            p.unrealized_at(dec!(100)),
+            dec!(-0.1),
+            "ao preço de entrada, o não realizado é exatamente a taxa paga"
+        );
+    }
+
+    #[test]
+    fn residuo_abaixo_do_passo_permanece_na_posicao() {
+        // A quantidade recebida não é múltiplo do passo negociável, e a
+        // diferença não é vendável agora. Ela não é perda: fica na posição e
+        // se soma à ordem seguinte (REQ-BYBIT-005).
+        let instr = crate::Instrumento::novo(dec!(0.000001), dec!(5)).unwrap();
+        let mut p = Position::default();
+        p.apply_fill(
+            Side::Buy,
+            &compra(dec!(81233.70), dec!(0.000615), dec!(0.000000615), 0),
+        )
+        .unwrap();
+
+        let detido = p.qty();
+        assert_eq!(detido, dec!(0.000614385));
+
+        let vendavel = instr.truncar_no_passo(detido);
+        assert_eq!(vendavel, dec!(0.000614));
+
+        p.apply_fill(Side::Sell, &fill(dec!(81233.70), vendavel, dec!(0.05), 1))
+            .unwrap();
+        assert_eq!(
+            p.qty(),
+            dec!(0.000000385),
+            "o resíduo continua detido, e não desaparece da contabilidade"
+        );
+    }
+
+    #[test]
+    fn residuo_acumulado_volta_a_ser_vendavel() {
+        // Três ciclos deixam resíduo suficiente para cruzar o passo. Se cada
+        // compra partisse do zero, esse saldo nunca voltaria a ser negociável.
+        let instr = crate::Instrumento::novo(dec!(0.000001), dec!(5)).unwrap();
+        let mut p = Position::default();
+        for h in 0..3 {
+            p.apply_fill(
+                Side::Buy,
+                &compra(dec!(81233.70), dec!(0.000615), dec!(0.000000615), h),
+            )
+            .unwrap();
+            let vendavel = instr.truncar_no_passo(p.qty());
+            p.apply_fill(
+                Side::Sell,
+                &fill(dec!(81233.70), vendavel, dec!(0.05), h + 1),
+            )
+            .unwrap();
+        }
+        assert_eq!(
+            p.qty(),
+            dec!(0.000000155),
+            "resíduo acumulado dos três ciclos"
+        );
+        assert!(
+            p.qty() > dec!(0),
+            "o resíduo se acumula em vez de ser descartado a cada ciclo"
+        );
     }
 
     #[test]
