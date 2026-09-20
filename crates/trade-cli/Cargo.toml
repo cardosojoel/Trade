@@ -21,6 +21,10 @@ toml.workspace = true
 ulid.workspace = true
 thiserror.workspace = true
 
+[lib]
+name = "trade_cli"
+path = "src/lib.rs"
+
 [[bin]]
 name = "trade"
 path = "src/main.rs"
