@@ -27,11 +27,41 @@ pub struct Cli {
 #[allow(clippy::large_enum_variant)]
 #[derive(Subcommand, Debug)]
 pub enum Command {
+    /// Coleta o histórico público da Bybit e grava localmente.
+    Collect(CollectArgs),
     /// Executa um backtest sobre o histórico local.
     Backtest(BacktestArgs),
     /// Aciona ou libera o kill switch.
     Kill(KillArgs),
 }
+
+#[derive(clap::Args, Debug)]
+pub struct CollectArgs {
+    #[arg(long, default_value = "BTCUSDT")]
+    pub symbol: String,
+
+    #[arg(long, default_value = "1m", value_parser = parse_interval)]
+    pub interval: Interval,
+
+    /// Início do período, em UTC (AAAA-MM-DD).
+    #[arg(long, value_parser = parse_date)]
+    pub from: DateTime<Utc>,
+
+    /// Fim do período, exclusivo, em UTC (AAAA-MM-DD).
+    #[arg(long, value_parser = parse_date)]
+    pub to: DateTime<Utc>,
+
+    #[arg(long, default_value = "data/market.db")]
+    pub db: PathBuf,
+
+    /// Tentativas antes de desistir de uma falha transitória.
+    #[arg(long, default_value_t = 5)]
+    pub max_retries: u32,
+}
+
+// Repare no que NÃO existe acima: nenhum parâmetro de credencial. O endpoint
+// de histórico da Bybit é público, e a forma mais simples de garantir FR-012 é
+// não haver nada a passar.
 
 #[derive(clap::Args, Debug)]
 pub struct BacktestArgs {

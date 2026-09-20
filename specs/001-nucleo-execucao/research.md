@@ -114,9 +114,25 @@ desenho do coletor:
 | Endpoint **público, sem autenticação** | Confirma FR-012 — nenhuma credencial na coleta, Princípio VI intocado nesta feature |
 | `category` aceita `spot`, `linear`, `inverse`, e **assume `linear` se omitido** | `category=spot` MUST ser enviado explicitamente. Omitir traria dados de perpétuo — outro mercado, contra FR-004 |
 | `limit` máximo **1000**, padrão 200 | 12 meses de velas de 1 minuto ≈ 525.600 velas ≈ **526 requisições**. Paginação obrigatória |
+| A resposta traz as `limit` velas **mais recentes** da janela pedida, e `end` é **inclusivo** | Verificado contra a API em 2026-09-20, **não** pela documentação. Ver a nota abaixo |
 | Preços retornam como **string** | Converter direto para `Decimal`, sem passar por float (ver R-002) |
 | Lista ordenada **do mais recente para o mais antigo** | O coletor inverte cada página antes de gravar. Errar isso produziria histórico invertido, que o backtest consumiria sem perceber |
 | `closePrice` é *"the last traded price when the candle is not closed"* | **A vela corrente é parcial.** O coletor MUST descartar a última vela quando ela ainda não fechou |
+
+**A armadilha da paginação** só apareceu numa coleta real, e a documentação não
+a descreve. Pedir `start=00:00`, `end=24:00`, `limit=1000` para um dia de velas
+de um minuto **não** devolve as mil primeiras: devolve as mil **últimas** da
+janela, de 07:21 em diante. A paginação para frente encerra achando que
+terminou, e 441 minutos nunca são buscados — sem erro, sem aviso, com a
+resposta parecendo completa.
+
+Some-se a isso que `end` é **inclusivo**: uma janela de mil passos contém 1001
+velas, e o limite descarta a mais antiga — justamente a que se queria.
+
+A correção é limitar a **janela** de cada requisição, e não só o cursor: cada
+página pede `[cursor, cursor + (limit-1) passos]`, que contém exatamente
+`limit` velas. Assim "as mais recentes da janela" e "as mais antigas a partir
+do cursor" passam a ser o mesmo conjunto.
 
 **A armadilha da vela aberta** merece destaque: gravar a vela em formação significa
 gravar um preço de fechamento que ainda vai mudar. Duas coletas do mesmo período

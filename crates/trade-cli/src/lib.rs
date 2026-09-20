@@ -6,5 +6,6 @@
 
 pub mod cli;
 pub mod cmd_backtest;
+pub mod cmd_collect;
 pub mod config;
 pub mod report;

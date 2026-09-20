@@ -1296,6 +1296,7 @@ dependencies = [
  "tempfile",
  "trade-domain",
  "trade-ports",
+ "trade-storage",
  "ureq",
 ]
 

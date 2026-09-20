@@ -3,13 +3,24 @@
 use clap::Parser;
 use std::process::ExitCode;
 use trade_cli::cli::{Cli, Command};
-use trade_cli::cmd_backtest;
+use trade_cli::{cmd_backtest, cmd_collect};
 use trade_risk::KillSwitch;
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
 
     match &cli.command {
+        Command::Collect(args) => match cmd_collect::run(args) {
+            Ok(saida) => {
+                println!("{saida}");
+                ExitCode::SUCCESS
+            }
+            Err((codigo, msg)) => {
+                eprintln!("{msg}");
+                ExitCode::from(codigo)
+            }
+        },
+
         Command::Backtest(args) => {
             let (code, saida) = cmd_backtest::run(args);
             if code == cmd_backtest::ExitCode::Ok

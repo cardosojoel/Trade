@@ -18,6 +18,12 @@ pub enum MarketError {
     Gap { from: String, to: String },
     #[error("fonte indisponível: {0}")]
     Unavailable(String),
+    /// A fonte respondeu, mas de forma que não dá para usar — resposta
+    /// malformada, campo ausente, recusa da consulta. Distinta de
+    /// `Unavailable` porque **não se resolve sozinha**: retentar devolve o
+    /// mesmo problema.
+    #[error("resposta inutilizável da fonte: {0}")]
+    Source(String),
     #[error("falha de armazenamento: {0}")]
     Storage(String),
 }

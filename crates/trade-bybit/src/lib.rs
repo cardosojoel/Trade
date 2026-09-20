@@ -1,14 +1,19 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! Adaptador da Bybit.
+//!
+//! **Única crate do workspace com cliente HTTP.** É o que a trava em
+//! `tests/architecture.rs` protege: estratégia, risco e backtest não declaram
+//! esta crate nem `ureq`, e por isso não conseguem alcançar a rede.
+//!
+//! Escopo desta feature: apenas leitura de histórico público. Não há envio de
+//! ordens e não há credencial — o endpoint `/v5/market/kline` é público, o que
+//! mantém o Princípio VI intocado.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod backoff;
+pub mod client;
+pub mod collector;
+pub mod errors;
+pub mod gaps;
+pub mod parse;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use client::{BybitClient, KlinePage};
+pub use collector::{CollectOutcome, Collector};

@@ -178,25 +178,25 @@ rodar um backtest sobre ele com a rede desligada.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T068 [P] [US3] Teste em `crates/trade-bybit/tests/ordering.rs`: a página devolvida pela Bybit vem do mais recente para o mais antigo e é **invertida** antes de gravar (R-005)
-- [ ] T069 [P] [US3] Teste em `crates/trade-bybit/tests/open_candle.rs`: a vela cujo intervalo ainda não terminou é **descartada** — gravá-la quebraria FR-029 e FR-030 em silêncio
-- [ ] T070 [P] [US3] Teste em `crates/trade-bybit/tests/resume.rs`: repetir uma coleta interrompida completa o que falta e não duplica nada (FR-014)
-- [ ] T071 [P] [US3] Teste em `crates/trade-bybit/tests/rate_limit.rs`: HTTP 403 com `retCode 10006` é tratado como transitório com recuo exponencial; esgotadas as tentativas vira falha de integridade, sem corromper o já gravado (FR-015)
-- [ ] T072 [P] [US3] Teste em `crates/trade-bybit/tests/gaps.rs`: períodos sem dados na fonte são detectados e gravados na tabela `gap` (FR-016)
-- [ ] T073 [P] [US3] Teste em `crates/trade-cli/tests/collect_no_credentials.rs`: o comando `collect` **não expõe** nenhum parâmetro de credencial e não lê variável de ambiente de segredo (FR-012)
+- [X] T068 [P] [US3] Teste em `crates/trade-bybit/tests/ordering.rs`: a página devolvida pela Bybit vem do mais recente para o mais antigo e é **invertida** antes de gravar (R-005)
+- [X] T069 [P] [US3] Teste em `crates/trade-bybit/tests/open_candle.rs`: a vela cujo intervalo ainda não terminou é **descartada** — gravá-la quebraria FR-029 e FR-030 em silêncio
+- [X] T070 [P] [US3] Teste em `crates/trade-bybit/tests/resume.rs`: repetir uma coleta interrompida completa o que falta e não duplica nada (FR-014)
+- [X] T071 [P] [US3] Teste em `crates/trade-bybit/tests/rate_limit.rs`: HTTP 403 com `retCode 10006` é tratado como transitório com recuo exponencial; esgotadas as tentativas vira falha de integridade, sem corromper o já gravado (FR-015)
+- [X] T072 [P] [US3] Teste em `crates/trade-bybit/tests/gaps.rs`: períodos sem dados na fonte são detectados e gravados na tabela `gap` (FR-016)
+- [X] T073 [P] [US3] Teste em `crates/trade-cli/tests/collect_no_credentials.rs`: o comando `collect` **não expõe** nenhum parâmetro de credencial e não lê variável de ambiente de segredo (FR-012)
 
 ### Implementation for User Story 3
 
-- [ ] T074 [US3] Implementar o cliente HTTP com `ureq` em `crates/trade-bybit/src/client.rs`, chamando `GET /v5/market/kline` com `category=spot` **explícito** — omitir traria perpétuo, contra FR-004
-- [ ] T075 [US3] Implementar o parse da resposta V5 em `crates/trade-bybit/src/parse.rs`: os 7 elementos na ordem `startTime, open, high, low, close, volume, turnover`, convertendo as strings direto para `Decimal` sem passar por float
-- [ ] T076 [US3] Implementar a paginação para frente por `start` com `limit=1000` em `crates/trade-bybit/src/collector.rs`
-- [ ] T077 [US3] Implementar o descarte da vela em formação em `crates/trade-bybit/src/collector.rs`
-- [ ] T078 [US3] Implementar o recuo exponencial e a leitura dos cabeçalhos `X-Bapi-Limit`, `X-Bapi-Limit-Status` e `X-Bapi-Limit-Reset-Timestamp` em `crates/trade-bybit/src/backoff.rs`
-- [ ] T079 [US3] Implementar a tradução de erros da Bybit para `ExecError`/`MarketError` agnósticos em `crates/trade-bybit/src/errors.rs` — nenhum código da corretora vaza para fora desta crate (FR-010)
-- [ ] T080 [US3] Implementar `SqliteCandleRepository` em `crates/trade-storage/src/candle_repo.rs`: `upsert_page` com `INSERT OR IGNORE` **em uma transação por página**, mais `coverage` e `record_gaps`
-- [ ] T081 [US3] Implementar a detecção de lacunas em `crates/trade-bybit/src/gaps.rs`
-- [ ] T082 [US3] Implementar o comando `trade collect` em `crates/trade-cli/src/cmd_collect.rs`, gravando a procedência (fonte, par, granularidade, período, instante) na tabela `dataset` (FR-017)
-- [ ] T083 [US3] Escrever teste de integração em `crates/trade-bybit/tests/local_server.rs` contra um servidor HTTP local que reproduz o formato da resposta V5
+- [X] T074 [US3] Implementar o cliente HTTP com `ureq` em `crates/trade-bybit/src/client.rs`, chamando `GET /v5/market/kline` com `category=spot` **explícito** — omitir traria perpétuo, contra FR-004
+- [X] T075 [US3] Implementar o parse da resposta V5 em `crates/trade-bybit/src/parse.rs`: os 7 elementos na ordem `startTime, open, high, low, close, volume, turnover`, convertendo as strings direto para `Decimal` sem passar por float
+- [X] T076 [US3] Implementar a paginação para frente por `start` com `limit=1000` em `crates/trade-bybit/src/collector.rs`
+- [X] T077 [US3] Implementar o descarte da vela em formação em `crates/trade-bybit/src/collector.rs`
+- [X] T078 [US3] Implementar o recuo exponencial e a leitura dos cabeçalhos `X-Bapi-Limit`, `X-Bapi-Limit-Status` e `X-Bapi-Limit-Reset-Timestamp` em `crates/trade-bybit/src/backoff.rs`
+- [X] T079 [US3] Implementar a tradução de erros da Bybit para `ExecError`/`MarketError` agnósticos em `crates/trade-bybit/src/errors.rs` — nenhum código da corretora vaza para fora desta crate (FR-010)
+- [X] T080 [US3] Implementar `SqliteCandleRepository` em `crates/trade-storage/src/candle_repo.rs`: `upsert_page` com `INSERT OR IGNORE` **em uma transação por página**, mais `coverage` e `record_gaps`
+- [X] T081 [US3] Implementar a detecção de lacunas em `crates/trade-bybit/src/gaps.rs`
+- [X] T082 [US3] Implementar o comando `trade collect` em `crates/trade-cli/src/cmd_collect.rs`, gravando a procedência (fonte, par, granularidade, período, instante) na tabela `dataset` (FR-017)
+- [X] T083 [US3] Escrever teste de integração em `crates/trade-bybit/tests/local_server.rs` contra um servidor HTTP local que reproduz o formato da resposta V5
 
 **Checkpoint**: histórico coletável em um comando, retomável, sem credencial.
 
