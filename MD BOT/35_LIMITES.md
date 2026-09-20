@@ -112,10 +112,11 @@ parcial e folga até o chão.
 
 | Limite | Origem | Muda por |
 |---|---|---|
-| Mercado à vista, apenas comprado, sem alavancagem | `CLAUDE.md` — **não está na constitution** | ADR-001, e ver ADR-005 |
+| Mercado à vista, apenas comprado, sem alavancagem | **constitution**, *Restrições Operacionais* → Mercado (emenda 1.3.0) | ADR-001 |
+| Ordem nunca excede o caixa disponível | **constitution**, idem (emenda 1.3.0) | emenda — nenhuma ADR aberta |
 | Freio diário sem exceção configurável em tempo de execução | constitution, Princípio II | ADR-002 |
 | Retomada automática na virada do período | constitution, Princípio II | ADR-003 |
-| Nenhum `f32`/`f64` em caminho monetário | `CLAUDE.md` e `tests/no_float.rs` | ADR-004, e ver ADR-005 |
+| Nenhum `f32`/`f64` em caminho monetário | **constitution**, *Restrições Operacionais* → Representação de valores (emenda 1.3.0), cobrado por `tests/no_float.rs` | ADR-004 |
 | Toda ordem atravessa a camada de risco | constitution, Princípio II | emenda — nenhuma ADR aberta |
 | Teste escrito e falhando antes da implementação crítica | constitution, Princípio III | emenda — nenhuma ADR aberta |
 | Ativo: Bitcoin | constitution | emenda MINOR |

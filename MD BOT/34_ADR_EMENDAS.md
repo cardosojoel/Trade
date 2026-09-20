@@ -33,15 +33,18 @@ dela dependa MAY gerar tarefa de implementação no repositório Trade.
 | [ADR-002](#adr-002) | Recovery depois do freio diário | constitution, Princípio II | **proposta** |
 | [ADR-003](#adr-003) | Sessão com depósito e confirmação humana | constitution, Princípio II | **proposta** |
 | [ADR-004](#adr-004) | `f64` nos contratos Rust | `CLAUDE.md` e `tests/no_float.rs` | **proposta** |
-| [ADR-005](#adr-005) | Promover duas restrições à constitution | nada — corrige uma lacuna | **proposta** |
+| [ADR-005](#adr-005) | Promover duas restrições à constitution | nada — corrigia uma lacuna | **aceita em 2026-09-20** |
 
-Nenhuma aceita. Nenhuma recusada. O Trade segue operando sob as regras atuais.
+Uma aceita, quatro em proposta. A aceitação da ADR-005 elevou a autoridade
+contrariada pelas ADR-001 e ADR-004: antes da emenda 1.3.0 elas contrariavam o
+`CLAUDE.md`; agora contrariam a constitution.
 
 ---
 
 ## ADR-001 — Derivativos e alavancagem {#adr-001}
 
-**Status:** proposta · **Contraria:** `CLAUDE.md` linhas 91–92
+**Status:** proposta · **Contraria:** constitution, *Restrições Operacionais e de
+Segurança* → **Mercado** (desde a emenda 1.3.0; antes dela, `CLAUDE.md`)
 
 ### Contexto
 Boa parte deste conjunto pressupõe mercado de derivativos: `leverage_min` e
@@ -124,7 +127,9 @@ derivados mudarem — que é o caso previsto em `REQ-BYBIT-007`.
 
 ## ADR-004 — `f64` nos contratos Rust {#adr-004}
 
-**Status:** proposta · **Contraria:** `CLAUDE.md` e `tests/no_float.rs`
+**Status:** proposta · **Contraria:** constitution, *Restrições Operacionais e de
+Segurança* → **Representação de valores monetários** (desde a emenda 1.3.0), mais
+`tests/no_float.rs`
 
 ### Contexto
 O `29_RUST_CONTRACTS.md` usa `f64` para `tick_size`, `qty_step`, `min_notional`
@@ -148,7 +153,23 @@ disso, a ADR-004 é encerrada como `recusada` por não haver decisão a tomar.
 
 ## ADR-005 — Promover duas restrições à constitution {#adr-005}
 
-**Status:** proposta · **Contraria:** nada — corrige uma lacuna
+**Status:** **aceita em 2026-09-20** pelo mantenedor · **Contraria:** nada —
+corrigia uma lacuna
+
+### Resultado
+Emenda **1.3.0** aplicada à `.specify/memory/constitution.md`, em *Restrições
+Operacionais e de Segurança*: a seção **Mercado** e a seção **Representação de
+valores monetários**, cada uma com o seu racional. Rodapé da constitution
+atualizado, com registro de impacto.
+
+**Impacto sobre código e specs: nenhum.** As duas restrições já eram observadas
+— a feature 001 opera apenas em spot comprado e usa `rust_decimal` em todo
+caminho monetário. A emenda muda o ato necessário para alterá-las, não o
+comportamento do sistema.
+
+Consequências registradas: âncora de hash de `00_FRONTEIRA.md` substituída e
+conformidades reavaliadas (nenhuma mudou); ADR-001 e ADR-004 passaram a
+contrariar a constitution.
 
 ### Contexto
 A verificação de 2026-09-20 encontrou que duas das restrições mais

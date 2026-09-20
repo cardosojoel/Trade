@@ -38,9 +38,10 @@ Ele descreve um sistema possível, não o sistema autorizado.
 | | |
 |---|---|
 | Documento | `.specify/memory/constitution.md` |
-| Versão | **1.2.0**, ratificada em 2026-09-20 |
-| SHA-256 | `82b24e3cb309d6f297a9c91b4a40b0b5390669b5b65d806a8107cb02bb8d1c72` |
-| Linhas | 220 |
+| Versão | **1.3.0**, emendada em 2026-09-20 |
+| SHA-256 | `38814ec18cab41b6059aaab3133b96670c49fffb795d307b173d1f7a8ea90114` |
+| Linhas | 251 |
+| Âncora anterior | 1.2.0 · `82b24e3c…` · 220 linhas — substituída pela emenda da ADR-005 |
 
 **REQ-FRONTEIRA-002** Se o hash mudar, toda a coluna `Conformidade` deste
 conjunto MUST ser reavaliada antes de qualquer proposta nova ser aceita. Hash
@@ -89,29 +90,41 @@ muda o estado — mas menção incidental MUST NOT virar requisito.
 Um documento marcado `exige emenda` continua válido como desenho. O que ele não
 pode é gerar tarefa de implementação enquanto a ADR não for aceita.
 
-## 4. Duas fronteiras, não uma
+## 4. Uma fronteira só — desde a emenda 1.3.0
 
-A verificação de 2026-09-20 mostrou que as quatro divergências conhecidas não
-são todas do mesmo tipo, e tratá-las como se fossem enfraquece as duas:
+A verificação de 2026-09-20 encontrou que as quatro divergências conhecidas não
+contrariavam a mesma autoridade: duas eram com a constitution e duas com uma
+diretriz de trabalho. A **ADR-005 foi aceita no mesmo dia** e a emenda 1.3.0
+fechou a lacuna, trazendo as duas restrições para o corpo normativo.
 
-| Divergência | Onde a regra contrária vive | Como se resolve |
+| Divergência | Contraria hoje | Contrariava antes da emenda |
 |---|---|---|
-| Recovery depois do freio diário | **constitution**, Princípio II | emenda formal à constitution |
-| Retomada por confirmação humana, não automática | **constitution**, Princípio II | emenda formal à constitution |
-| Derivativos, alavancagem, funding | `CLAUDE.md` — **não está na constitution** | ver ADR-005 |
-| `f64` em caminho monetário | `CLAUDE.md` e `tests/no_float.rs` — **não está na constitution** | ver ADR-005 |
+| Recovery depois do freio diário | constitution, Princípio II | o mesmo |
+| Retomada por confirmação humana | constitution, Princípio II | o mesmo |
+| Derivativos, alavancagem, funding | **constitution**, *Restrições Operacionais* → Mercado | `CLAUDE.md` |
+| `f64` em caminho monetário | **constitution**, *Restrições Operacionais* → Representação de valores | `CLAUDE.md` e `tests/no_float.rs` |
+
+As quatro agora exigem emenda formal. O ato ficou **mais pesado**, não menos, e
+essa era a intenção: as duas restrições que limitam a perda máxima possível
+deixaram de poder ser alteradas por edição de arquivo.
 
 **REQ-FRONTEIRA-006** Uma proposta MUST nomear qual documento ela contraria.
-"Conflita com a constitution" MUST NOT ser usado como fórmula genérica: das
-quatro divergências conhecidas, duas contrariam a constitution e duas contrariam
-uma diretriz de trabalho e um teste de build.
+"Conflita com a constitution" MUST NOT ser usado como fórmula genérica — hoje
+ela é verdadeira para as quatro divergências conhecidas, mas a fórmula continua
+proibida, porque foi justamente a verificação documento a documento que revelou
+a lacuna que a emenda fechou.
 
-A distinção importa porque o peso do ato é diferente. Emendar a constitution é
-ato formal com racional escrito e aprovação registrada. Mudar o `CLAUDE.md` é
-decisão de rotina — e é exatamente por isso que **"mercado à vista, apenas
-comprado, sem alavancagem" estar apenas ali é, em si, um risco**: é a restrição
-que impede a perda de exceder o depósito, e hoje qualquer sessão pode reescrevê-la
-sem cerimônia. Ver ADR-005.
+### Reavaliação exigida pela troca de âncora
+
+`REQ-FRONTEIRA-002` obriga a reavaliar toda a coluna `Conformidade` quando o
+hash muda. Feita em 2026-09-20, com este resultado:
+
+- **nenhum documento mudou de estado.** Os seis marcados `exige emenda`
+  continuam marcados; os demais continuam `conforme`;
+- o que mudou foi **a autoridade contrariada** por ADR-001 e ADR-004, que subiu
+  de diretriz de trabalho para constitution;
+- a restrição nova de nocional — *ordem nunca excede o caixa disponível* — já era
+  observada por `REQ-SIZING-003`, e não criou não-conformidade.
 
 ## 4.1 O envelope
 

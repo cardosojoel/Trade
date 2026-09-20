@@ -91,6 +91,10 @@ base em algo que já não é verdade.
 Robô de day trade automatizado de Bitcoin. **Mercado spot, apenas comprado** —
 sem alavancagem e sem venda a descoberto.
 
+Desde a emenda **1.3.0**, essa restrição é da constitution, seção *Restrições
+Operacionais e de Segurança* → **Mercado**. Aqui ela é lembrete no ponto de uso,
+não a fonte: alterá-la exige emenda formal, não edição deste arquivo.
+
 ## A constitution prevalece
 
 `.specify/memory/constitution.md` governa o projeto e tem precedência sobre
@@ -116,7 +120,8 @@ Não são convenção — falham a compilação ou o CI:
   não declaram a corretora nem cliente de rede. `trade-strategy` não declara
   `trade-ports` e portanto não consegue nomear `OrderExecutor`.
 - `tests/no_float.rs` — nenhum `f32`/`f64` em caminho monetário. Todo valor é
-  `rust_decimal::Decimal`.
+  `rust_decimal::Decimal`. Desde a emenda **1.3.0**, além de invariante de build
+  é regra da constitution (*Representação de valores monetários*).
 - `crates/trade-risk/tests/compile_fail/` — obter o executor de dentro do
   `RiskGuard` **não compila**.
 

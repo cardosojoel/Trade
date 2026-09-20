@@ -88,6 +88,35 @@ da corretora e da aritmética, medidos do mercado e do capital, de autoridade, d
 promoção, e os limites da própria medição. Um desenho que não passa nessa folha
 não chega a precisar de ADR.
 
+## Decidido em 2026-09-20: a constitution passou a 1.3.0
+
+**A ADR-005 foi aceita.** As duas restrições que limitam a perda máxima possível
+subiram para o corpo normativo:
+
+| Seção nova na constitution | O que fixa |
+|---|---|
+| *Restrições Operacionais* → **Mercado** | à vista, apenas comprado; sem alavancagem, sem venda a descoberto, e ordem nunca excede o caixa disponível |
+| *Restrições Operacionais* → **Representação de valores monetários** | nenhum ponto flutuante em caminho que alcance saldo, posição, P&L, risco ou ordem |
+
+**Impacto sobre código e specs: nenhum.** As duas já eram observadas — a feature
+001 opera só em spot comprado e usa `rust_decimal` em todo caminho monetário. A
+emenda muda o **ato necessário para alterá-las**, não o comportamento: antes
+bastava editar o `CLAUDE.md`; agora exige emenda escrita, com racional e
+aprovação registrada.
+
+Consequências em cadeia, todas aplicadas: a âncora de hash da fronteira passou a
+`38814ec1…` (251 linhas); `REQ-FRONTEIRA-002` obrigou a reavaliar toda a coluna
+`Conformidade`, e **nenhum documento mudou de estado** — o que mudou foi a
+autoridade contrariada por ADR-001 e ADR-004, que subiu de diretriz de trabalho
+para constitution. As quatro divergências abertas agora pesam igual.
+
+**O que a ADR-005 levantou e não resolveu:** a restrição de mercado à vista
+continua **sem proteção executável**. O `tests/no_float.rs` barra o ponto
+flutuante no CI; nenhum teste equivalente impede alavancagem de entrar no
+código. Forte no papel, ausente no build.
+
+---
+
 **A verificação da fronteira desmentiu uma coisa que este arquivo vinha
 afirmando.** Eu repeti quatro vezes que havia "quatro conflitos com a
 constitution". São quatro divergências, mas **só duas são com a constitution**:

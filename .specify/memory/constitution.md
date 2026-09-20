@@ -140,6 +140,17 @@ Princípio V. Testnet da Bybit é o ambiente da porta de paper trading.
 
 **Ativo:** Bitcoin. Qualquer outro ativo está fora de escopo até emenda MINOR.
 
+**Mercado:** exclusivamente à vista (*spot*), **apenas comprado**. O sistema MUST NOT
+operar com alavancagem, MUST NOT vender a descoberto e MUST NOT emitir ordem cujo valor
+nocional exceda o caixa disponível. Derivativos estão fora de escopo até emenda MINOR.
+
+**Racional:** o mercado à vista é o que garante que o pior caso seja perder o capital
+depositado. Com alavancagem, o pior caso passa a depender da liquidação da corretora, e
+o Princípio II — cujo racional é impedir que um bug, um flash crash ou uma falha de API
+virem perda ilimitada — perde a sua garantia mais forte. Esta restrição vivia apenas no
+`CLAUDE.md`, onde podia ser alterada sem emenda, sem racional escrito e sem aprovação;
+a emenda 1.3.0 a traz para onde ela pertence.
+
 **Portas de Promoção** — cumulativas e em ordem. Os limiares abaixo foram propostos
 pelo assistente e **aceitos pelo mantenedor em 2026-09-20 como valores de partida
 provisórios**, não como medição. Permanecem ajustáveis: toda implementação MUST
@@ -166,6 +177,18 @@ calibrá-los. Os limiares MUST ser revistos pelo mantenedor contra o capital rea
 resultados observados **antes da Porta 3** — a liberação para capital real. Até lá
 servem para que o sistema seja construído e exercitado; a partir dali passam a
 governar dinheiro, e um número que ninguém mediu não deve governar dinheiro.
+
+**Representação de valores monetários:** nenhum valor monetário, de quantidade ou de
+preço MAY ser representado em ponto flutuante — `f32`, `f64` ou equivalente — em
+qualquer caminho que alcance cálculo de saldo, posição, P&L, limite de risco ou ordem.
+A representação MUST ser decimal exata.
+
+**Racional:** erro de arredondamento em ponto flutuante não aparece como exceção,
+aparece como divergência silenciosa entre o que o sistema acredita ter e o que de fato
+tem. Os Princípios II e IV dependem de o número estar certo: um limite calculado sobre
+valor errado não é limite, e um registro reconstituível sobre valor errado não
+reconstitui nada. O invariante já era cobrado por `tests/no_float.rs`; a emenda 1.3.0 o
+eleva de prática de repositório a regra de governança.
 
 **Segredos:** nenhum segredo no repositório. `.gitignore` MUST cobrir arquivos de
 credencial antes de qualquer código de integração ser escrito.
@@ -217,4 +240,12 @@ emenda formal desta constitution.
 **Orientação de runtime.** Enquanto o projeto não tiver um `CLAUDE.md`, este
 documento é a única fonte de orientação de desenvolvimento em tempo de execução.
 
-**Version**: 1.2.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+**Version**: 1.3.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+
+**Emenda 1.3.0** — incorpora ao corpo normativo duas restrições que vigoravam apenas no
+`CLAUDE.md`: mercado à vista apenas comprado sem alavancagem, e proibição de ponto
+flutuante em caminho monetário. Proposta e racional em `MD BOT/34_ADR_EMENDAS.md`,
+ADR-005. **Impacto sobre specs e código existentes: nenhum.** As duas restrições já
+eram observadas — a feature 001 opera apenas em spot comprado e usa `rust_decimal` em
+todo caminho monetário, com `tests/no_float.rs` cobrando o invariante. A emenda muda o
+ato necessário para alterá-las, não o comportamento do sistema.

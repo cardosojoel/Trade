@@ -53,30 +53,36 @@ Quatro pontos onde a SDD assume um sistema que o projeto não autoriza. **Nenhum
 foi decidido**, e cada um tem ADR aberta em
 [`34_ADR_EMENDAS.md`](34_ADR_EMENDAS.md).
 
-Verificação de 2026-09-20: os quatro **não** contrariam a mesma autoridade, e
-tratá-los como se contrariassem enfraquece as duas. A coluna do meio nomeia
-quem realmente determina o contrário.
+Desde a emenda **1.3.0**, aceita em 2026-09-20 pela ADR-005, os quatro
+contrariam a constitution. Até aquele dia, dois contrariavam apenas uma diretriz
+de trabalho — a coluna da direita preserva esse histórico, porque foi ele que
+motivou a emenda.
 
-| # | A SDD pressupõe | A regra contrária vive em | ADR |
-|---|---|---|---|
-| 1 | derivativos — `leverage_min/max`, funding, `reduce-only` | `CLAUDE.md` linhas 91–92 — **não está na constitution** | ADR-001 |
-| 2 | Recovery depois de atingido o limite de perda diária | **constitution**, Princípio II, linha 44 | ADR-002 |
-| 3 | sessão com depósito e confirmação humana para retomar | **constitution**, Princípio II, linha 45 | ADR-003 |
-| 4 | `f64` para `tick_size`, `qty_step`, `min_notional` e EV | `CLAUDE.md` e `tests/no_float.rs` — **não está na constitution** | ADR-004 |
+| # | A SDD pressupõe | Contraria hoje | ADR | Contrariava antes de 1.3.0 |
+|---|---|---|---|---|
+| 1 | derivativos — `leverage_min/max`, funding, `reduce-only` | constitution → **Mercado** | ADR-001 | `CLAUDE.md` |
+| 2 | Recovery depois de atingido o limite de perda diária | constitution, Princípio II, linha 44 | ADR-002 | o mesmo |
+| 3 | sessão com depósito e confirmação humana para retomar | constitution, Princípio II, linha 45 | ADR-003 | o mesmo |
+| 4 | `f64` para `tick_size`, `qty_step`, `min_notional` e EV | constitution → **Representação de valores** | ADR-004 | `CLAUDE.md` e `tests/no_float.rs` |
 
 **REQ-SCOPE-004** Nenhum destes quatro MAY ser implementado antes de a ADR
 correspondente ser aceita. Implementar primeiro e regularizar depois é a ordem
 inversa da que o projeto adotou.
 
 **REQ-SCOPE-005** Uma proposta MUST nomear o documento que contraria. "Conflita
-com a constitution" MUST NOT ser usado como fórmula genérica — duas das quatro
-divergências acima contrariam uma diretriz de trabalho, cujo ato de mudança é
-muito mais leve que uma emenda.
+com a constitution" MUST NOT ser usado como fórmula genérica, ainda que hoje ela
+seja verdadeira para as quatro: foi a verificação documento a documento que
+revelou a lacuna fechada pela emenda 1.3.0.
 
-A ADR-005 trata da lacuna que essa verificação expôs: **as duas restrições que
-limitam a perda máxima possível — mercado à vista sem alavancagem e ausência de
-ponto flutuante em caminho monetário — não estão na constitution**, e a
-primeira não tem nenhuma proteção executável.
+A ADR-005 tratou dessa lacuna e **foi aceita em 2026-09-20**. As duas restrições
+que limitam a perda máxima possível — mercado à vista sem alavancagem e ausência
+de ponto flutuante em caminho monetário — passaram a viver na constitution, onde
+alterá-las exige emenda escrita e aprovada.
+
+Segue em aberto o ponto que a ADR-005 levantou e não resolveu: **a restrição de
+mercado à vista não tem proteção executável.** O `tests/no_float.rs` barra o
+ponto flutuante no CI; nenhum teste equivalente impede que alavancagem entre no
+código. Hoje a regra é forte no papel e ausente no build.
 
 O ponto 2 merece nota: o Recovery é disciplinado — orçamento consumível, risco
 decrescente, regra anti-Martingale explícita. A objeção não é à qualidade do
