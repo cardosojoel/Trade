@@ -59,6 +59,17 @@ fechada. `record_realized` passou a receber o não realizado no mesmo argumento
 — uma venda move as duas parcelas ao mesmo tempo, e atualizar só uma contaria
 o mesmo prejuízo duas vezes.
 
+**Medido depois: o freio não dispara neste cenário.** Eu previ que o número de
+operações cairia. Não caiu — os doze meses deram resultado idêntico ao da regra
+antiga, com **zero** decisões de freio armado em 28.633 e pior dia em −143,80
+contra um limite de −200.
+
+A `sma-cross` não perde em quedas diárias violentas: ela sangra custo de
+transação, cerca de −27 por dia. E o teto de posição (1.000) limita o prejuízo
+aberto a uma queda de 20% do preço no mesmo dia. **Um limite de perda diária de
+2% simplesmente não é a cerca que contém esta estratégia** — insumo direto para
+a calibração que a constitution exige antes da Porta 3.
+
 ---
 
 ## Decisões que definem o projeto
@@ -86,21 +97,19 @@ trade backtest --mode backtest --from 2025-09-20 --to 2026-09-20 --capital 10000
 trade kill                  # aciona o freio; --release libera
 ```
 
-Medido sobre **dados reais** de doze meses (ver [docs/desempenho.md](docs/desempenho.md)).
-
-> ⚠️ **Estas medições são anteriores à mudança da perda diária.** Coleta,
-> velocidade, determinismo e integridade da auditoria não são afetados — mas
-> as 14.308 operações da estratégia de referência foram produzidas sob a regra
-> antiga, e com o freio enxergando prejuízo aberto o número cai. Refazer exige
-> recoletar: `/data` não está versionado e o banco local não existe mais.
+Medido sobre **dados reais** de doze meses, recoletados e remedidos **depois**
+da mudança da perda diária (ver [docs/desempenho.md](docs/desempenho.md)):
 
 | | |
 |---|---|
-| Coleta | 525.600 velas, 526 páginas, 4m48, pico de 12 MB |
-| Backtest | 525.600 velas em **1,03s** (a meta era 60s), 15 MB |
+| Coleta | 525.600 velas, 526 páginas, 4m46, pico de 11,4 MB |
+| Backtest | 525.600 velas em **2,46s** (a meta era 60s), 14,6 MB |
 | Conta | resultado reportado × soma do extrato: **divergência zero** em 14.308 operações |
 | Auditoria | 143.135 eventos, `seq` sem buraco; 28.633 ordens e 28.633 decisões |
 | Determinismo | duas execuções idênticas dígito a dígito |
+
+O backtest anterior marcava 1,03s. A diferença é a máquina, não a marcação a
+mercado: o binário antigo, sem marcação, roda em 2,44s aqui.
 
 ---
 
@@ -147,11 +156,15 @@ medidos. Vivem em `limits.toml`, nunca no código.
 
 A constitution **exige** revisão contra o capital real antes da Porta 3.
 
+A medição de 2026-09-20 deu a primeira evidência concreta para essa revisão: o
+limite de perda diária **nunca é alcançado** pela estratégia de referência, nem
+contando prejuízo aberto. Um limiar que não dispara em doze meses ou está
+folgado demais, ou está medindo a grandeza errada para este perfil de perda.
+
 ### 🟡 A estratégia de referência perde dinheiro, e isso é informação
 
 Sobre doze meses reais: **−98,7%**, com 9.664 de custo de transação sobre 10.000
-de capital, em 14.308 operações — números da regra antiga de perda diária, ver o
-aviso acima.
+de capital, em 14.308 operações.
 
 Não é defeito do motor — é o motor funcionando. Uma estratégia que opera 14 mil
 vezes por ano em velas de um minuto não sobrevive ao próprio custo. Antes de

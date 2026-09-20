@@ -138,3 +138,12 @@ cargo test --workspace --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo fmt --all --check
 ```
+
+O binário `trade` vive em `crates/trade-cli`. A raiz também é um pacote — só
+para hospedar os testes de arquitetura — e por isso **`cargo build --release`
+na raiz não recompila o binário**: compila a lib da raiz, diz `Finished` e
+deixa um `target/release/trade` velho no lugar. Para medir ou executar, use:
+
+```
+cargo build --release --workspace
+```
