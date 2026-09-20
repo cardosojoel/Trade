@@ -45,6 +45,9 @@ sobrevive à regeneração das tabelas abaixo.
 | Derivação do perfil | `trade-domain/src/perfil.rs` — `Perfil::derivar` | `perfil::tests::a_tabela_do_registry_e_reproduzida` | **TESTED** |
 | `REQ-EXEC-010` | `trade-paper/src/ordem.rs` — `corpo_de_criacao` | `ordem::tests::a_compra_leva_stop_a_mercado_no_gatilho` | **TESTED** |
 | `REQ-EXEC-003` | `trade-paper/src/erros.rs` — `de_transporte` | `erros::tests::resultado_desconhecido_e_integridade_e_nao_transitorio` | **TESTED** |
+| `REQ-EXEC-011` | `trade-paper/src/executor.rs` — `enviar` | `executor::tests::sem_preco_de_referencia_a_entrada_nao_sai` | **TESTED** |
+| `REQ-EXEC-004` | `trade-paper/src/ordem.rs` — `order_link_id` | `ordem::tests::ordens_diferentes_tem_identificadores_diferentes` | **TESTED** |
+| `REQ-RECON-005` | `trade-paper/src/reconcile.rs` — `Veredito` | `reconcile::tests::desconhecido_bloqueia_como_divergencia_mas_nao_exige_revisao` | **TESTED** |
 
 A derivação usa a tabela do `27_CONFIGURATION_REGISTRY.md` como oráculo de
 teste: se código e documento divergirem, o teste quebra. É o que impede a folha

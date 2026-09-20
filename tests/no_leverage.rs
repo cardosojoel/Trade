@@ -158,7 +158,11 @@ fn o_adaptador_so_negocia_na_categoria_spot() {
             // Toda linha que nomeia `category` tem de fixá-la em spot. A API da
             // Bybit assume `linear` quando o parâmetro é omitido, então o valor
             // certo por omissão é o errado para este projeto.
-            if codigo.contains("category") && !codigo.contains("\"spot\"") {
+            // `spot` sem exigir aspas próprias: a categoria aparece tanto
+            // como `"category":"spot"` quanto como `category=spot` numa query.
+            // Exigir a forma com aspas recusava a segunda, que é igualmente
+            // explícita.
+            if codigo.contains("category") && !codigo.contains("spot") {
                 violacoes.push(format!(
                     "{}:{} — `category` sem \"spot\" na mesma linha",
                     f.display(),

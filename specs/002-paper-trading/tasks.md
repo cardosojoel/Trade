@@ -27,20 +27,20 @@ Verificável sem rede e sem credencial.
 
 ## Fatia 3 — o adaptador
 
-- [ ] T013 **(TF)** `OrderExecutor` para paper, contra duplo HTTP
+- [X] T013 **(TF)** `OrderExecutor` para paper, contra duplo HTTP
 - [X] T014 **(TF)** Identificador de cliente único por ordem (FR-106)
 - [X] T015 **(TF)** Ordem de entrada carrega stop a mercado no gatilho (FR-113, REQ-EXEC-010)
-- [ ] T016 **(TF)** Stop recusado impede a posição; se já aberta, encerra (REQ-EXEC-011)
-- [ ] T017 **(TF)** Resultado desconhecido não é reenviado antes de reconciliar (FR-107)
-- [ ] T018 **(TF)** Preenchimento registra referência, obtido, taxa e moeda da taxa (FR-109)
-- [ ] T019 **(TF)** Preenchimento parcial abaixo da ordem mínima deixa resíduo, como no backtest
+- [X] T016 **(TF)** Stop recusado impede a posição; se já aberta, encerra (REQ-EXEC-011)
+- [X] T017 **(TF)** Resultado desconhecido não é reenviado antes de reconciliar (FR-107)
+- [X] T018 **(TF)** Preenchimento registra referência, obtido, taxa e moeda da taxa (FR-109)
+- [X] T019 **(TF)** Preenchimento parcial abaixo da ordem mínima deixa resíduo, como no backtest
 - [X] T020 Tradução de erro da Bybit para `ExecError`, com transitório e integridade separados
 
 ## Fatia 4 — reconciliação
 
-- [ ] T021 **(TF)** Comparação de posição local × reportada, com veredito
-- [ ] T022 **(TF)** Divergência classifica como falha de integridade e exige revisão humana
-- [ ] T023 **(TF)** `DESCONHECIDO` bloqueia nova entrada até resolver (FR-108)
+- [X] T021 **(TF)** Comparação de posição local × reportada, com veredito
+- [X] T022 **(TF)** Divergência classifica como falha de integridade e exige revisão humana
+- [X] T023 **(TF)** `DESCONHECIDO` bloqueia nova entrada até resolver (FR-108)
 - [ ] T024 **(TF)** Estado recuperado do `runs.db` no início da sessão (FR-112)
 - [ ] T025 **(TF)** Contadores de risco — perda diária, ordens na janela — sobrevivem ao reinício
 
@@ -69,12 +69,14 @@ Verificável sem rede e sem credencial.
 
 ---
 
-**Situação em 2026-09-20**: 17 de 31 tarefas das fatias 1 a 5 concluídas.
+**Situação em 2026-09-20**: 25 de 31 tarefas das fatias 1 a 5 concluídas.
 Feito: modo `paper`, credenciais redigidas, assinatura conferida contra a
 documentação, verificação de permissão da chave, montagem de ordem com stop a
 mercado no gatilho, identificador de cliente, tradução de erro, cliente HTTP
-autenticado e o comando `trade paper verificar`. Falta o executor ligando as
-peças, a reconciliação e o laço contínuo.
+autenticado, o comando `trade paper verificar`, o executor ligando as peças e a
+reconciliação com tolerância. Falta a recuperação de estado do `runs.db` e o
+laço contínuo — as duas dependem de decisões de persistência, não de
+credencial.
 
 **Fatias 1 a 5**: 31 tarefas, nenhuma precisa de credencial.
 **Fatias 6 e 7**: 8 tarefas, todas dependem do mantenedor criar a chave de

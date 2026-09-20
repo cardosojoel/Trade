@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**270 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**290 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
 
 ---
 
@@ -95,8 +95,8 @@ não chega a precisar de ADR.
 
 ## Em andamento: feature 002, paper trading
 
-Spec, plano e tarefas escritos. **15 das 31 tarefas que não precisam de
-credencial estão concluídas**, em quatro commits.
+Spec, plano e tarefas escritos. **25 das 31 tarefas que não precisam de
+credencial estão concluídas.**
 
 O que existe: modo `paper` no domínio e recusado no comando `backtest`;
 credenciais lidas do ambiente com o segredo redigido em `Debug` e `Display`;
