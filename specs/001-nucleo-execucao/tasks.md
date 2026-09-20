@@ -240,14 +240,14 @@ provedores de mercado distintos.
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T094 [P] [US5] Teste em `crates/trade-backtest/tests/provider_swap.rs`: a mesma instância de `sma-cross`, sem alteração, completa o ciclo contra `SqliteMarketDataSource` e contra `VecMarketDataSource` (SC-006)
-- [ ] T095 [P] [US5] Teste em `crates/trade-backtest/tests/uniform_failure.rs`: falha de provedor chega à estratégia como o mesmo `ExecError`, independentemente de qual provedor falhou (FR-010)
-- [ ] T096 [P] [US5] Teste em `crates/trade-strategy/tests/no_exchange_reference.rs`: o código de `trade-strategy` e `trade-risk` não contém nenhuma referência textual a corretora específica
+- [X] T094 [P] [US5] Teste em `crates/trade-backtest/tests/provider_swap.rs`: a mesma instância de `sma-cross`, sem alteração, completa o ciclo contra `SqliteMarketDataSource` e contra `VecMarketDataSource` (SC-006)
+- [X] T095 [P] [US5] Teste em `crates/trade-backtest/tests/uniform_failure.rs`: falha de provedor chega à estratégia como o mesmo `ExecError`, independentemente de qual provedor falhou (FR-010)
+- [X] T096 [P] [US5] Teste em `crates/trade-strategy/tests/no_exchange_reference.rs`: o código de `trade-strategy` e `trade-risk` não contém nenhuma referência textual a corretora específica
 
 ### Implementation for User Story 5
 
-- [ ] T097 [US5] Implementar a seleção de provedor no ponto de composição em `crates/trade-cli/src/wiring.rs` — o único lugar do sistema que conhece as duas pontas
-- [ ] T098 [US5] Estender `tests/architecture.rs` para rodar no CI como portão de merge, falhando o build se o grafo de crates for violado
+- [X] T097 [US5] Implementar a seleção de provedor no ponto de composição em `crates/trade-cli/src/wiring.rs` — o único lugar do sistema que conhece as duas pontas
+- [X] T098 [US5] Estender `tests/architecture.rs` para rodar no CI como portão de merge, falhando o build se o grafo de crates for violado
 
 **Checkpoint**: todas as histórias funcionam de forma independente.
 

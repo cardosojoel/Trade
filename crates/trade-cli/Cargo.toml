@@ -30,6 +30,7 @@ name = "trade"
 path = "src/main.rs"
 
 [dev-dependencies]
+trade-ports = { workspace = true, features = ["testing"] }
 assert_cmd.workspace = true
 predicates.workspace = true
 tempfile.workspace = true

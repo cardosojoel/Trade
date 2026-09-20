@@ -95,3 +95,54 @@ fn o_ponto_de_composicao_e_unico() {
         );
     }
 }
+
+/// Nomes de corretora que não podem aparecer no código de estratégia e risco.
+const CORRETORAS: &[&str] = &["bybit", "binance", "coinbase", "kraken", "okx"];
+
+#[test]
+fn estrategia_e_risco_nao_mencionam_corretora_alguma() {
+    // A dependência já é barrada pelo grafo. Este teste pega o passo anterior:
+    // uma constante com URL, um comentário que assume o comportamento de uma
+    // corretora específica, um campo batizado com o nome dela. Nada disso
+    // quebra o build, e tudo isso é conhecimento vazando para onde não devia.
+    let mut violacoes = Vec::new();
+
+    for c in ["trade-strategy", "trade-risk"] {
+        let mut arquivos = Vec::new();
+        rs_files(Path::new(&format!("crates/{c}/src")), &mut arquivos);
+        arquivos.sort();
+
+        for f in arquivos {
+            let src = fs::read_to_string(&f).unwrap_or_default().to_lowercase();
+            for nome in CORRETORAS {
+                if src.contains(nome) {
+                    violacoes.push(format!("{} menciona '{nome}'", f.display()));
+                }
+            }
+        }
+    }
+
+    assert!(
+        violacoes.is_empty(),
+        "Conhecimento de corretora vazou para estratégia ou risco:\n  {}\n\n\
+         Estratégia e risco operam sobre as traits de `trade-ports`. Quem \
+         conhece a corretora é o adaptador, e só ele.",
+        violacoes.join("\n  ")
+    );
+}
+
+use std::path::Path;
+
+fn rs_files(dir: &Path, out: &mut Vec<std::path::PathBuf>) {
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            rs_files(&path, out);
+        } else if path.extension().is_some_and(|e| e == "rs") {
+            out.push(path);
+        }
+    }
+}
