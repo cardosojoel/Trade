@@ -29,26 +29,44 @@ desenvolvimento de alcançar o dinheiro.
 ### II. Limites de Risco Invioláveis (NÃO-NEGOCIÁVEL)
 
 O robô opera de forma autônoma, sem aprovação humana por ordem. Essa autonomia só é
-admissível sob limites que a estratégia não possa contornar.
+admissível sob limites que a estratégia não possa contornar. Dentro dos limites, a
+autonomia não é apenas permitida — é a operação esperada: enquanto todos os valores
+estiverem dentro da regra, o sistema MUST seguir operando sem intervenção humana.
 
+- O sistema MUST NOT exigir aprovação humana por ordem enquanto os limites estiverem
+  respeitados. Interrupção é exceção, não regime de funcionamento.
 - Os limites MUST residir em uma camada de risco independente, posicionada entre a
   estratégia e o executor de ordens. Toda ordem MUST atravessá-la; não pode existir
   caminho de código que alcance a corretora sem passar por essa camada.
 - A camada de risco MUST impor, no mínimo: perda máxima diária, tamanho máximo de
   posição, exposição máxima total e número máximo de ordens por intervalo.
 - Atingido o limite de perda diária, o sistema MUST cessar a abertura de novas
-  posições até o próximo período, sem exceção configurável em tempo de execução.
+  posições até o próximo período, sem exceção configurável em tempo de execução, e
+  MUST retomar a operação automaticamente na virada do período.
+- Ordem recusada por limite de tamanho, exposição ou frequência MUST NOT interromper
+  a operação: recusa-se a ordem e o ciclo segue.
 - Um kill switch manual MUST existir, ser acionável sem acesso ao código e ter efeito
-  sobre um processo já em operação.
+  sobre um processo já em operação. Uma vez acionado, a retomada MUST ser um ato
+  humano explícito.
 - O sistema MUST parar automaticamente diante de anomalia — perda de conexão com a
   corretora além do limiar, divergência entre posição local e posição reportada pela
   corretora, preço fora de faixa plausível, ou falha repetida de ordem.
+- A anomalia MUST ser classificada como transitória ou de integridade. Falha
+  transitória MUST ser retentada automaticamente dentro de um número limitado de
+  tentativas, sem intervenção humana. Falha de integridade — divergência de posição,
+  preço implausível, ou esgotamento das tentativas — MUST exigir revisão humana antes
+  da retomada.
+- Toda parada e toda retomada MUST ser registrada com a causa e a classificação.
 - A estratégia MUST NOT ter capacidade de desabilitar, elevar ou contornar qualquer
   um desses limites.
 
 **Racional:** um robô autônomo sem freio transforma qualquer bug, flash crash ou
 falha de API em perda ilimitada. O limite precisa viver fora da lógica que ele
-restringe, senão não é limite.
+restringe, senão não é limite. Na direção oposta, um robô que pede permissão a cada
+passo não é um robô de day trade — a janela fecha antes da resposta. Por isso a
+distinção entre falha transitória e falha de integridade: parar por uma queda de rede
+de três segundos custa oportunidade sem comprar segurança; seguir operando com a
+posição divergindo da corretora custa dinheiro.
 
 ### III. Test-First na Lógica Crítica (NÃO-NEGOCIÁVEL)
 
@@ -191,4 +209,4 @@ emenda formal desta constitution.
 **Orientação de runtime.** Enquanto o projeto não tiver um `CLAUDE.md`, este
 documento é a única fonte de orientação de desenvolvimento em tempo de execução.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+**Version**: 1.1.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
