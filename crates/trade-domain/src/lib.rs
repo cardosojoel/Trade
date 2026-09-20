@@ -13,6 +13,7 @@ pub mod candle;
 pub mod instrumento;
 pub mod metrics;
 pub mod mode;
+pub mod perfil;
 pub mod position;
 pub mod risk_types;
 pub mod strategy;
@@ -23,6 +24,7 @@ pub use candle::{Candle, CandleError};
 pub use instrumento::{Instrumento, InstrumentoError};
 pub use metrics::RunMetrics;
 pub use mode::{ExecutionMode, ModeError};
+pub use perfil::{ParametrosDerivacao, Perfil, PerfilError};
 pub use position::{Position, PositionError};
 pub use risk_types::{
     Anomaly, FeeModel, IntegrityCause, LimitBreach, RiskDecision, RiskLimits, RiskState, Verdict,

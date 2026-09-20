@@ -1,0 +1,22 @@
+# Insumos da derivação do perfil.
+#
+# Não são escolhas de quem opera: cada um tem origem declarada, conforme
+# REQ-CFG-004. Ficam em arquivo porque a constitution exige que limiar de risco
+# seja configuração externa, nunca constante embutida no código.
+
+# CONSTITUTION — fração do capital em que a operação para para revisão.
+drawdown_de_parada = "0.15"
+
+# Desenho — quantas perdas cheias o drawdown tolera. É o que fixa o risco por
+# operação em 1%: 15% ÷ 15.
+perdas_toleradas = 15
+
+# MEASURED — stop que minimiza o acerto necessário, sobre doze meses de
+# BTCUSDT. Mais largo não melhora: sobram posições sem resolver.
+stop_otimo = "0.02"
+
+# CONSTITUTION — emenda 2.0.0. Prazo máximo de posição, em minutos.
+prazo_maximo_min = 4320
+
+# MEASURED — frequência natural com uma posição por vez: 1440 ÷ 25,2 h.
+operacoes_por_dia = "0.95"

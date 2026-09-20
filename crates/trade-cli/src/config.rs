@@ -14,7 +14,7 @@ use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
-use trade_domain::{Instrumento, Money, RiskLimits};
+use trade_domain::{Instrumento, Money, ParametrosDerivacao, RiskLimits};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
@@ -173,6 +173,34 @@ pub fn validar_perfil(
         ));
     }
     Ok(())
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ParametrosFile {
+    drawdown_de_parada: String,
+    perdas_toleradas: u32,
+    stop_otimo: String,
+    prazo_maximo_min: i64,
+    operacoes_por_dia: String,
+}
+
+/// Carrega os insumos da derivação do perfil.
+pub fn load_parametros(path: impl AsRef<Path>) -> Result<ParametrosDerivacao, ConfigError> {
+    let path = path.as_ref();
+    let raw = read(path)?;
+    let f: ParametrosFile = toml::from_str(&raw).map_err(|e| ConfigError::Parse {
+        path: path.display().to_string(),
+        cause: e.message().to_string(),
+    })?;
+
+    Ok(ParametrosDerivacao {
+        drawdown_de_parada: decimal(path, "drawdown_de_parada", &f.drawdown_de_parada)?,
+        perdas_toleradas: f.perdas_toleradas,
+        stop_otimo: decimal(path, "stop_otimo", &f.stop_otimo)?,
+        prazo_maximo_min: f.prazo_maximo_min,
+        operacoes_por_dia: decimal(path, "operacoes_por_dia", &f.operacoes_por_dia)?,
+    })
 }
 
 /// Carrega o custo de transação.

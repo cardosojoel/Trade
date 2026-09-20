@@ -33,6 +33,22 @@ pub enum Command {
     Backtest(BacktestArgs),
     /// Aciona ou libera o kill switch.
     Kill(KillArgs),
+    /// Deriva o perfil de operação a partir do depósito.
+    Perfil(PerfilArgs),
+}
+
+#[derive(clap::Args, Debug)]
+pub struct PerfilArgs {
+    /// O depósito. É a única coisa que quem opera informa.
+    #[arg(long)]
+    pub capital: trade_domain::Money,
+
+    #[arg(long, default_value = "instrumento.toml")]
+    pub instrumento: PathBuf,
+
+    /// Insumos da derivação, cada um com origem declarada.
+    #[arg(long, default_value = "parametros.toml")]
+    pub parametros: PathBuf,
 }
 
 #[derive(clap::Args, Debug)]

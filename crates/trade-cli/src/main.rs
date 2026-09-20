@@ -3,7 +3,7 @@
 use clap::Parser;
 use std::process::ExitCode;
 use trade_cli::cli::{Cli, Command};
-use trade_cli::{cmd_backtest, cmd_collect};
+use trade_cli::{cmd_backtest, cmd_collect, cmd_perfil};
 use trade_risk::KillSwitch;
 
 fn main() -> ExitCode {
@@ -35,6 +35,17 @@ fn main() -> ExitCode {
             }
             ExitCode::from(code as u8)
         }
+
+        Command::Perfil(args) => match cmd_perfil::run(args) {
+            Ok(saida) => {
+                println!("{saida}");
+                ExitCode::SUCCESS
+            }
+            Err((codigo, msg)) => {
+                eprintln!("{msg}");
+                ExitCode::from(codigo)
+            }
+        },
 
         Command::Kill(args) => {
             let ks = KillSwitch::sentinel(&args.kill_file);

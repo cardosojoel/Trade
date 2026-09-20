@@ -169,6 +169,15 @@ limite_diario      = operacoes_por_dia x risco_por_operacao
 chao_de_operacao   = min_order_amt / teto_de_posicao
 ```
 
+**Implementado em 2026-09-20** — `crates/trade-domain/src/perfil.rs` e o
+comando `trade perfil --capital X`. Os insumos vivem em `parametros.toml`, cada
+um com origem declarada; a tabela da seção seguinte é o oráculo dos testes.
+
+O comando **não grava** o `limits.toml`: imprime o conteúdo para revisão. A
+constitution exige que os limiares sejam revistos contra o capital real antes da
+liberação, e um comando que sobrescrevesse a cerca sozinho tiraria essa revisão
+do caminho. Derivar é automático; adotar é ato de quem opera.
+
 **A frequência deixou de ser escolhida e passou a ser consequência.** Com uma
 posição por vez e prazo de 72h, o que limita o giro é o tempo até a posição
 resolver — medido em 25,2h de média, 19h de mediana. Daí **0,95 operação por

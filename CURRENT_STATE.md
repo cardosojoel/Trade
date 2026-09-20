@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**227 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**232 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
 
 ---
 
