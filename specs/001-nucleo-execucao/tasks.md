@@ -212,19 +212,19 @@ dados de entrada que produziram o sinal que a originou.
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T084 [P] [US4] Teste em `crates/trade-storage/tests/audit_envelope.rs`: todo evento carrega `run_id`, `seq`, `at` em UTC e `mode`, sem exceção (FR-033)
-- [ ] T085 [P] [US4] Teste em `crates/trade-storage/tests/audit_signal_inputs.rs`: o evento `signal` carrega os `inputs` que o produziram, não apenas a intenção (FR-034)
-- [ ] T086 [P] [US4] Teste em `crates/trade-storage/tests/audit_seq.rs`: `seq` é ordem total dentro da execução, sem buraco e sem repetição, inclusive entre eventos do mesmo instante simulado
-- [ ] T087 [P] [US4] Teste em `crates/trade-storage/tests/audit_no_json_numbers.rs`: todo valor monetário é serializado como **string**, nunca como número JSON — número JSON é IEEE-754 na maioria dos leitores
-- [ ] T088 [P] [US4] Teste em `crates/trade-storage/tests/audit_no_secrets.rs`: nenhum campo de nenhum evento contém chave, segredo ou token (FR-036)
-- [ ] T089 [P] [US4] Teste em `crates/trade-risk/tests/no_auto_resume.rs`: nenhum `resume` com `automatic: true` sucede um `halt` com `requires_human: true` (SC-015)
+- [X] T084 [P] [US4] Teste em `crates/trade-storage/tests/audit_envelope.rs`: todo evento carrega `run_id`, `seq`, `at` em UTC e `mode`, sem exceção (FR-033)
+- [X] T085 [P] [US4] Teste em `crates/trade-storage/tests/audit_signal_inputs.rs`: o evento `signal` carrega os `inputs` que o produziram, não apenas a intenção (FR-034)
+- [X] T086 [P] [US4] Teste em `crates/trade-storage/tests/audit_seq.rs`: `seq` é ordem total dentro da execução, sem buraco e sem repetição, inclusive entre eventos do mesmo instante simulado
+- [X] T087 [P] [US4] Teste em `crates/trade-storage/tests/audit_no_json_numbers.rs`: todo valor monetário é serializado como **string**, nunca como número JSON — número JSON é IEEE-754 na maioria dos leitores
+- [X] T088 [P] [US4] Teste em `crates/trade-storage/tests/audit_no_secrets.rs`: nenhum campo de nenhum evento contém chave, segredo ou token (FR-036)
+- [X] T089 [P] [US4] Teste em `crates/trade-risk/tests/no_auto_resume.rs`: nenhum `resume` com `automatic: true` sucede um `halt` com `requires_human: true` (SC-015)
 
 ### Implementation for User Story 4
 
-- [ ] T090 [US4] Implementar a serialização das variantes de `AuditEvent` em `crates/trade-domain/src/audit.rs`, conforme `contracts/audit-event.md`
-- [ ] T091 [US4] Implementar `SqliteAuditSink` em `crates/trade-storage/src/audit_sink.rs`, com escrita em lote transacional e `flush` explícito
-- [ ] T092 [US4] Ligar o `SqliteAuditSink` ao motor e ao `RiskGuard` no ponto de composição em `crates/trade-cli/src/wiring.rs`
-- [ ] T093 [US4] Escrever teste de reconstituição em `crates/trade-storage/tests/reconstitute.rs`: partindo de uma operação do extrato, alcançar `fill` → `order` → `signal` → `inputs` **só por consulta SQL**, sem reexecutar nada (SC-005)
+- [X] T090 [US4] Implementar a serialização das variantes de `AuditEvent` em `crates/trade-domain/src/audit.rs`, conforme `contracts/audit-event.md`
+- [X] T091 [US4] Implementar `SqliteAuditSink` em `crates/trade-storage/src/audit_sink.rs`, com escrita em lote transacional e `flush` explícito
+- [X] T092 [US4] Ligar o `SqliteAuditSink` ao motor e ao `RiskGuard` no ponto de composição em `crates/trade-cli/src/wiring.rs`
+- [X] T093 [US4] Escrever teste de reconstituição em `crates/trade-storage/tests/reconstitute.rs`: partindo de uma operação do extrato, alcançar `fill` → `order` → `signal` → `inputs` **só por consulta SQL**, sem reexecutar nada (SC-005)
 
 **Checkpoint**: qualquer decisão do robô é explicável a partir do registro.
 

@@ -18,7 +18,7 @@ use trade_domain::{ExecutionMode, FeeModel, Strategy, Symbol};
 use trade_ports::AuditRecorder;
 use trade_risk::KillSwitch;
 use trade_storage::runs_repo::{RunHeader, RunsRepository};
-use trade_storage::{SqliteMarketDataSource, open_market, open_runs};
+use trade_storage::{SqliteAuditSink, SqliteMarketDataSource, open_market, open_runs};
 use trade_strategy::{SmaCross, SmaCrossParams};
 use ulid::Ulid;
 
@@ -116,11 +116,14 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
     })
     .map_err(|e| (ExitCode::Uso, e.to_string()))?;
 
-    // Nesta fase a auditoria vai para a memória; a persistência dela é a US4.
+    // A auditoria vai para o mesmo banco da execução. Não existe configuração
+    // que a desligue: o motor não é construível sem um destino de registro, e
+    // o Princípio IV não admite execução sem ele.
+    let audit_conn = open_runs(&args.runs_db).map_err(|e| (ExitCode::Uso, e.to_string()))?;
     let mut audit = AuditRecorder::new(
         run_id.clone(),
         ExecutionMode::Backtest,
-        trade_storage::audit_noop::NoopAuditSink,
+        SqliteAuditSink::new(audit_conn),
     );
 
     let resultado = BacktestEngine::new(config.clone())
@@ -132,7 +135,10 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
         )
         .map_err(|e| (ExitCode::HistoricoAusente, e.to_string()))?;
 
-    let _ = audit.flush();
+    audit
+        .flush()
+        .map_err(|e| (ExitCode::Uso, format!("falha ao gravar a auditoria: {e}")))?;
+    let eventos = audit.sink().gravados();
 
     if resultado.candles_seen == 0 {
         return Err((
@@ -174,9 +180,10 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
 
     let mut saida = report::render(&run_id, args.capital, &resultado);
     saida.push_str(&format!(
-        "\nRegistro: {} · run_id {}\n",
+        "\nRegistro: {} · run_id {} · {} eventos de auditoria\n",
         args.runs_db.display(),
-        run_id
+        run_id,
+        eventos
     ));
 
     Ok((code, saida))

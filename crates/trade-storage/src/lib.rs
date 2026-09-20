@@ -5,13 +5,14 @@
 //! só, "limpar o cache" e "destruir a auditoria" seriam a mesma operação — o
 //! que o Princípio IV não admite.
 
-pub mod audit_noop;
+pub mod audit_sink;
 pub mod candle_repo;
 pub mod db;
 pub mod decimal_sql;
 pub mod market_source;
 pub mod runs_repo;
 
+pub use audit_sink::SqliteAuditSink;
 pub use candle_repo::SqliteCandleRepository;
 pub use db::{open_market, open_runs};
 pub use market_source::SqliteMarketDataSource;
