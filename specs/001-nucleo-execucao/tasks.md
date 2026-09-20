@@ -102,28 +102,28 @@ plenamente testável sozinha; a US1 não é construível antes dela.
 
 ### Tests for User Story 2 ⚠️ escrever antes, garantir que falham
 
-- [ ] T030 [P] [US2] Teste de compilação com `trybuild` em `crates/trade-risk/tests/compile_fail/executor_escape.rs`: tentar obter o executor de dentro do `RiskGuard` **não compila** — FR-018 como propriedade do tipo
-- [ ] T031 [P] [US2] Teste de tamanho máximo de posição em `crates/trade-risk/tests/limits_size.rs`: valor **exatamente** igual ao limite é aceito; acima é recusado com `MaxPositionSize`; a ordem **não** é reduzida ao teto (FR-019a, FR-020)
-- [ ] T032 [P] [US2] Teste de exposição máxima total em `crates/trade-risk/tests/limits_exposure.rs`: ordem que levaria a exposição somada acima do limite é recusada com `MaxTotalExposure`
-- [ ] T033 [P] [US2] Teste de perda máxima diária em `crates/trade-risk/tests/limits_daily_loss.rs`: **atingir** o valor já bloqueia (FR-019a); nenhuma posição nova é aberta; venda que reduz exposição continua permitida (FR-022)
-- [ ] T034 [P] [US2] Teste de ordens por janela em `crates/trade-risk/tests/limits_rate.rs`: excedentes recusadas com `MaxOrdersPerWindow`
-- [ ] T035 [P] [US2] Teste de escopo spot comprado em `crates/trade-risk/tests/spot_only.rs`: venda acima do detido recusada com `SellExceedsHoldings`; compra sem saldo recusada com `InsufficientBalance` (FR-005, FR-006)
-- [ ] T036 [P] [US2] Teste de kill switch em `crates/trade-risk/tests/kill_switch.rs`: acionado, nenhuma ordem é aceita; a posição aberta **é mantida e reportada**, não liquidada (FR-023a); liberar exige chamada explícita
-- [ ] T037 [P] [US2] Teste de retomada automática em `crates/trade-risk/tests/day_boundary.rs`: bloqueio por perda diária cai em `on_day_boundary` sem nenhum ato humano (FR-022a, SC-014)
-- [ ] T038 [P] [US2] Teste de classificação de anomalia em `crates/trade-risk/tests/anomaly.rs`: falha transitória retenta até `max_transient_retries` sem interromper; esgotado, vira `Integrity` e exige ato humano; divergência de posição e preço implausível são `Integrity` desde a primeira ocorrência (FR-024a, FR-024b)
-- [ ] T039 [P] [US2] Teste em `crates/trade-risk/tests/decision_always.rs`: toda chamada a `submit` produz exatamente um `RiskDecision`, aceita ou recusada (SC-002)
+- [X] T030 [P] [US2] Teste de compilação com `trybuild` em `crates/trade-risk/tests/compile_fail/executor_escape.rs`: tentar obter o executor de dentro do `RiskGuard` **não compila** — FR-018 como propriedade do tipo
+- [X] T031 [P] [US2] Teste de tamanho máximo de posição em `crates/trade-risk/tests/limits_size.rs`: valor **exatamente** igual ao limite é aceito; acima é recusado com `MaxPositionSize`; a ordem **não** é reduzida ao teto (FR-019a, FR-020)
+- [X] T032 [P] [US2] Teste de exposição máxima total em `crates/trade-risk/tests/limits_exposure.rs`: ordem que levaria a exposição somada acima do limite é recusada com `MaxTotalExposure`
+- [X] T033 [P] [US2] Teste de perda máxima diária em `crates/trade-risk/tests/limits_daily_loss.rs`: **atingir** o valor já bloqueia (FR-019a); nenhuma posição nova é aberta; venda que reduz exposição continua permitida (FR-022)
+- [X] T034 [P] [US2] Teste de ordens por janela em `crates/trade-risk/tests/limits_rate.rs`: excedentes recusadas com `MaxOrdersPerWindow`
+- [X] T035 [P] [US2] Teste de escopo spot comprado em `crates/trade-risk/tests/spot_only.rs`: venda acima do detido recusada com `SellExceedsHoldings`; compra sem saldo recusada com `InsufficientBalance` (FR-005, FR-006)
+- [X] T036 [P] [US2] Teste de kill switch em `crates/trade-risk/tests/kill_switch.rs`: acionado, nenhuma ordem é aceita; a posição aberta **é mantida e reportada**, não liquidada (FR-023a); liberar exige chamada explícita
+- [X] T037 [P] [US2] Teste de retomada automática em `crates/trade-risk/tests/day_boundary.rs`: bloqueio por perda diária cai em `on_day_boundary` sem nenhum ato humano (FR-022a, SC-014)
+- [X] T038 [P] [US2] Teste de classificação de anomalia em `crates/trade-risk/tests/anomaly.rs`: falha transitória retenta até `max_transient_retries` sem interromper; esgotado, vira `Integrity` e exige ato humano; divergência de posição e preço implausível são `Integrity` desde a primeira ocorrência (FR-024a, FR-024b)
+- [X] T039 [P] [US2] Teste em `crates/trade-risk/tests/decision_always.rs`: toda chamada a `submit` produz exatamente um `RiskDecision`, aceita ou recusada (SC-002)
 
 ### Implementation for User Story 2
 
-- [ ] T040 [US2] Implementar `RiskState` (perda do dia, exposição, contagem de ordens na janela) em `crates/trade-risk/src/state.rs`
-- [ ] T041 [US2] Implementar `RiskGuard` em `crates/trade-risk/src/guard.rs` com `inner: E` **privado e movido**, `limits` **sem setter público**, e `submit` devolvendo `(RiskDecision, Option<Fill>)` sempre
-- [ ] T042 [US2] Implementar a avaliação dos limites em `crates/trade-risk/src/rules.rs`, com a fronteira de FR-019a explícita em cada regra
-- [ ] T043 [US2] Implementar `KillSwitch` em `crates/trade-risk/src/kill_switch.rs` por arquivo sentinela cujo caminho é configurável, verificado a cada `submit` — acionável sem acesso ao código e com efeito sobre processo em operação (FR-023)
-- [ ] T044 [US2] Implementar `on_day_boundary` em `crates/trade-risk/src/guard.rs`, zerando a perda do dia na virada em UTC
-- [ ] T045 [US2] Implementar `classify` e a política de retentativa em `crates/trade-risk/src/anomaly.rs`
-- [ ] T046 [US2] Emitir os eventos `risk_decision`, `halt`, `resume` e `anomaly` pelo `AuditSink` em `crates/trade-risk/src/guard.rs`, com causa, classificação e número de tentativas (FR-024c)
-- [ ] T047 [US2] Implementar a estratégia de teste `reckless` em `crates/trade-strategy/src/reckless.rs`, sob a feature `testing` — tenta posição acima do teto, insiste após estourar a perda diária e tenta alterar os limites
-- [ ] T048 [US2] Escrever teste de integração em `crates/trade-risk/tests/reckless_contained.rs`: a estratégia imprudente não ultrapassa **nenhum** dos limites em nenhuma tentativa (SC-003)
+- [X] T040 [US2] Implementar `RiskState` (perda do dia, exposição, contagem de ordens na janela) em `crates/trade-risk/src/state.rs`
+- [X] T041 [US2] Implementar `RiskGuard` em `crates/trade-risk/src/guard.rs` com `inner: E` **privado e movido**, `limits` **sem setter público**, e `submit` devolvendo `(RiskDecision, Option<Fill>)` sempre
+- [X] T042 [US2] Implementar a avaliação dos limites em `crates/trade-risk/src/rules.rs`, com a fronteira de FR-019a explícita em cada regra
+- [X] T043 [US2] Implementar `KillSwitch` em `crates/trade-risk/src/kill_switch.rs` por arquivo sentinela cujo caminho é configurável, verificado a cada `submit` — acionável sem acesso ao código e com efeito sobre processo em operação (FR-023)
+- [X] T044 [US2] Implementar `on_day_boundary` em `crates/trade-risk/src/guard.rs`, zerando a perda do dia na virada em UTC
+- [X] T045 [US2] Implementar `classify` e a política de retentativa em `crates/trade-risk/src/anomaly.rs`
+- [X] T046 [US2] Emitir os eventos `risk_decision`, `halt`, `resume` e `anomaly` pelo `AuditSink` em `crates/trade-risk/src/guard.rs`, com causa, classificação e número de tentativas (FR-024c)
+- [X] T047 [US2] Implementar a estratégia de teste `reckless` em `crates/trade-strategy/src/reckless.rs`, sob a feature `testing` — tenta posição acima do teto, insiste após estourar a perda diária e tenta alterar os limites
+- [X] T048 [US2] Escrever teste de integração em `crates/trade-risk/tests/reckless_contained.rs`: a estratégia imprudente não ultrapassa **nenhum** dos limites em nenhuma tentativa (SC-003)
 
 **Checkpoint**: a camada de risco existe, é testada sozinha e nenhum caminho até um executor a contorna.
 

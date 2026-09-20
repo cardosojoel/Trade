@@ -18,6 +18,13 @@ pub struct RiskLimits {
     pub max_orders_per_window: u32,
     pub window_minutes: i64,
     pub max_transient_retries: u32,
+    /// Variação máxima plausível entre o preço de referência e o observado.
+    ///
+    /// Acima disso o dado é tratado como implausível e a operação para
+    /// (FR-024). É configuração como os demais limites: qual variação é
+    /// implausível depende da granularidade e do ativo, e fixar no código
+    /// seria decidir isso por quem opera.
+    pub max_price_deviation_ratio: Money,
 }
 
 /// Estado corrente avaliado contra a cerca.
@@ -153,6 +160,7 @@ impl Default for RiskLimits {
             max_orders_per_window: 0,
             window_minutes: 60,
             max_transient_retries: 0,
+            max_price_deviation_ratio: Decimal::ZERO,
         }
     }
 }

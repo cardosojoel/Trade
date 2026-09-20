@@ -1,0 +1,11 @@
+error[E0616]: field `inner` of struct `RiskGuard` is private
+  --> tests/compile_fail/executor_escape.rs:21:26
+   |
+21 |     let _escapou = guard.inner;
+   |                          ^^^^^ private field
+
+error[E0599]: no method named `inner` found for struct `RiskGuard<E>` in the current scope
+  --> tests/compile_fail/executor_escape.rs:24:29
+   |
+24 |     let _tambem_nao = guard.inner();
+   |                             ^^^^^ private field, not a method

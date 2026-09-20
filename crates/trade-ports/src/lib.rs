@@ -11,10 +11,12 @@
 //! nomear [`OrderExecutor`].
 
 pub mod errors;
+pub mod recorder;
 #[cfg(feature = "testing")]
 pub mod testing;
 
 pub use errors::{AuditError, ExecError, MarketError, StorageError};
+pub use recorder::{AuditRecorder, Recorder};
 
 use chrono::{DateTime, Utc};
 use trade_domain::{

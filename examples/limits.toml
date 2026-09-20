@@ -17,3 +17,8 @@ max_total_exposure    = "2000.00"
 max_orders_per_window = 10
 window_minutes        = 60
 max_transient_retries = 5
+
+# Variação acima da qual o preço observado é tratado como implausível e a
+# operação para para revisão humana. 20% entre velas de um minuto em BTC não
+# é movimento, é dado ruim.
+max_price_deviation_ratio = "0.20"

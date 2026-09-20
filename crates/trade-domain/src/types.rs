@@ -163,6 +163,12 @@ pub struct Signal {
     pub id: SignalId,
     pub at: DateTime<Utc>,
     pub intent: Intent,
+    /// Tamanho sugerido pela estratégia. `None` deixa o dimensionamento com o
+    /// motor.
+    ///
+    /// Sugerido, nunca garantido: a camada de risco julga o que chegar, e uma
+    /// sugestão absurda é recusada como qualquer outra ordem.
+    pub qty: Option<Qty>,
     pub inputs: SignalInputs,
 }
 

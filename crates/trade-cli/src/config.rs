@@ -50,6 +50,7 @@ struct LimitsFile {
     max_orders_per_window: u32,
     window_minutes: i64,
     max_transient_retries: u32,
+    max_price_deviation_ratio: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -105,6 +106,11 @@ pub fn load_limits(path: impl AsRef<Path>) -> Result<RiskLimits, ConfigError> {
         max_orders_per_window: f.max_orders_per_window,
         window_minutes: f.window_minutes,
         max_transient_retries: f.max_transient_retries,
+        max_price_deviation_ratio: decimal(
+            path,
+            "max_price_deviation_ratio",
+            &f.max_price_deviation_ratio,
+        )?,
     })
 }
 
@@ -144,6 +150,7 @@ max_total_exposure    = "2000.00"
 max_orders_per_window = 10
 window_minutes        = 60
 max_transient_retries = 5
+max_price_deviation_ratio = "0.20"
 "#;
 
     #[test]
@@ -156,6 +163,7 @@ max_transient_retries = 5
         assert_eq!(l.max_orders_per_window, 10);
         assert_eq!(l.window_minutes, 60);
         assert_eq!(l.max_transient_retries, 5);
+        assert_eq!(l.max_price_deviation_ratio, dec!(0.20));
     }
 
     #[test]

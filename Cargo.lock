@@ -1351,6 +1351,7 @@ dependencies = [
  "chrono",
  "rstest",
  "rust_decimal",
+ "tempfile",
  "trade-domain",
  "trade-ports",
  "trybuild",
