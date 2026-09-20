@@ -1,6 +1,7 @@
 # Trade Constitution
 
-Robô de day trade automatizado especializado em Bitcoin.
+Robô de negociação automatizada especializado em Bitcoin, com prazo máximo de
+posição de 72 horas.
 
 Este documento governa todas as decisões de especificação, plano, tarefas e
 implementação do projeto. Onde houver conflito entre esta constitution e qualquer
@@ -43,6 +44,27 @@ estiverem dentro da regra, o sistema MUST seguir operando sem intervenção huma
 - Atingido o limite de perda diária, o sistema MUST cessar a abertura de novas
   posições até o próximo período, sem exceção configurável em tempo de execução, e
   MUST retomar a operação automaticamente na virada do período.
+- **Recovery — a única exceção admitida ao parágrafo anterior**, introduzida pela
+  emenda 2.0.0. Atingido o limite, o sistema MAY recolocar em risco lucro
+  **realizado** na própria sessão, e somente sob todas estas condições, que MUST
+  ser cumulativas:
+  - o orçamento MUST ser criado **uma única vez** por sessão, a partir de lucro
+    realizado; lucro não realizado MUST NOT gerar orçamento;
+  - o orçamento MUST ser consumível e MUST NOT ser reposto por ganho posterior;
+  - o risco por operação em Recovery MUST decrescer conforme o orçamento é
+    consumido;
+  - aumentar risco em função de perdas consecutivas, do valor da última perda ou
+    da distância até o alvo MUST NOT ocorrer — Martingale é proibido;
+  - o número de episódios e de tentativas por episódio MUST ter teto configurado
+    antes do início da sessão;
+  - o Recovery MUST NOT elevar a perda máxima do capital depositado.
+
+  **Racional:** o freio deixa de ser absoluto, e isso é uma perda real — era a
+  única regra do sistema sem exceção configurável. A troca foi aceita porque o
+  que volta a risco é lucro que já existiu, com teto fixado antes e risco que só
+  diminui; o capital depositado continua protegido pelo limite que o Recovery
+  MUST NOT elevar. Esta exceção MUST NOT ser usada como precedente: qualquer
+  outra exceção ao Princípio II exige emenda própria.
 - Ordem recusada por limite de tamanho, exposição ou frequência MUST NOT interromper
   a operação: recusa-se a ordem e o ciclo segue.
 - Um kill switch manual MUST existir, ser acionável sem acesso ao código e ter efeito
@@ -139,6 +161,18 @@ do código, da máquina, de uma dependência — em perda total em vez de perda 
 Princípio V. Testnet da Bybit é o ambiente da porta de paper trading.
 
 **Ativo:** Bitcoin. Qualquer outro ativo está fora de escopo até emenda MINOR.
+A restrição vale para posição de qualquer natureza, inclusive a mantida apenas
+para obter desconto de taxa.
+
+**Prazo de posição:** máximo de **72 horas**. O robô MUST encerrar posição que
+atinja esse prazo, e MUST NOT abrir posição cujo horizonte previsto o exceda.
+
+**Racional:** medido sobre doze meses reais, um alvo simétrico de 2% resolve em
+94% das janelas de 72h contra 59% nas de 24h. As 41% que expiram sem resolver
+pagam custo sem produzir resultado, e é isso que o prazo maior elimina — a
+vantagem exigida da estratégia cai de 12,9 para 8,2 pontos percentuais sobre a
+entrada aleatória, e o custo mensal cai de 7,2% para 3,5% do capital. O preço é
+o tempo até a evidência: as 100 operações da Porta 1 passam de 50 para 105 dias.
 
 **Mercado:** exclusivamente à vista (*spot*), **apenas comprado**. O sistema MUST NOT
 operar com alavancagem, MUST NOT vender a descoberto e MUST NOT emitir ordem cujo valor
@@ -240,7 +274,24 @@ emenda formal desta constitution.
 **Orientação de runtime.** Enquanto o projeto não tiver um `CLAUDE.md`, este
 documento é a única fonte de orientação de desenvolvimento em tempo de execução.
 
-**Version**: 1.3.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+**Version**: 2.0.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+
+**Emenda 2.0.0** — MAJOR, por redefinir um princípio marcado NÃO-NEGOCIÁVEL.
+Duas mudanças, propostas em `MD BOT/34_ADR_EMENDAS.md` e aceitas pelo mantenedor
+em 2026-09-20:
+
+1. **Recovery** (ADR-002) — o Princípio II passa a admitir uma exceção ao freio
+   diário, sob seis condições cumulativas. É o primeiro caso de exceção a um
+   não-negociável neste projeto, e por isso a versão é MAJOR e não MINOR: quem
+   ler "o freio não tem exceção" em qualquer artefato anterior a esta emenda
+   está lendo o que já não vale.
+2. **Prazo de posição de 72 horas** — o domínio deixa de ser day trade.
+
+**Impacto sobre specs e código existentes:** a feature 001 não implementa
+Recovery e não mantém posição entre períodos, então nada do que existe deixa de
+estar conforme. O que muda é o que pode ser construído daqui em diante. A
+`specs/001-nucleo-execucao/` MUST ser relida antes de qualquer feature nova que
+toque risco, porque o texto dela pressupõe o freio sem exceção.
 
 **Emenda 1.3.0** — incorpora ao corpo normativo duas restrições que vigoravam apenas no
 `CLAUDE.md`: mercado à vista apenas comprado sem alavancagem, e proibição de ponto

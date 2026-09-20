@@ -2,7 +2,7 @@
 
 **Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-BYBIT-*`  
-**Conformidade:** exige emenda (ADR-001)  
+**Conformidade:** conforme — ADR-001 recusada; os campos de alavancagem não geram tarefa  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---

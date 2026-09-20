@@ -2,7 +2,7 @@
 
 **Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`trading_risk_recovery_mathematical_spec.md`](trading_risk_recovery_mathematical_spec.md)  
-**Conformidade:** exige emenda (ADR-002, ADR-003) — herdada da fonte  
+**Conformidade:** conforme — herdada da fonte  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 Sessão, orçamento de risco e episódios de recuperação.

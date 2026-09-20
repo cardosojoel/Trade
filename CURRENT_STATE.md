@@ -93,6 +93,47 @@ da corretora e da aritmética, medidos do mercado e do capital, de autoridade, d
 promoção, e os limites da própria medição. Um desenho que não passa nessa folha
 não chega a precisar de ADR.
 
+## Decidido em 2026-09-20: a constitution passou a 2.0.0
+
+**Nove decisões, e nenhuma divergência permanece aberta.** As cinco ADRs foram
+decididas e duas delas viraram emenda MAJOR — a primeira exceção a um princípio
+não-negociável neste projeto.
+
+| Decisão | Resultado |
+|---|---|
+| Recovery depois do freio (ADR-002) | **aceito**, sob seis condições cumulativas no Princípio II |
+| Prazo máximo de posição (ADR-006) | **72 horas** — o domínio deixa de ser day trade |
+| Derivativos e alavancagem (ADR-001) | **recusados** — a perda segue limitada ao depósito |
+| Sessão com confirmação humana (ADR-003) | **recusada**; confirmação só quando os parâmetros derivados mudam |
+| `f64` nos contratos (ADR-004) | **corrigido** para `Decimal` — era erro de redação |
+| Desconto de taxa via MNT | **recusado** — exigiria manter um segundo ativo |
+| Depósito na Bybit | **nenhum ainda**; a conta serve para testnet e para conferir a taxa |
+| `MD BOT/` | **fica** no repositório |
+| Próximo trabalho | **implementar as regras já decididas** |
+
+**O prazo de 72h foi a decisão com maior efeito medido:**
+
+| | 24h | 72h |
+|---|---:|---:|
+| Posições que resolvem | 59% | **94%** |
+| Acerto necessário | 59,4% | **56,6%** |
+| Lacuna sobre o acaso | 12,9 pt | **8,2 pt** |
+| Custo mensal do capital | 7,2% | **3,5%** |
+| Resultado sem vantagem, 30 dias | −8,5% | **−4,2%** |
+| Contas paradas por drawdown | 16% | **1%** |
+| Tempo até as 100 operações da Porta 1 | 50 dias | 105 dias |
+
+A frequência deixou de ser escolhida: com uma posição por vez e resolução média
+de 25,2h, saem **0,95 operação por dia**. O custo caiu porque o giro caiu, não
+porque a taxa mudou.
+
+**A taxa foi confirmada, e era a última premissa grande.** Lida na conta em
+2026-09-20: spot 0,1% por perna, maker e taker. O valor presumido estava certo,
+e o parâmetro passa de `ASSUMED` a `EXCHANGE`. Sobra o slippage de 0,05%, que
+só a Porta 2 mede.
+
+---
+
 ## Separação concluída em 2026-09-20: nasceu o DsTrade
 
 O desenho **da interface** saiu para `/home/c/Projetos/DsTrade`, repositório

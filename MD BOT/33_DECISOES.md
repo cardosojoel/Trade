@@ -66,6 +66,9 @@ anterior.
 | D-27 | `SDD` designa só o System Design Document; o fluxo do Trade chama-se `Spec Kit` | a mesma sigla servia a duas coisas em repositórios que vão se separar | `00_GLOSSARIO.md` §7.1 |
 | D-28 | Divergência passa a nomear o documento contrariado, nunca "a constitution" genericamente | duas das quatro divergências contrariam o `CLAUDE.md`, não a constitution — e o ato que as resolve é outro | `REQ-FRONTEIRA-006`, `REQ-SCOPE-005` |
 | D-29 | **ADR-005 aceita**: mercado à vista sem alavancagem e proibição de ponto flutuante em caminho monetário sobem para a constitution (emenda 1.3.0) | eram as duas regras que limitam a perda máxima possível, e viviam num arquivo que qualquer sessão reescrevia sem racional nem aprovação | `34_ADR_EMENDAS.md` ADR-005 |
+| D-31 | **ADR-001 recusada, ADR-002 aceita, ADR-003 recusada com encaminhamento, ADR-004 encerrada por correção, ADR-006 aceita** | as cinco decisões pendentes foram tomadas pelo mantenedor em 2026-09-20; nenhuma divergência permanece aberta | `34_ADR_EMENDAS.md` |
+| D-32 | Prazo máximo de posição passa a 72h, e o domínio deixa de ser day trade | 94% das janelas resolvem contra 59% em 24h: o acerto exigido cai de 59,4% para 56,6%, o custo mensal de 7,2% para 3,5%, e o risco de parada por drawdown de 16% para 1% | constitution 2.0.0, ADR-006 |
+| D-33 | O desconto de 25% na taxa via MNT é recusado | exigiria manter um segundo ativo em conta, e "Ativo: Bitcoin" vale para posição de qualquer natureza — a economia de 0,05% por operação não paga carregar a volatilidade de outro token | constitution → Ativo |
 | D-30 | A restrição de mercado à vista ganha trava de build em `tests/no_leverage.rs`, verificada violando de propósito | regra sem trava executável é convenção; o projeto já tratava assim os outros três invariantes | `CLAUDE.md` §Invariantes |
 
 ---

@@ -1,6 +1,6 @@
 # 27 — Configuration Registry
 
-**Status:** normativo · **Versão:** 3.1 · **Atualizado em:** 2026-09-20  
+**Status:** normativo · **Versão:** 4.0 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-CFG-*`  
 **Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
@@ -121,7 +121,7 @@ São os primeiros valores deste projeto com origem rastreável.
 |---|---|
 | Dados | `data/market.db` — 525.600 velas de 1 min, 2025-09-20 a 2026-09-20 |
 | Instrumento | Bybit spot BTCUSDT, lido da API em 2026-09-20: `minOrderAmt` 5 USDT, `minOrderQty` 0,000001 BTC, `basePrecision` 0,000001, `tickSize` 0,1 — valores pertencem ao [`28_BYBIT_INSTRUMENT_REGISTRY.md`](28_BYBIT_INSTRUMENT_REGISTRY.md) |
-| Custo por operação | 0,25% do valor negociado — 0,20% de taxa (0,1% por perna, VIP0) + 0,05% de slippage e spread |
+| Custo por operação | 0,25% — **taxa confirmada** em 0,1% por perna, maker e taker, lida na conta em 2026-09-20 (`EXCHANGE`), mais 0,05% de slippage e spread ainda presumidos |
 | Preço de referência | 81.233,70 USDT |
 
 ### Medições que sustentam os perfis
@@ -163,11 +163,16 @@ risco_por_operacao = drawdown_de_parada / 15        = 1,00%
 teto_minimo        = min_order_amt / (D x 0,85)
 stop               = min(2,00% ; risco_por_operacao / teto_minimo)
 teto_de_posicao    = risco_por_operacao / stop
-operacoes_por_dia  = piso(1 / teto_de_posicao)
+prazo_maximo       = 4320 min                        (72h — emenda 2.0.0)
+operacoes_por_dia  = 1440 / tempo_medio_ate_resolver (uma posição por vez)
 limite_diario      = operacoes_por_dia x risco_por_operacao
 chao_de_operacao   = min_order_amt / teto_de_posicao
-prazo_maximo       = 1440 min
 ```
+
+**A frequência deixou de ser escolhida e passou a ser consequência.** Com uma
+posição por vez e prazo de 72h, o que limita o giro é o tempo até a posição
+resolver — medido em 25,2h de média, 19h de mediana. Daí **0,95 operação por
+dia**, contra as 2 que o prazo de 24h permitia.
 
 Origem de cada regra:
 
@@ -175,29 +180,30 @@ Origem de cada regra:
 |---|---|
 | risco = drawdown ÷ 15 | `DERIVED` — a parada por drawdown tolera 15 perdas cheias |
 | teto mínimo | `DERIVED` — a posição MUST continuar emitível depois do drawdown máximo |
-| stop de 2,00% | `MEASURED` — minimiza o acerto necessário em prazo de 24h |
+| stop de 2,00% | `MEASURED` — minimiza o acerto necessário |
 | operações por dia | `DERIVED` — mantém o custo mensal em ~7% do capital |
-| prazo de 24h | `MEASURED` — abaixo de 4h o custo excede o movimento mediano |
+| prazo de 72h | `MEASURED` — resolve 94% das janelas contra 59% em 24h; abaixo de 4h o custo excede o movimento mediano |
 
 **Viabilidade:** `D >= min_order_amt / 0,85` = **5,88 USDT**. Abaixo disso nem a
 primeira posição sobrevive ao drawdown, e a sessão MUST NOT iniciar.
 
 ## Família derivada
 
-| Depósito | Teto | Stop | Risco | Posição | Risco $ | Ops/dia | Lim. diário | Chão | Faixa |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| $10 | 58,8% | 1,70% | 1,00% | $5,88 | $0,10 | 1 | 1,0% | $8,50 | 1 ordem |
-| $100 | 50,0% | 2,00% | 1,00% | $50,00 | $1,00 | 2 | 2,0% | $10,00 | 10 ordens |
-| $200 | 50,0% | 2,00% | 1,00% | $100,00 | $2,00 | 2 | 2,0% | $10,00 | 20 ordens |
-| $500 | 50,0% | 2,00% | 1,00% | $250,00 | $5,00 | 2 | 2,0% | $10,00 | 50 ordens |
-| $900 | 50,0% | 2,00% | 1,00% | $450,00 | $9,00 | 2 | 2,0% | $10,00 | 90 ordens |
+Com prazo de 72h, uma posição por vez e frequência de 0,95 operação/dia.
+
+| Depósito | Teto | Stop | Risco | Posição | Risco $ | Lim. diário | Chão | Faixa |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| $200 | 50,0% | 2,00% | 1,00% | $100,00 | $2,00 | 1,0% | $10,00 | 20 ordens |
+| $500 | 50,0% | 2,00% | 1,00% | $250,00 | $5,00 | 1,0% | $10,00 | 50 ordens |
+| $900 | 50,0% | 2,00% | 1,00% | $450,00 | $9,00 | 1,0% | $10,00 | 90 ordens |
 
 Acima de **11,76 USDT** o stop atinge o ótimo medido e os percentuais
-**congelam**: $200, $500 e $900 recebem exatamente a mesma configuração. Custo,
-risco e posição são todos proporcionais ao capital; só a ordem mínima é
-absoluta, e ela deixa de morder cedo. O que o capital compra é granularidade
-(faixa de tamanhos), saída parcial — possível a partir de 20 USDT — e folga até
-o chão.
+**congelam**. O que o capital compra é granularidade, saída parcial — possível a
+partir de 20 USDT — e folga até o chão. O `REQ-CFG-007` mantém o piso prático em
+**US$ 160** enquanto o resíduo da moeda base não for tratado no código.
+
+O perfil de US$ 10 foi retirado desta tabela: com o custo real do resíduo ele
+exigiria 89% de acerto, e não existe.
 
 ## Perfil de referência — D = 100 USDT
 
@@ -223,41 +229,43 @@ para 10 ordens mínimas, e a saída parcial passa a ser possível.
 
 ## Resultado operacional esperado — `REQ-CFG-005`
 
-Saldo esperado ao fim de 30 dias **sem vantagem nenhuma**: a estratégia escolhe
-a hora de entrar tão bem quanto o acaso, e só o custo e a assimetria do ativo
-agem.
+Saldo esperado ao fim de 30 dias **sem vantagem nenhuma**, no prazo de 72h:
+20.000 simulações reamostrando 8.688 operações medidas.
 
-| Depósito | Saldo médio | Resultado | Mediana | Faixa p5–p95 | Parou por drawdown |
-|---:|---:|---:|---:|---:|---:|
-| $10 | $9,53 | **−$0,47 (−4,7%)** | $9,52 | $8,81 – $10,28 | 1,1% |
-| $100 | $91,50 | **−$8,50 (−8,5%)** | $91,08 | $84,26 – $101,02 | 16,0% |
-| $200 | $183,00 | **−$17,00 (−8,5%)** | $182,20 | $168,44 – $201,98 | 15,8% |
-| $500 | $457,47 | **−$42,53 (−8,5%)** | $455,38 | $421,17 – $505,25 | 15,6% |
-| $900 | $823,25 | **−$76,75 (−8,5%)** | $819,48 | $757,88 – $908,79 | 16,2% |
+| Depósito | Resultado | Faixa p5–p95 | Parou por drawdown |
+|---:|---:|---:|---:|
+| $200 | **−4,3%** | $175 – $208 | **1%** |
+| $500 | **−4,2%** | $439 – $521 | **1%** |
+| $900 | **−4,2%** | $790 – $938 | **1%** |
 
-O perfil de $10 perde menos em percentual porque executa 1 operação por dia
-contra 2 — metade do giro, metade do custo. Paga isso em tempo: as 100
-operações que a Porta 1 exige levam 100 dias em vez de 50.
+**O prazo de 72h cortou o custo pela metade e o risco de parada por dezesseis.**
+No prazo de 24h os mesmos perfis perdiam 8,5% ao mês e 16% das contas batiam a
+parada por drawdown antes do fim do mês. A razão é a mesma nos dois casos: 41%
+das posições de 24h expiravam sem resolver e pagavam custo sem produzir
+resultado; em 72h são 6%.
 
 ### Acerto necessário e sensibilidade
 
-O empate exige **59,4%** de acerto entre as operações que resolvem. A entrada
-aleatória entrega 46,5%. A lacuna que a estratégia precisa produzir é de
-**12,9 pontos percentuais**.
+O empate exige **56,6%** de acerto entre as operações que resolvem. A entrada
+aleatória entrega 48,4%. A lacuna que a estratégia precisa produzir é de
+**8,2 pontos percentuais** — era 12,9 no prazo de 24h.
 
-| Acerto entre resolvidos | $10 em 30d | $100 em 30d | Parou por drawdown |
-|---:|---:|---:|---:|
-| 46,5% — medido, acaso | −4,7% | −8,5% | 16,1% |
-| 50,0% | −3,8% | −6,3% | 8,4% |
-| 55,0% | −1,9% | −3,0% | 2,6% |
-| **59,4% — empate** | −0,0% | −0,0% | 0,8% |
-| 62,0% | +1,0% | +1,8% | 0,3% |
-| 65,0% | +2,3% | +4,0% | 0,1% |
+| Acerto entre resolvidos | Resultado em 30 dias |
+|---:|---:|
+| **48,4% — medido, acaso** | **−4,2%** |
+| 52,0% | −2,3% |
+| **56,6% — empate** | 0,0% |
+| 60,0% | +1,8% |
+| 64,0% | +3,9% |
 
-Entre 55% e 62% de acerto — sete pontos — o resultado mensal de $100 vai de
-−3,0% a +1,8%. Cada ponto percentual de acerto vale cerca de 0,7% ao mês.
-**Um ponto de acerto vale mais que qualquer recalibração de percentual de
-risco.**
+A derivada é de **0,53% ao mês por ponto** de acerto, no prazo de 72h com 0,95
+operação/dia — era 0,7% no prazo de 24h, porque lá o giro era o dobro. O
+resultado é menos sensível ao acerto e também menos sensível ao erro.
+
+**Um ponto de acerto continua valendo mais que qualquer recalibração de
+percentual de risco.** A diferença é que a barra a vencer caiu de 12,9 para 8,2
+pontos, e não por a estratégia ter melhorado: por parar de pagar custo em
+posições que expiravam sem resolver.
 
 ## Condição de validade dos números acima
 
@@ -280,7 +288,9 @@ tamanho da posição:
 
 **O perfil de $10 deixa de existir nessa condição:** empatar exigiria 89% de
 acerto, contra os 59,5% do custo modelado. O de $100 sobrevive, mas a barra sobe
-de 59,4% para 63,0%.
+de 59,4% para 63,0% — números do perfil de 24h, que era o vigente quando o
+resíduo foi medido. O multiplicador de custo do resíduo não depende do prazo; o
+acerto de empate correspondente, sim.
 
 **REQ-CFG-007** Enquanto `REQ-SIZING-004` e `REQ-BYBIT-005` não estiverem
 implementados e testados, nenhum perfil com depósito abaixo de **US$ 160** MAY
@@ -318,13 +328,14 @@ A função de derivação desta versão produz, para o mesmo capital, teto de ~5
 stop de ~1,70%, com acerto necessário praticamente igual ao de $100. A conclusão
 que aquele perfil sustentava — de que capital maior baixaria a barra de acerto —
 **estava errada**. Capital maior compra granularidade, saída parcial e folga até
-o chão; a barra de acerto permanece em ~59,4% em qualquer tamanho de banca.
+o chão; a barra de acerto não depende do tamanho da banca. Ela depende do prazo:
+56,6% em 72h, 59,4% em 24h.
 
 ## Valores ainda `ASSUMED`
 
 | Premissa | Valor usado | Efeito se estiver errada |
 |---|---|---|
-| Taxa por perna | 0,1% (VIP0 público) | é ~80% do custo total; a 0,06% o resultado esperado de $100 sem vantagem sobe de −8,5% para cerca de −5,5%, e o acerto de empate cai de 59,4% para ~57% |
+| ~~Taxa por perna~~ | **confirmada** | Lida na conta em 2026-09-20: spot 0,1% maker e taker, nível "usuário comum". Era a única premissa que respondia por 80% do custo, e o valor presumido estava certo. Passa de `ASSUMED` a `EXCHANGE`. |
 | Slippage + spread | 0,05% por round trip | não medido contra execução real; depende do `06_EXECUTION_SIMULATOR.md` |
 
 Ambas MUST ser confirmadas antes de qualquer uso com capital real

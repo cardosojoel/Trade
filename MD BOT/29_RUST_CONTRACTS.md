@@ -2,7 +2,7 @@
 
 **Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-RUST-*`  
-**Conformidade:** exige correção (ADR-004)  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---
@@ -32,10 +32,14 @@ replay
 
 ## Contratos conceituais
 ```rust
+// Probabilidade é adimensional e não alimenta cálculo de dinheiro: f64 serve.
 struct Probability3 { up: f64, neutral: f64, down: f64 }
-struct ExpectedValue { gross: f64, costs: CostBreakdown, net: f64, conservative: f64 }
-struct PositionSize { raw: f64, final_qty: f64, constraints: ConstraintReport }
-struct InstrumentSpec { tick_size: f64, qty_step: f64, min_qty: f64, max_qty: f64, min_notional: f64 }
+
+// Tudo abaixo é dinheiro ou quantidade, e MUST ser Decimal — constitution,
+// Restrições Operacionais → Representação de valores monetários.
+struct ExpectedValue { gross: Decimal, costs: CostBreakdown, net: Decimal, conservative: Decimal }
+struct PositionSize { raw: Decimal, final_qty: Decimal, constraints: ConstraintReport }
+struct InstrumentSpec { tick_size: Decimal, qty_step: Decimal, min_qty: Decimal, max_qty: Decimal, min_notional: Decimal }
 ```
 
 ```rust
@@ -69,22 +73,12 @@ trait ExecutionAdapter {
 **REQ-RUST-002** Interfaces críticas MUST NOT exigir I/O síncrono, lock global ou
 alocação não controlada.
 
-## Pendência conhecida
+## Corrigido em 2026-09-20
 
-Os exemplos desta página usam `f64` para `tick_size`, `qty_step`, `min_notional`
-e para os campos de `ExpectedValue`. Isso conflita com a
-`trading_risk_recovery_mathematical_spec.md` §33, que proíbe ponto flutuante em
-caminho monetário, e com a constitution do repositório Trade — *Restrições
-Operacionais e de Segurança* → **Representação de valores monetários**, desde a
-emenda 1.3.0 —, cobrada pelo `tests/no_float.rs`.
-
-A divergência está registrada como [ADR-004](34_ADR_EMENDAS.md#adr-004), e lá
-já foi classificada: é **erro de redação desta página**, não escolha de
-desenho — dois documentos deste mesmo conjunto se contradizem. **Não há decisão
-a tomar aqui e não cabe emenda.** O encaminhamento é corrigir estes contratos
-para `Decimal` em todo campo monetário e de quantidade, mantendo `f64` apenas
-onde a grandeza é adimensional e não alimenta cálculo de dinheiro —
-probabilidade, por exemplo.
+Esta página usava `f64` para `tick_size`, `qty_step`, `min_notional` e para os
+campos de `ExpectedValue`, contradizendo a `trading_risk_recovery_mathematical_spec.md`
+§33 e a constitution do Trade. Era erro de redação, não escolha de desenho —
+[ADR-004](34_ADR_EMENDAS.md#adr-004), encerrada sem ir à assinatura.
 
 ## Objetivo
 Este documento é contrato arquitetural; tipos concretos, crates e assinaturas finais serão congelados após profiling e revisão do código MVP.

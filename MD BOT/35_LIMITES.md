@@ -87,13 +87,14 @@ Sobre 525.600 velas de 1 min, de 20/09/2025 a 19/09/2026.
 | Custo ÷ movimento mediano, 4 h | 0,61× | **primeiro horizonte viável** |
 | Custo ÷ movimento mediano, 24 h | 0,19× | folga confortável |
 | Horizonte mínimo de posição | **4 h** | enquanto o custo for 0,25% |
+| Prazo máximo de posição | **72 h** | constitution, emenda 2.0.0; resolve 94% das janelas contra 59% em 24h |
 | ATR de 1 min | 0,061% do preço | stop por múltiplo de ATR de 1 min fica **dentro do custo** |
 | Excursão adversa em 4 h | mediana 0,46% · p75 0,90% · p90 1,52% | dimensiona o stop |
 | Stop que minimiza o acerto exigido | **2,00%** | mais largo não melhora: sobram posições sem resolver |
-| Acerto da entrada aleatória | **46,5%** | a régua |
-| Acerto para empatar | **59,4%** | com o resíduo tratado |
+| Acerto da entrada aleatória | **48,4%** | a régua, no prazo de 72h |
+| Acerto para empatar | **56,6%** | no prazo de 72h, com o resíduo tratado |
 | Acerto para empatar sem tratar o resíduo | **63,0%** | em banca de US$ 100 |
-| Lacuna a produzir | **12,9 pontos** | é o alvo de desenvolvimento |
+| Lacuna a produzir | **8,2 pontos** | é o alvo de desenvolvimento |
 
 ## 4. Limites medidos — o capital
 
@@ -112,11 +113,12 @@ parcial e folga até o chão.
 
 | Limite | Origem | Muda por |
 |---|---|---|
-| Mercado à vista, apenas comprado, sem alavancagem | **constitution**, *Restrições Operacionais* → Mercado (emenda 1.3.0), cobrado por `tests/no_leverage.rs` | ADR-001 |
+| Mercado à vista, apenas comprado, sem alavancagem | **constitution**, *Restrições Operacionais* → Mercado (emenda 1.3.0), cobrado por `tests/no_leverage.rs` | ADR-001 **recusada** — fechada |
 | Ordem nunca excede o caixa disponível | **constitution**, idem (emenda 1.3.0) | emenda — nenhuma ADR aberta |
-| Freio diário sem exceção configurável em tempo de execução | constitution, Princípio II | ADR-002 |
-| Retomada automática na virada do período | constitution, Princípio II | ADR-003 |
-| Nenhum `f32`/`f64` em caminho monetário | **constitution**, *Restrições Operacionais* → Representação de valores (emenda 1.3.0), cobrado por `tests/no_float.rs` | ADR-004 |
+| Freio diário, com a **única** exceção do Recovery sob seis condições cumulativas | constitution, Princípio II (emenda 2.0.0) | ADR-002 **aceita** |
+| Retomada automática na virada do período | constitution, Princípio II | ADR-003 **recusada** — confirmação só quando os parâmetros derivados mudam |
+| Nenhum `f32`/`f64` em caminho monetário | **constitution**, *Restrições Operacionais* → Representação de valores (emenda 1.3.0), cobrado por `tests/no_float.rs` | ADR-004 **encerrada** — o `29` foi corrigido |
+| Ativo único: Bitcoin, inclusive posição mantida só para desconto de taxa | **constitution**, *Restrições Operacionais* → Ativo (emenda 2.0.0) | — |
 | Toda ordem atravessa a camada de risco | constitution, Princípio II | emenda — nenhuma ADR aberta |
 | Teste escrito e falhando antes da implementação crítica | constitution, Princípio III | emenda — nenhuma ADR aberta |
 | Ativo: Bitcoin | constitution | emenda MINOR |
@@ -143,7 +145,7 @@ O mais importante desta folha, porque delimita a confiança em todo o resto.
 | Limite da medição | Efeito |
 |---|---|
 | **Um ano, e de baixa** — BTC caiu 29,7%, com drawdown de 54,1% | um robô que só compra foi calibrado contra a correnteza; os números podem não valer em ano de alta |
-| **Taxa presumida** — 0,1%/perna, tabela pública VIP0 | é 80% do custo; a taxa real da conta exige credencial |
+| ~~Taxa presumida~~ — **confirmada** em 2026-09-20 | lida na conta: 0,1% por perna no spot, maker e taker. O valor presumido estava certo |
 | **Slippage presumido** — 0,05% por ida e volta | nunca medido contra execução real |
 | **Nada com credencial** — taxa efetiva, tipo de conta, permissões da chave, saldo | a auditoria foi feita só com dado público |
 | **Um ativo, um regime** | nenhuma medição fora de BTCUSDT |
@@ -151,7 +153,8 @@ O mais importante desta folha, porque delimita a confiança em todo o resto.
 
 **REQ-LIMITE-005** Um número desta folha MUST NOT ser citado sem a limitação
 correspondente desta seção quando a limitação for material para o uso. O
-exemplo canônico: o acerto necessário de 59,4% foi medido num ano de baixa.
+exemplo canônico: o acerto necessário de 56,6% foi medido num ano de baixa, com
+um robô que só compra.
 
 ---
 

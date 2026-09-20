@@ -29,22 +29,37 @@ dela dependa MAY gerar tarefa de implementação no repositório Trade.
 
 | ADR | Assunto | Contraria | Status |
 |---|---|---|---|
-| [ADR-001](#adr-001) | Derivativos e alavancagem | `CLAUDE.md` | **proposta** |
-| [ADR-002](#adr-002) | Recovery depois do freio diário | constitution, Princípio II | **proposta** |
-| [ADR-003](#adr-003) | Sessão com depósito e confirmação humana | constitution, Princípio II | **proposta** |
-| [ADR-004](#adr-004) | `f64` nos contratos Rust | `CLAUDE.md` e `tests/no_float.rs` | **proposta** |
+| [ADR-001](#adr-001) | Derivativos e alavancagem | constitution → Mercado | **recusada em 2026-09-20** |
+| [ADR-002](#adr-002) | Recovery depois do freio diário | constitution, Princípio II | **aceita em 2026-09-20** — emenda 2.0.0 |
+| [ADR-003](#adr-003) | Sessão com depósito e confirmação humana | constitution, Princípio II | **recusada em 2026-09-20**, com encaminhamento |
+| [ADR-004](#adr-004) | `f64` nos contratos Rust | contradição interna ao conjunto | **encerrada em 2026-09-20** — corrigida |
+| [ADR-006](#adr-006) | Prazo máximo de posição de 72 horas | constitution → domínio | **aceita em 2026-09-20** — emenda 2.0.0 |
 | [ADR-005](#adr-005) | Promover duas restrições à constitution | nada — corrigia uma lacuna | **aceita em 2026-09-20** |
 
-Uma aceita, quatro em proposta. A aceitação da ADR-005 elevou a autoridade
-contrariada pelas ADR-001 e ADR-004: antes da emenda 1.3.0 elas contrariavam o
-`CLAUDE.md`; agora contrariam a constitution.
+**Nenhuma em proposta.** Três aceitas (005, 002, 006), duas recusadas (001, 003)
+e uma encerrada por correção (004). As decisões foram tomadas pelo mantenedor em
+2026-09-20 e produziram duas emendas: a 1.3.0 e a 2.0.0.
+
+Com a ADR-001 recusada e a ADR-004 corrigida, **nenhum documento deste conjunto
+permanece marcado `exige emenda`**.
 
 ---
 
 ## ADR-001 — Derivativos e alavancagem {#adr-001}
 
-**Status:** proposta · **Contraria:** constitution, *Restrições Operacionais e de
-Segurança* → **Mercado** (desde a emenda 1.3.0; antes dela, `CLAUDE.md`)
+**Status:** **recusada em 2026-09-20** pelo mantenedor · **Contraria:**
+constitution, *Restrições Operacionais e de Segurança* → **Mercado**
+
+### Resultado
+Recusada. O mercado permanece à vista, apenas comprado, sem alavancagem — a
+perda continua limitada ao depósito. Os documentos que pressupunham funding,
+`leverage_min/max` e `reduce-only` deixam de ter caminho para implementação;
+`tests/no_leverage.rs` passa a cobrar algo que ninguém mais pretende contrariar.
+
+Registrado para quem reabrir o assunto: a tabela de taxas da conta, lida em
+2026-09-20, mostra derivativos **mais baratos** que spot — futuros a 0,02%
+maker e 0,055% taker, contra 0,1% em ambos no spot. A recusa não foi por custo;
+foi porque com alavancagem o pior caso deixa de ser o depósito.
 
 ### Contexto
 Boa parte deste conjunto pressupõe mercado de derivativos: `leverage_min` e
@@ -73,7 +88,18 @@ derivados supondo caixa próprio.
 
 ## ADR-002 — Recovery depois do freio diário {#adr-002}
 
-**Status:** proposta · **Contraria:** constitution, Princípio II, linha 44
+**Status:** **aceita em 2026-09-20** pelo mantenedor · **Contraria:**
+constitution, Princípio II
+
+### Resultado
+Aceita com as seis travas, e incorporada ao Princípio II pela **emenda 2.0.0** —
+MAJOR, por ser a primeira exceção a um princípio não-negociável neste projeto.
+As travas viraram condições cumulativas no texto da constitution: orçamento
+criado uma única vez a partir de lucro realizado, consumível e sem reposição,
+risco decrescente, Martingale proibido, teto de episódios e tentativas fixado
+antes da sessão, e proibição de elevar a perda máxima do depósito.
+
+A emenda registra que esta exceção **MUST NOT ser usada como precedente**.
 
 ### Contexto
 A constitution determina: *"Atingido o limite de perda diária, o sistema MUST
@@ -103,7 +129,21 @@ qualidade.
 
 ## ADR-003 — Sessão com depósito e confirmação humana {#adr-003}
 
-**Status:** proposta · **Contraria:** constitution, Princípio II, linha 45
+**Status:** **recusada em 2026-09-20** pelo mantenedor · **Contraria:**
+constitution, Princípio II
+
+### Resultado
+Recusada na forma proposta, e encaminhada na forma intermediária que esta
+própria ADR havia levantado: **mantém-se a retomada automática na virada do
+período**, e a confirmação humana passa a ser exigida apenas quando os
+parâmetros derivados mudarem — o caso que o `REQ-BYBIT-007` já prevê, quando a
+Bybit revisa a ordem mínima nos dias 3 e 17. Isso não contraria a constitution e
+não precisou de emenda.
+
+Fica um ponto aberto no desenho, e é consequência de aceitar a ADR-002: o
+orçamento de Recovery é definido **por sessão**, e sessão deixou de ser a
+unidade de tempo do sistema. Qual período delimita o orçamento — o dia, a
+semana, a vida da configuração — não foi decidido.
 
 ### Contexto
 A constitution determina retomada **automática** na virada do período. Este
@@ -127,9 +167,16 @@ derivados mudarem — que é o caso previsto em `REQ-BYBIT-007`.
 
 ## ADR-004 — `f64` nos contratos Rust {#adr-004}
 
-**Status:** proposta · **Contraria:** constitution, *Restrições Operacionais e de
-Segurança* → **Representação de valores monetários** (desde a emenda 1.3.0), mais
-`tests/no_float.rs`
+**Status:** **encerrada em 2026-09-20** — corrigida, sem decisão a tomar ·
+**Contradizia:** a `trading_risk_recovery_mathematical_spec.md` §33 e, desde a
+emenda 1.3.0, a constitution
+
+### Resultado
+O `29_RUST_CONTRACTS.md` foi corrigido: `Decimal` em todo campo monetário e de
+quantidade, `f64` mantido apenas onde a grandeza é adimensional e não alimenta
+cálculo de dinheiro. A conformidade daquele documento passou de `exige correção`
+para `conforme`, e esta ADR encerra sem ir à fila de assinatura — como previsto
+desde a sua abertura.
 
 ### Contexto
 O `29_RUST_CONTRACTS.md` usa `f64` para `tick_size`, `qty_step`, `min_notional`
@@ -148,6 +195,36 @@ Corrigir o `29` para `Decimal` em todo campo monetário e de quantidade, mantend
 `f64` apenas onde a grandeza é adimensional e não alimenta cálculo de dinheiro —
 probabilidade, por exemplo. Isso **não** exige emenda; exige correção. Depois
 disso, a ADR-004 é encerrada como `recusada` por não haver decisão a tomar.
+
+---
+
+## ADR-006 — Prazo máximo de posição de 72 horas {#adr-006}
+
+**Status:** **aceita em 2026-09-20** pelo mantenedor · **Contrariava:** o domínio
+declarado na constitution — *robô de day trade*
+
+### Contexto
+Medido sobre doze meses reais, um alvo simétrico de 2% resolve em **94%** das
+janelas de 72h contra **59%** nas de 24h. As posições que expiram sem resolver
+pagam custo sem produzir resultado, e eram 41% do total.
+
+### Decisão
+Prazo máximo de posição de 72 horas, incorporado pela emenda 2.0.0. O domínio
+deixa de ser day trade.
+
+### O que se ganha, medido
+| | 24h | 72h |
+|---|---:|---:|
+| Posições que resolvem | 59% | **94%** |
+| Acerto necessário | 59,4% | **56,6%** |
+| Lacuna sobre o acaso | 12,9 pt | **8,2 pt** |
+| Frequência natural | 2 op/dia | **0,95 op/dia** |
+| Custo mensal do capital | 7,2% | **3,5%** |
+
+### O que se perde
+O tempo até a evidência dobra: as 100 operações que a Porta 1 exige passam de 50
+para **105 dias**. E o projeto deixa de ser o que o seu nome e a sua
+documentação diziam ser — o que exigiu MAJOR, não MINOR.
 
 ---
 

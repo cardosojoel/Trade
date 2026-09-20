@@ -38,10 +38,10 @@ Ele descreve um sistema possível, não o sistema autorizado.
 | | |
 |---|---|
 | Documento | `.specify/memory/constitution.md` |
-| Versão | **1.3.0**, emendada em 2026-09-20 |
-| SHA-256 | `38814ec18cab41b6059aaab3133b96670c49fffb795d307b173d1f7a8ea90114` |
-| Linhas | 251 |
-| Âncora anterior | 1.2.0 · `82b24e3c…` · 220 linhas — substituída pela emenda da ADR-005 |
+| Versão | **2.0.0**, emendada em 2026-09-20 |
+| SHA-256 | `44a42755f8e04ce3b553849d32fc03ca343177d6cfcdb237736d642bc48d228d` |
+| Linhas | 302 |
+| Âncoras anteriores | 1.3.0 · `38814ec1…` · 251 linhas · emenda da ADR-005 · 1.2.0 · `82b24e3c…` · 220 linhas |
 
 **REQ-FRONTEIRA-002** Se o hash mudar, toda a coluna `Conformidade` deste
 conjunto MUST ser reavaliada antes de qualquer proposta nova ser aceita. Hash
@@ -138,17 +138,27 @@ ela é verdadeira para as quatro divergências conhecidas, mas a fórmula contin
 proibida, porque foi justamente a verificação documento a documento que revelou
 a lacuna que a emenda fechou.
 
-### Reavaliação exigida pela troca de âncora
+### Reavaliações exigidas pela troca de âncora
 
 `REQ-FRONTEIRA-002` obriga a reavaliar toda a coluna `Conformidade` quando o
-hash muda. Feita em 2026-09-20, com este resultado:
+hash muda. Foram duas trocas em 2026-09-20.
 
-- **nenhum documento mudou de estado.** Os seis marcados `exige emenda`
-  continuam marcados; os demais continuam `conforme`;
-- o que mudou foi **a autoridade contrariada** por ADR-001 e ADR-004, que subiu
-  de diretriz de trabalho para constitution;
-- a restrição nova de nocional — *ordem nunca excede o caixa disponível* — já era
-  observada por `REQ-SIZING-003`, e não criou não-conformidade.
+**Na 1.3.0:** nenhum documento mudou de estado; o que mudou foi a autoridade
+contrariada por ADR-001 e ADR-004, que subiu de diretriz de trabalho para
+constitution. A restrição nova de nocional já era observada pelo
+`REQ-SIZING-003`.
+
+**Na 2.0.0, depois das decisões do mantenedor:** **nenhum documento permanece
+`exige emenda`**. O Recovery e o prazo de 72h foram incorporados à constitution,
+os derivativos foram recusados e o `29` foi corrigido. Os seis documentos que
+estavam marcados voltaram a `conforme` — três porque a regra que contrariavam
+passou a existir a favor deles, dois porque a proposta foi recusada e o texto
+deixou de gerar tarefa, e um por correção.
+
+Fica um ponto aberto que a aceitação criou: o orçamento de Recovery é **por
+sessão**, e a ADR-003 recusou a sessão como unidade de tempo. Qual período
+delimita o orçamento não foi decidido, e o desenho do Recovery MUST NOT gerar
+tarefa até que seja.
 
 ## 4.1 O envelope
 

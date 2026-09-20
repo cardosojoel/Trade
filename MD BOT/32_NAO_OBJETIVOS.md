@@ -58,12 +58,14 @@ contrariam a constitution. Até aquele dia, dois contrariavam apenas uma diretri
 de trabalho — a coluna da direita preserva esse histórico, porque foi ele que
 motivou a emenda.
 
-| # | A SDD pressupõe | Contraria hoje | ADR | Contrariava antes de 1.3.0 |
-|---|---|---|---|---|
-| 1 | derivativos — `leverage_min/max`, funding, `reduce-only` | constitution → **Mercado** | ADR-001 | `CLAUDE.md` |
-| 2 | Recovery depois de atingido o limite de perda diária | constitution, Princípio II, linha 44 | ADR-002 | o mesmo |
-| 3 | sessão com depósito e confirmação humana para retomar | constitution, Princípio II, linha 45 | ADR-003 | o mesmo |
-| 4 | `f64` para `tick_size`, `qty_step`, `min_notional` e EV | constitution → **Representação de valores** | ADR-004 | `CLAUDE.md` e `tests/no_float.rs` |
+**Todas decididas em 2026-09-20. Nenhuma divergência permanece aberta.**
+
+| # | O que era | Decisão | Efeito |
+|---|---|---|---|
+| 1 | derivativos, alavancagem, funding | **recusada** (ADR-001) | o escopo fica à vista; os campos de alavancagem não geram tarefa |
+| 2 | Recovery depois do freio diário | **aceita** (ADR-002) | incorporado ao Princípio II pela emenda 2.0.0, sob seis condições cumulativas |
+| 3 | sessão com confirmação humana | **recusada** (ADR-003) | retomada automática mantida; confirmação só quando os parâmetros derivados mudam |
+| 4 | `f64` em caminho monetário | **encerrada** (ADR-004) | era erro de redação; o `29` foi corrigido para `Decimal` |
 
 **REQ-SCOPE-004** Nenhum destes quatro MAY ser implementado antes de a ADR
 correspondente ser aceita. Implementar primeiro e regularizar depois é a ordem
