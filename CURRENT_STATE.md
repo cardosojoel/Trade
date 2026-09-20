@@ -150,15 +150,6 @@ provisórios**, não medidos. Vivem em `limits.toml`, nunca no código.
 A constitution **exige** que sejam revistos contra o capital real antes da
 Porta 3, a liberação para capital real.
 
-### 🟠 `git push` bloqueado
-
-8 commits locais aguardando. O token do `gh` tem `gist`, `read:org` e `repo`;
-falta `workflow`, necessário desde que o CI entrou no repositório.
-
-```
-gh auth refresh -h github.com -s workflow
-```
-
 ---
 
 ## Defeitos encontrados e corrigidos
@@ -193,6 +184,9 @@ cargo fmt --all --check
 
 O CI roda as travas de arquitetura **primeiro e isoladas**: se uma delas falha,
 o problema é arquitetural e não adianta saber se o resto passou.
+
+Verificado no GitHub em 2026-09-20: os três jobs passam — travas de arquitetura
+(27s), formato e lints (1m07), testes (2m03). Tudo sincronizado com o remoto.
 
 ---
 
