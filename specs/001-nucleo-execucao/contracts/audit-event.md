@@ -61,6 +61,11 @@ algo dá errado.
 }
 ```
 
+`daily_pnl` é o resultado **do dia**: o realizado desde a virada mais a variação do
+não realizado no mesmo intervalo (FR-019b). Não é o resultado acumulado da execução,
+nem só o que foi fechado — é exatamente o número contra o qual o freio de perda
+diária foi comparado naquele instante, e é isso que torna a recusa reconstituível.
+
 `limits` e `state` são fotografias do momento da avaliação. Sem elas, uma recusa cujo
 limite tenha mudado depois vira registro indecifrável — sabe-se que houve recusa, não
 se sabe contra o quê.

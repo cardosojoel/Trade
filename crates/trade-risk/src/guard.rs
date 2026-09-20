@@ -232,10 +232,27 @@ impl<E: OrderExecutor> RiskGuard<E> {
         }
     }
 
-    /// Acumula resultado realizado, acionando o bloqueio de perda diária ao
-    /// atingir o limite.
-    pub fn record_realized(&mut self, pnl: Money) {
-        self.state.record_realized(pnl, self.limits.max_daily_loss);
+    /// Acumula resultado realizado e remarca a posição no mesmo passo,
+    /// acionando o bloqueio de perda diária ao atingir o limite.
+    ///
+    /// `unrealized_now` é o resultado aberto **depois** de aplicado o
+    /// preenchimento. Pedi-lo aqui, em vez de deixar para uma chamada
+    /// seguinte, fecha a janela em que o realizado já subiu e o aberto ainda
+    /// não caiu — nela, o mesmo prejuízo apareceria nas duas parcelas.
+    pub fn record_realized(&mut self, pnl: Money, unrealized_now: Money) {
+        self.state
+            .record_realized(pnl, unrealized_now, self.limits.max_daily_loss);
+    }
+
+    /// Remarca a posição aberta a mercado.
+    ///
+    /// O motor chama a cada vela fechada. É o que faz uma posição perdendo
+    /// sozinha acionar o freio: sem isto, o contador só se moveria quando uma
+    /// venda fechasse operação, e um prejuízo aberto poderia crescer sem
+    /// limite com a cerca inteira intacta.
+    pub fn mark_to_market(&mut self, unrealized_now: Money) {
+        self.state
+            .mark_to_market(unrealized_now, self.limits.max_daily_loss);
     }
 
     /// Virada do dia em UTC: o bloqueio de perda diária cai **sozinho**.

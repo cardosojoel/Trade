@@ -163,7 +163,7 @@ fn a_retomada_automatica_e_registrada_como_automatica() {
     );
 
     g.on_day_boundary(at(1, 0), &mut rec);
-    g.record_realized(dec!(-500));
+    g.record_realized(dec!(-500), dec!(0));
     assert!(g.daily_loss_blocked());
     g.on_day_boundary(at(2, 0), &mut rec);
 

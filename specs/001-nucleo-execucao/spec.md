@@ -289,6 +289,15 @@ provedores de mercado distintos, e verificar que ambos completam o ciclo.
   ser tratado como valor permitido: a violação ocorre ao **ultrapassá-lo**, não ao
   atingi-lo. Para a perda máxima diária vale o inverso — **atingir** o valor já
   aciona o bloqueio, conforme o Princípio II da constitution.
+- **FR-019b**: A perda diária MUST considerar o resultado **realizado no dia** somado
+  à **variação do resultado não realizado** desde a virada do período. Contar apenas
+  o realizado permitiria carregar prejuízo aberto sem limite com a cerca intacta. A
+  variação, e não o valor absoluto do não realizado, é o que preserva a retomada
+  automática exigida pelo Princípio II: prejuízo aberto herdado do período anterior
+  é linha de base do novo período, não perda dele. Atingido o limite, o bloqueio
+  MUST permanecer até a virada — recuperação de preço no mesmo período MUST NOT
+  soltá-lo. O bloqueio cessa a **abertura** de posições; a saída permanece
+  permitida (FR-022).
 - **FR-020**: A camada de risco MUST recusar a ordem que viole um limite, MUST NOT
   ajustá-la silenciosamente para caber.
 - **FR-020a**: Recusa por tamanho de posição, exposição ou frequência MUST NOT

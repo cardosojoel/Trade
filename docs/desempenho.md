@@ -3,6 +3,13 @@
 Medições feitas em 2026-09-20 sobre **dados reais da Bybit**, não sintéticos.
 Máquina: Linux x86-64, build `--release`, toolchain 1.98.1.
 
+> ⚠️ **Anteriores à mudança da perda diária (FR-019b, 2026-09-20).** A partir
+> dela o freio enxerga prejuízo **aberto**, e não só o fechado — o que barra
+> compras que aqui passaram. Coleta, velocidade, determinismo e integridade da
+> auditoria não mudam; o número de operações da estratégia de referência e seu
+> resultado, sim. Refazer exige recoletar o histórico: `/data` não é
+> versionado.
+
 ---
 
 ## Coleta

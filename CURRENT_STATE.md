@@ -14,27 +14,15 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**194 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**207 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
 
 ---
 
-## Duas decisões esperando por você
+## Uma decisão esperando por você
 
-Nenhuma bloqueia o que existe. Ambas mudam comportamento e não são minhas para
-tomar.
+Não bloqueia o que existe. Muda comportamento e não é minha para tomar.
 
-### 1. A perda diária conta só o resultado realizado
-
-`record_realized` só é chamado quando uma venda fecha operação. **Uma posição
-aberta perdendo 50% não move o contador e nunca dispara o freio.** O robô pode
-segurar um prejuízo indefinidamente com a cerca inteira intacta.
-
-A constitution diz "perda máxima diária" sem qualificar. Incluir o não
-realizado faz o freio disparar com oscilação normal e fechar o dia cedo demais;
-não incluir permite segurar prejuízo sem limite. As duas leituras são
-defensáveis.
-
-### 2. `max_total_exposure` hoje não morde
+### `max_total_exposure` hoje não morde
 
 Tamanho de posição e exposição total são calculados sobre a mesma grandeza
 (`quantidade × preço`). Com um ativo e uma posição, o limite mais apertado
@@ -43,6 +31,33 @@ sempre vence. Na configuração atual (1000 vs 2000), a exposição é decorativ
 Não é defeito: os dois só divergem com múltiplos ativos ou posições
 simultâneas, ambos fora do escopo desta feature. Mas hoje você tem, na prática,
 um limite e não dois.
+
+---
+
+## Decidido em 2026-09-20: a perda diária conta o não realizado
+
+O contador do dia passou a ser **realizado no dia + variação do não realizado
+desde a virada** (FR-019b). Antes, `record_realized` só se movia quando uma
+venda fechava operação, e uma posição aberta perdendo 50% nunca acionava o
+freio.
+
+O que a constitution decidiu, e não eu:
+
+| Texto | Consequência no desenho |
+|---|---|
+| "cessar a **abertura** de novas posições" | o freio barra compra; venda continua passando — não há liquidação forçada |
+| "**até o próximo período**" | o bloqueio **trava**; recuperação de preço no mesmo dia não o solta |
+| "MUST retomar automaticamente na virada" | o não realizado entra por **variação**: o prejuízo aberto de ontem é linha de base de hoje, senão o freio re-armaria toda madrugada |
+
+**O que isto não resolve:** o freio impede risco novo, não estanca o prejuízo
+que corre. Uma posição aberta pode continuar afundando depois de acionado o
+bloqueio. Liquidação automática seria outra decisão — e a constitution, como
+está escrita, não a pede.
+
+`RiskGuard::mark_to_market` é a entrada nova; o motor chama a cada vela
+fechada. `record_realized` passou a receber o não realizado no mesmo argumento
+— uma venda move as duas parcelas ao mesmo tempo, e atualizar só uma contaria
+o mesmo prejuízo duas vezes.
 
 ---
 
@@ -71,7 +86,13 @@ trade backtest --mode backtest --from 2025-09-20 --to 2026-09-20 --capital 10000
 trade kill                  # aciona o freio; --release libera
 ```
 
-Medido sobre **dados reais** de doze meses (ver [docs/desempenho.md](docs/desempenho.md)):
+Medido sobre **dados reais** de doze meses (ver [docs/desempenho.md](docs/desempenho.md)).
+
+> ⚠️ **Estas medições são anteriores à mudança da perda diária.** Coleta,
+> velocidade, determinismo e integridade da auditoria não são afetados — mas
+> as 14.308 operações da estratégia de referência foram produzidas sob a regra
+> antiga, e com o freio enxergando prejuízo aberto o número cai. Refazer exige
+> recoletar: `/data` não está versionado e o banco local não existe mais.
 
 | | |
 |---|---|
@@ -129,7 +150,8 @@ A constitution **exige** revisão contra o capital real antes da Porta 3.
 ### 🟡 A estratégia de referência perde dinheiro, e isso é informação
 
 Sobre doze meses reais: **−98,7%**, com 9.664 de custo de transação sobre 10.000
-de capital, em 14.308 operações.
+de capital, em 14.308 operações — números da regra antiga de perda diária, ver o
+aviso acima.
 
 Não é defeito do motor — é o motor funcionando. Uma estratégia que opera 14 mil
 vezes por ano em velas de um minuto não sobrevive ao próprio custo. Antes de

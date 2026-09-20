@@ -182,7 +182,10 @@ impl BacktestEngine {
                                     match position.apply_fill(side, &fill) {
                                         Ok(Some(operacao)) => {
                                             balance += bruto - fill.fee;
-                                            guard.record_realized(operacao.pnl);
+                                            guard.record_realized(
+                                                operacao.pnl,
+                                                position.unrealized_at(referencia),
+                                            );
                                             let _ = audit.record(
                                                 clock.now(),
                                                 AuditKind::StateTransition {
@@ -234,6 +237,16 @@ impl BacktestEngine {
                     }
                 }
             }
+
+            // Posição aberta marcada a mercado: é o que faz um prejuízo ainda
+            // não realizado mover o contador de perda diária. Sem esta
+            // marcação, o contador só andaria quando uma venda fechasse
+            // operação, e uma posição afundando não acionaria freio nenhum.
+            //
+            // No fechamento da vela, não no meio dela: o freio decidido aqui
+            // só alcança a ordem da vela seguinte, e portanto se apoia apenas
+            // em preço já ocorrido.
+            guard.mark_to_market(position.unrealized_at(candle.close));
 
             // Patrimônio: saldo mais posição marcada ao preço corrente.
             let patrimonio = balance + position.exposure_at(candle.close);
