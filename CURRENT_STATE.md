@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**207 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**211 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
 
 ---
 
@@ -110,31 +110,36 @@ Consequências em cadeia, todas aplicadas: a âncora de hash da fronteira passou
 autoridade contrariada por ADR-001 e ADR-004, que subiu de diretriz de trabalho
 para constitution. As quatro divergências abertas agora pesam igual.
 
-**O que a ADR-005 levantou e não resolveu:** a restrição de mercado à vista
-continua **sem proteção executável**. O `tests/no_float.rs` barra o ponto
-flutuante no CI; nenhum teste equivalente impede alavancagem de entrar no
-código. Forte no papel, ausente no build.
+**O que a ADR-005 levantou, e que foi resolvido no mesmo dia:** a restrição de
+mercado à vista não tinha proteção executável. Agora tem — `tests/no_leverage.rs`,
+quatro travas que o CI cobra:
+
+| Trava | O que barra |
+|---|---|
+| Vocabulário | `leverage`, `margin`, `reduce_only`, `funding_rate`, `perpetual`, `descoberto` e mais 14 termos, em qualquer crate. Comentário é ignorado de propósito: explicar por que não há alavancagem é o que se espera encontrar |
+| Categoria | toda linha que nomeia `category` fixa `"spot"`; literais `"linear"`, `"inverse"` e `"option"` são recusados. A Bybit assume `linear` quando o parâmetro é omitido — esquecer não dá erro, dá derivativo |
+| `Side` | admite exatamente `Buy` e `Sell`; `Intent`, exatamente `Buy`, `Sell` e `Hold` |
+| Domínio | `PositionError::SellExceedsHoldings` tem de continuar existindo: é o que impede a quantidade detida de ficar negativa |
+
+**Verifiquei as quatro violando de propósito**, como as outras três garantias:
+injetei `LEVERAGE_MAX` em `trade-risk`, troquei `category=spot` por `linear` no
+cliente, acrescentei uma variante `Short` ao `Side` e renomeei o erro de venda
+acima do detido. As quatro falharam, cada uma com a sua mensagem. Restaurado
+tudo em seguida.
 
 ---
 
-**A verificação da fronteira desmentiu uma coisa que este arquivo vinha
-afirmando.** Eu repeti quatro vezes que havia "quatro conflitos com a
-constitution". São quatro divergências, mas **só duas são com a constitution**:
+**Como a lacuna apareceu.** Eu repeti em cinco commits que havia "quatro
+conflitos com a constitution". A verificação documento a documento mostrou que
+eram quatro divergências, mas **só duas com a constitution** — derivativos e
+`f64` contrariavam o `CLAUDE.md`, cujo ato de mudança é uma edição de arquivo.
+Nas 220 linhas da 1.2.0 não havia "spot", "alavancagem", "venda a descoberto",
+"float" nem "decimal".
 
-| Divergência | Onde a regra contrária realmente vive |
-|---|---|
-| Recovery depois do freio | constitution, Princípio II, linha 44 |
-| Retomada por confirmação humana | constitution, Princípio II, linha 45 |
-| Derivativos e alavancagem | `CLAUDE.md` linhas 91–92 — **não está na constitution** |
-| `f64` em caminho monetário | `CLAUDE.md` e `tests/no_float.rs` — **não está na constitution** |
-
-A constitution não menciona spot, alavancagem, venda a descoberto, float nem
-decimal em nenhuma das suas 220 linhas. Isso é uma lacuna, não um detalhe: as
-duas regras que limitam a perda máxima possível — o pior caso ser o depósito, e
-o cálculo do saldo estar certo — vivem num arquivo de diretrizes que qualquer
-sessão reescreve sem racional nem aprovação. A segunda ao menos tem o
-`tests/no_float.rs` barrando o merge; **a primeira não tem nenhuma proteção
-executável.** A ADR-005 propõe promovê-las à constitution; é decisão sua.
+Foi o que motivou a ADR-005. **Desde a emenda 1.3.0 as quatro contrariam a
+constitution**, e a divergência de mercado à vista ganhou trava de build. A
+distinção de autoridade fica registrada aqui porque foi ela que expôs a lacuna,
+não porque ainda valha.
 
 **Portabilidade medida:** o conjunto tem oito referências para fora dele, em 45
 documentos. Movê-lo para outro repositório é `git mv` mais a conversão dessas
@@ -326,14 +331,15 @@ mercado: o binário antigo, sem marcação, roda em 2,44s aqui.
 
 ---
 
-## As três garantias estruturais
+## As quatro garantias estruturais
 
-Não são convenção. Verifiquei as três violando de propósito.
+Não são convenção. Verifiquei as quatro violando de propósito.
 
 | Garantia | O que acontece se for violada |
 |---|---|
 | Estratégia, risco e backtest não alcançam corretora nem rede | `tests/architecture.rs` falha, CI barra o merge |
 | Nenhum `f32`/`f64` em caminho monetário | `tests/no_float.rs` falha, CI barra o merge |
+| Nenhuma alavancagem, derivativo ou venda a descoberto | `tests/no_leverage.rs` falha, CI barra o merge |
 | Obter o executor de dentro do `RiskGuard` | **Não compila** |
 
 `trade-strategy` não declara `trade-ports` e por isso não consegue sequer

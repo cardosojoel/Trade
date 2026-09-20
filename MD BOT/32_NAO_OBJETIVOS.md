@@ -79,10 +79,12 @@ que limitam a perda máxima possível — mercado à vista sem alavancagem e aus
 de ponto flutuante em caminho monetário — passaram a viver na constitution, onde
 alterá-las exige emenda escrita e aprovada.
 
-Segue em aberto o ponto que a ADR-005 levantou e não resolveu: **a restrição de
-mercado à vista não tem proteção executável.** O `tests/no_float.rs` barra o
-ponto flutuante no CI; nenhum teste equivalente impede que alavancagem entre no
-código. Hoje a regra é forte no papel e ausente no build.
+O ponto que a ADR-005 levantou foi fechado no mesmo dia: a restrição de mercado
+à vista **tem proteção executável** desde `tests/no_leverage.rs`, que barra
+vocabulário de alavancagem e derivativo em qualquer crate, exige `category=spot`
+explícito em toda chamada à Bybit, trava `Side` em `Buy`/`Sell` e verifica que o
+domínio mantém o erro que impede posição negativa. Cada uma das quatro travas
+foi verificada violando de propósito.
 
 O ponto 2 merece nota: o Recovery é disciplinado — orçamento consumível, risco
 decrescente, regra anti-Martingale explícita. A objeção não é à qualidade do

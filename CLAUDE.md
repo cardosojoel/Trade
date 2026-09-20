@@ -122,6 +122,10 @@ Não são convenção — falham a compilação ou o CI:
 - `tests/no_float.rs` — nenhum `f32`/`f64` em caminho monetário. Todo valor é
   `rust_decimal::Decimal`. Desde a emenda **1.3.0**, além de invariante de build
   é regra da constitution (*Representação de valores monetários*).
+- `tests/no_leverage.rs` — nenhum vocabulário de alavancagem, derivativo ou
+  venda a descoberto no código; `category=spot` explícito em toda chamada à
+  Bybit; `Side` só admite `Buy` e `Sell`; e o domínio mantém o erro que impede
+  posição negativa. Constitution 1.3.0, *Mercado*.
 - `crates/trade-risk/tests/compile_fail/` — obter o executor de dentro do
   `RiskGuard` **não compila**.
 

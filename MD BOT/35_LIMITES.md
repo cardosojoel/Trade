@@ -112,7 +112,7 @@ parcial e folga até o chão.
 
 | Limite | Origem | Muda por |
 |---|---|---|
-| Mercado à vista, apenas comprado, sem alavancagem | **constitution**, *Restrições Operacionais* → Mercado (emenda 1.3.0) | ADR-001 |
+| Mercado à vista, apenas comprado, sem alavancagem | **constitution**, *Restrições Operacionais* → Mercado (emenda 1.3.0), cobrado por `tests/no_leverage.rs` | ADR-001 |
 | Ordem nunca excede o caixa disponível | **constitution**, idem (emenda 1.3.0) | emenda — nenhuma ADR aberta |
 | Freio diário sem exceção configurável em tempo de execução | constitution, Princípio II | ADR-002 |
 | Retomada automática na virada do período | constitution, Princípio II | ADR-003 |

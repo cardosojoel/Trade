@@ -66,6 +66,7 @@ anterior.
 | D-27 | `SDD` designa só o System Design Document; o fluxo do Trade chama-se `Spec Kit` | a mesma sigla servia a duas coisas em repositórios que vão se separar | `00_GLOSSARIO.md` §7.1 |
 | D-28 | Divergência passa a nomear o documento contrariado, nunca "a constitution" genericamente | duas das quatro divergências contrariam o `CLAUDE.md`, não a constitution — e o ato que as resolve é outro | `REQ-FRONTEIRA-006`, `REQ-SCOPE-005` |
 | D-29 | **ADR-005 aceita**: mercado à vista sem alavancagem e proibição de ponto flutuante em caminho monetário sobem para a constitution (emenda 1.3.0) | eram as duas regras que limitam a perda máxima possível, e viviam num arquivo que qualquer sessão reescrevia sem racional nem aprovação | `34_ADR_EMENDAS.md` ADR-005 |
+| D-30 | A restrição de mercado à vista ganha trava de build em `tests/no_leverage.rs`, verificada violando de propósito | regra sem trava executável é convenção; o projeto já tratava assim os outros três invariantes | `CLAUDE.md` §Invariantes |
 
 ---
 

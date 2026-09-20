@@ -171,6 +171,13 @@ Consequências registradas: âncora de hash de `00_FRONTEIRA.md` substituída e
 conformidades reavaliadas (nenhuma mudou); ADR-001 e ADR-004 passaram a
 contrariar a constitution.
 
+**A lacuna que esta ADR levantou foi fechada junto.** O texto abaixo dizia que a
+restrição de mercado à vista não tinha proteção executável. Passou a ter:
+`tests/no_leverage.rs`, quatro travas cobradas pelo CI — vocabulário de
+alavancagem e derivativo, `category=spot` explícito, `Side` limitado a
+`Buy`/`Sell`, e a permanência do erro que impede posição negativa. As quatro
+foram verificadas violando de propósito.
+
 ### Contexto
 A verificação de 2026-09-20 encontrou que duas das restrições mais
 consequentes do projeto **não estão na constitution**:
@@ -184,6 +191,10 @@ A constitution não menciona "spot", "alavancagem", "venda a descoberto",
 "float", `f64` nem "decimal" em nenhuma linha.
 
 ### Por que isso é um risco
+
+*Texto da proposta, preservado como estava em 2026-09-20 antes da aceitação. Os
+dois pontos levantados aqui foram fechados: ver **Resultado**, acima.*
+
 São as duas regras que limitam a perda máxima possível. A primeira garante que
 o pior caso é perder o depósito. A segunda garante que o cálculo do que se tem
 está certo. Ambas vivem hoje em um arquivo de diretrizes de trabalho, que
