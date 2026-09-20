@@ -164,3 +164,10 @@ impl Default for RiskLimits {
         }
     }
 }
+
+/// Custo de transação modelado explicitamente (FR-027).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct FeeModel {
+    pub taker_fee_rate: Money,
+    pub slippage_rate: Money,
+}

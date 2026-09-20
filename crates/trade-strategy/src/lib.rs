@@ -7,5 +7,9 @@
 //!
 //! Verificado por `tests/architecture.rs` na raiz do workspace.
 
+pub mod sma_cross;
+
 #[cfg(feature = "testing")]
 pub mod reckless;
+
+pub use sma_cross::{SmaCross, SmaCrossParams};

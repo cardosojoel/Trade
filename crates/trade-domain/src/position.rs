@@ -102,7 +102,14 @@ impl Position {
                 let proporcao = fill.qty / self.qty;
                 let taxa_de_entrada = self.open_fees * proporcao;
                 let preco_de_entrada = self.avg_price;
-                let pnl = (fill.price - preco_de_entrada) * fill.qty - fill.fee - taxa_de_entrada;
+
+                // Quantizados: é o que torna a soma do extrato reproduzível
+                // por fora, em SQL, sem depender da mesma aritmética que a
+                // produziu (SC-009).
+                let taxas = crate::quantizar(fill.fee + taxa_de_entrada);
+                let pnl = crate::quantizar(
+                    (fill.price - preco_de_entrada) * fill.qty - fill.fee - taxa_de_entrada,
+                );
                 let entry_at = self.opened_at.unwrap_or(fill.at);
 
                 self.open_fees -= taxa_de_entrada;
@@ -117,7 +124,7 @@ impl Position {
                     exit_at: fill.at,
                     exit_price: fill.price,
                     qty: fill.qty,
-                    fees: fill.fee + taxa_de_entrada,
+                    fees: taxas,
                     pnl,
                 };
 

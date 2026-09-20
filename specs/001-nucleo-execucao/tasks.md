@@ -141,28 +141,28 @@ direto no SQLite, e conferir resultado e métricas contra cálculo feito à mão
 
 ### Tests for User Story 1 ⚠️ escrever antes, garantir que falham
 
-- [ ] T049 [P] [US1] Teste em `crates/trade-backtest/tests/known_dataset.rs`: sobre um conjunto de ~50 velas com resultado calculado à mão, o motor devolve profit factor, drawdown, número de operações, resultado líquido e extrato idênticos ao esperado
-- [ ] T050 [P] [US1] Teste de determinismo em `crates/trade-backtest/tests/determinism.rs`: duas execuções com a mesma entrada produzem resultados idênticos dígito a dígito (FR-029, SC-004)
-- [ ] T051 [P] [US1] Teste em `crates/trade-backtest/tests/no_lookahead.rs`: o preenchimento ocorre na vela **seguinte** ao sinal, nunca na que o originou (FR-030)
-- [ ] T052 [P] [US1] Teste em `crates/trade-backtest/tests/costs.rs`: taxa e slippage aparecem **discriminados** no `Fill` e no resultado, nunca embutidos no preço (FR-027)
-- [ ] T053 [P] [US1] Teste em `crates/trade-backtest/tests/gaps.rs`: lacunas no histórico são reportadas, nunca interpoladas como continuidade de preço (FR-031)
-- [ ] T054 [P] [US1] Teste em `crates/trade-backtest/tests/capital_exhausted.rs`: capital esgotado encerra de forma controlada e reporta o instante exato, sem saldo negativo (FR-032)
-- [ ] T055 [P] [US1] Teste em `crates/trade-backtest/tests/accounting.rs`: `net_result` coincide com a soma do extrato, divergência zero (SC-009)
-- [ ] T056 [P] [US1] Teste em `crates/trade-backtest/tests/partial_fill.rs`: volume insuficiente na vela produz preenchimento parcial ou recusa **explícitos** e registrados
-- [ ] T057 [P] [US1] Teste de CLI em `crates/trade-cli/tests/mode_required.rs`: sem `--mode` falha com código 2 e mensagem de obrigatoriedade; `--mode paper` e `--mode live` falham com "ainda não implementado", **não** com "valor inválido" (FR-001 a FR-003, SC-007)
+- [X] T049 [P] [US1] Teste em `crates/trade-backtest/tests/known_dataset.rs`: sobre um conjunto de ~50 velas com resultado calculado à mão, o motor devolve profit factor, drawdown, número de operações, resultado líquido e extrato idênticos ao esperado
+- [X] T050 [P] [US1] Teste de determinismo em `crates/trade-backtest/tests/determinism.rs`: duas execuções com a mesma entrada produzem resultados idênticos dígito a dígito (FR-029, SC-004)
+- [X] T051 [P] [US1] Teste em `crates/trade-backtest/tests/no_lookahead.rs`: o preenchimento ocorre na vela **seguinte** ao sinal, nunca na que o originou (FR-030)
+- [X] T052 [P] [US1] Teste em `crates/trade-backtest/tests/costs.rs`: taxa e slippage aparecem **discriminados** no `Fill` e no resultado, nunca embutidos no preço (FR-027)
+- [X] T053 [P] [US1] Teste em `crates/trade-backtest/tests/gaps.rs`: lacunas no histórico são reportadas, nunca interpoladas como continuidade de preço (FR-031)
+- [X] T054 [P] [US1] Teste em `crates/trade-backtest/tests/capital_exhausted.rs`: capital esgotado encerra de forma controlada e reporta o instante exato, sem saldo negativo (FR-032)
+- [X] T055 [P] [US1] Teste em `crates/trade-backtest/tests/accounting.rs`: `net_result` coincide com a soma do extrato, divergência zero (SC-009)
+- [X] T056 [P] [US1] Teste em `crates/trade-backtest/tests/partial_fill.rs`: volume insuficiente na vela produz preenchimento parcial ou recusa **explícitos** e registrados
+- [X] T057 [P] [US1] Teste de CLI em `crates/trade-cli/tests/mode_required.rs`: sem `--mode` falha com código 2 e mensagem de obrigatoriedade; `--mode paper` e `--mode live` falham com "ainda não implementado", **não** com "valor inválido" (FR-001 a FR-003, SC-007)
 
 ### Implementation for User Story 1
 
-- [ ] T058 [US1] Implementar `SimulatedExecutor` em `crates/trade-backtest/src/executor.rs`: aplica taxa e slippage configurados, resolve preenchimento parcial pelo volume da vela, devolve `Fill` com `fee` e `slippage` discriminados
-- [ ] T059 [US1] Implementar `BacktestClock` em `crates/trade-backtest/src/clock.rs`, devolvendo o **instante simulado** da vela corrente — nunca o relógio da máquina (R-008)
-- [ ] T060 [US1] Implementar `BacktestEngine` em `crates/trade-backtest/src/engine.rs`: cursor de velas, ciclo sinal → `RiskGuard` → fill → posição, detecção da virada de dia UTC e chamada a `on_day_boundary`
-- [ ] T061 [US1] Implementar acumulação de métricas e extrato em `crates/trade-backtest/src/run.rs`
-- [ ] T062 [P] [US1] Implementar a estratégia de referência `sma-cross` em `crates/trade-strategy/src/sma_cross.rs`, com `SignalInputs` carregando as duas médias e os parâmetros vigentes (FR-034, FR-037)
-- [ ] T063 [US1] Implementar `SqliteMarketDataSource` em `crates/trade-storage/src/market_source.rs`, percorrendo as velas por cursor — memória constante em relação ao período
-- [ ] T064 [US1] Implementar a persistência de `run`, `trade` e `metrics` em `crates/trade-storage/src/runs_repo.rs`, gravando `limits_json` e `fees_json` junto (FR-025)
-- [ ] T065 [US1] Implementar o comando `trade backtest` em `crates/trade-cli/src/cmd_backtest.rs` com `--mode` obrigatório e sem valor padrão
-- [ ] T066 [US1] Implementar os códigos de saída 0, 2, 3, 4 e 5 em `crates/trade-cli/src/main.rs`, conforme `contracts/cli.md`
-- [ ] T067 [US1] Implementar a saída formatada em `crates/trade-cli/src/report.rs`, exibindo `indefinido` para profit factor sem operação perdedora, nunca `∞`
+- [X] T058 [US1] Implementar `SimulatedExecutor` em `crates/trade-backtest/src/executor.rs`: aplica taxa e slippage configurados, resolve preenchimento parcial pelo volume da vela, devolve `Fill` com `fee` e `slippage` discriminados
+- [X] T059 [US1] Implementar `BacktestClock` em `crates/trade-backtest/src/clock.rs`, devolvendo o **instante simulado** da vela corrente — nunca o relógio da máquina (R-008)
+- [X] T060 [US1] Implementar `BacktestEngine` em `crates/trade-backtest/src/engine.rs`: cursor de velas, ciclo sinal → `RiskGuard` → fill → posição, detecção da virada de dia UTC e chamada a `on_day_boundary`
+- [X] T061 [US1] Implementar acumulação de métricas e extrato em `crates/trade-backtest/src/run.rs`
+- [X] T062 [P] [US1] Implementar a estratégia de referência `sma-cross` em `crates/trade-strategy/src/sma_cross.rs`, com `SignalInputs` carregando as duas médias e os parâmetros vigentes (FR-034, FR-037)
+- [X] T063 [US1] Implementar `SqliteMarketDataSource` em `crates/trade-storage/src/market_source.rs`, percorrendo as velas por cursor — memória constante em relação ao período
+- [X] T064 [US1] Implementar a persistência de `run`, `trade` e `metrics` em `crates/trade-storage/src/runs_repo.rs`, gravando `limits_json` e `fees_json` junto (FR-025)
+- [X] T065 [US1] Implementar o comando `trade backtest` em `crates/trade-cli/src/cmd_backtest.rs` com `--mode` obrigatório e sem valor padrão
+- [X] T066 [US1] Implementar os códigos de saída 0, 2, 3, 4 e 5 em `crates/trade-cli/src/main.rs`, conforme `contracts/cli.md`
+- [X] T067 [US1] Implementar a saída formatada em `crates/trade-cli/src/report.rs`, exibindo `indefinido` para profit factor sem operação perdedora, nunca `∞`
 
 **Checkpoint**: 🎯 **MVP completo.** É possível avaliar uma estratégia sobre histórico e obter as métricas da Porta 1, com todo o caminho de ordens sob a camada de risco.
 

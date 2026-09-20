@@ -16,3 +16,6 @@ testing = []
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+chrono.workspace = true
