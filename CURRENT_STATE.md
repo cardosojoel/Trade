@@ -8,12 +8,41 @@
 
 ## Em uma frase
 
-O núcleo está pronto e funcionando: `trade backtest` avalia uma estratégia
-sobre histórico de BTC com toda ordem passando por uma camada de risco que a
-estratégia não consegue contornar. Falta a coleta de histórico, a persistência
-da auditoria e o polimento.
+**A feature 001 está completa: 105 de 105 tarefas.** O robô coleta histórico da
+Bybit, avalia estratégias sobre ele, registra toda decisão de forma
+reconstituível e mantém toda ordem sob uma camada de risco que a estratégia não
+consegue contornar. Tudo em modo backtest — paper trading e capital real são
+recusados explicitamente.
 
-**67 de 105 tarefas · 147 testes verdes · 4.879 linhas de código, 2.510 de teste**
+**194 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+
+---
+
+## Duas decisões esperando por você
+
+Nenhuma bloqueia o que existe. Ambas mudam comportamento e não são minhas para
+tomar.
+
+### 1. A perda diária conta só o resultado realizado
+
+`record_realized` só é chamado quando uma venda fecha operação. **Uma posição
+aberta perdendo 50% não move o contador e nunca dispara o freio.** O robô pode
+segurar um prejuízo indefinidamente com a cerca inteira intacta.
+
+A constitution diz "perda máxima diária" sem qualificar. Incluir o não
+realizado faz o freio disparar com oscilação normal e fechar o dia cedo demais;
+não incluir permite segurar prejuízo sem limite. As duas leituras são
+defensáveis.
+
+### 2. `max_total_exposure` hoje não morde
+
+Tamanho de posição e exposição total são calculados sobre a mesma grandeza
+(`quantidade × preço`). Com um ativo e uma posição, o limite mais apertado
+sempre vence. Na configuração atual (1000 vs 2000), a exposição é decorativa.
+
+Não é defeito: os dois só divergem com múltiplos ativos ou posições
+simultâneas, ambos fora do escopo desta feature. Mas hoje você tem, na prática,
+um limite e não dois.
 
 ---
 
@@ -23,64 +52,50 @@ da auditoria e o polimento.
 |---|---|
 | **Domínio** | Robô de day trade de Bitcoin |
 | **Mercado** | Spot, **apenas comprado** — sem alavancagem, sem venda a descoberto |
-| **Corretora** | Bybit (histórico público, sem credencial nesta fase) |
+| **Corretora** | Bybit (histórico público, sem credencial) |
 | **Autonomia** | Total dentro dos limites; sem aprovação humana por ordem |
 | **Linguagem** | Rust estável 1.98.1, edition 2024 |
 | **Armazenamento** | SQLite em dois arquivos: `market.db` (cache) e `runs.db` (auditoria) |
-| **Testes** | TDD obrigatório na lógica crítica — ordens, risco, posição e P&L |
 
-A constitution (`.specify/memory/constitution.md`, **v1.2.0**) governa tudo e tem
-precedência sobre qualquer outra prática.
+A constitution (`.specify/memory/constitution.md`, **v1.2.0**) governa tudo e
+tem precedência sobre qualquer outra prática.
 
 ---
 
-## O que funciona hoje
+## O que funciona
 
 ```bash
-trade backtest --mode backtest --symbol BTCUSDT --interval 1m \
-  --from 2026-01-01 --to 2026-01-04 --capital 10000 \
-  --strategy sma-cross --strategy-params fast=9,slow=21 \
-  --limits examples/limits.toml --fees examples/fees.toml
+trade collect  --symbol BTCUSDT --interval 1m --from 2025-09-20 --to 2026-09-20
+trade backtest --mode backtest --from 2025-09-20 --to 2026-09-20 --capital 10000 \
+               --limits limits.toml --fees fees.toml
+trade kill                  # aciona o freio; --release libera
 ```
 
-Saída de uma execução real sobre 3.000 velas:
+Medido sobre **dados reais** de doze meses (ver [docs/desempenho.md](docs/desempenho.md)):
 
-```
-  Capital inicial            10000
-  Resultado líquido         -75.09     -0.8%
-  Taxas                     113.71
-  Slippage                   57.35
-
-  Operações                     57
-  Profit factor               0.48
-  Drawdown máximo            75.09     +0.8%
-
-  Ordens recusadas              10   (MaxPositionSize 10)
-  Velas percorridas           3000
-```
-
-As 10 recusas são a cerca funcionando **e aparecendo**: a estratégia pediu 10%
-do saldo com posição já aberta e o teto barrou.
-
-Também existe `trade kill` para acionar e liberar o kill switch.
+| | |
+|---|---|
+| Coleta | 525.600 velas, 526 páginas, 4m48, pico de 12 MB |
+| Backtest | 525.600 velas em **1,03s** (a meta era 60s), 15 MB |
+| Conta | resultado reportado × soma do extrato: **divergência zero** em 14.308 operações |
+| Auditoria | 143.135 eventos, `seq` sem buraco; 28.633 ordens e 28.633 decisões |
+| Determinismo | duas execuções idênticas dígito a dígito |
 
 ---
 
 ## As três garantias estruturais
 
-Não são convenção nem disciplina — o build recusa a violação. Verifiquei as três
-violando de propósito e confirmando que falham.
+Não são convenção. Verifiquei as três violando de propósito.
 
-| Garantia | Onde | O que acontece se for violada |
-|---|---|---|
-| Estratégia, risco e backtest não alcançam a corretora nem a rede | `tests/architecture.rs` | Teste falha, CI barra o merge |
-| Nenhum `f32`/`f64` em caminho monetário | `tests/no_float.rs` | Teste falha, CI barra o merge |
-| Obter o executor de dentro do `RiskGuard` | `crates/trade-risk/tests/compile_fail/` | **Não compila** |
+| Garantia | O que acontece se for violada |
+|---|---|
+| Estratégia, risco e backtest não alcançam corretora nem rede | `tests/architecture.rs` falha, CI barra o merge |
+| Nenhum `f32`/`f64` em caminho monetário | `tests/no_float.rs` falha, CI barra o merge |
+| Obter o executor de dentro do `RiskGuard` | **Não compila** |
 
-`trade-strategy` não declara `trade-ports` como dependência e por isso não
-consegue sequer **nomear** `OrderExecutor`. A estratégia devolve `Signal`; quem
-converte em ordem é o motor, e o caminho do motor até o mercado atravessa o
-`RiskGuard`, que **possui** o executor.
+`trade-strategy` não declara `trade-ports` e por isso não consegue sequer
+**nomear** `OrderExecutor`. Um guarda adicional impede que estratégia ou risco
+mencionem nome de corretora no próprio texto.
 
 ---
 
@@ -88,132 +103,68 @@ converte em ordem é o motor, e o caminho do motor até o mercado atravessa o
 
 ```
 crates/
-├── trade-domain/      tipos puros, sem E/S            33 testes
+├── trade-domain/      tipos puros, sem E/S
 ├── trade-ports/       as traits de fronteira
-├── trade-risk/        camada de risco                 51 testes
-├── trade-strategy/    sma-cross e reckless             5 testes
-├── trade-backtest/    o motor                         22 testes
-├── trade-storage/     SQLite                          18 testes
-├── trade-bybit/       coleta (vazio — Fase 5)
-└── trade-cli/         binário `trade`                 13 testes
-tests/                 travas de arquitetura            4 testes
+├── trade-risk/        camada de risco; possui o executor
+├── trade-strategy/    sma-cross e reckless; depende só do domínio
+├── trade-backtest/    o motor
+├── trade-storage/     SQLite: histórico, execuções, auditoria
+├── trade-bybit/       coleta; única crate com HTTP
+└── trade-cli/         binário `trade`; ponto de composição
+tests/                 travas de arquitetura
 ```
 
 ---
 
-## O que falta
-
-| Fase | História | Tarefas |
-|---|---|---|
-| 5 | **US3** — coleta do histórico da Bybit | 0/16 |
-| 6 | **US4** — auditoria persistente | 0/10 |
-| 7 | **US5** — troca de provedor | 0/5 |
-| 8 | Polish, README e quickstart completo | 0/7 |
-
-Fases 1 a 4 concluídas (67/67).
-
----
-
-## Pendências e decisões em aberto
-
-### 🔴 Auditoria não persiste
-
-O `AuditSink` em uso descarta os eventos (`trade-storage/src/audit_noop.rs`).
-**O Princípio IV não está cumprido em execução real.** Não é configurável — não
-há bandeira que o selecione — e o arquivo sai quando a US4 chegar.
-
-### 🟡 A perda diária conta só o resultado realizado
-
-`record_realized` só é chamado quando uma venda fecha operação. Uma posição
-aberta perdendo 50% não move o contador e **nunca dispara o freio**.
-
-A constitution diz "perda máxima diária" sem qualificar. Incluir o não realizado
-faria o freio disparar com oscilação normal e fechar o dia cedo demais; não
-incluir permite segurar prejuízo indefinidamente. **Decisão pendente do
-mantenedor.**
-
-### 🟡 `max_total_exposure` hoje não morde
-
-Tamanho de posição e exposição total são calculados sobre a mesma grandeza
-(`quantidade × preço`). Com um ativo e uma posição, o limite mais apertado
-sempre vence. Na configuração atual (1000 vs 2000), a exposição é decorativa.
-
-Não é defeito: os dois só divergem com múltiplos ativos ou posições
-simultâneas, ambos fora do escopo desta feature.
+## Pendências
 
 ### 🟡 Os limiares ainda não foram calibrados
 
 Perda diária 2%, posição 10%, exposição 20%, profit factor 1.3, drawdown 15% —
-todos **propostos pelo assistente e aceitos como valores de partida
-provisórios**, não medidos. Vivem em `limits.toml`, nunca no código.
+**propostos pelo assistente e aceitos como valores de partida provisórios**, não
+medidos. Vivem em `limits.toml`, nunca no código.
 
-A constitution **exige** que sejam revistos contra o capital real antes da
-Porta 3, a liberação para capital real.
+A constitution **exige** revisão contra o capital real antes da Porta 3.
 
----
+### 🟡 A estratégia de referência perde dinheiro, e isso é informação
 
-## Defeitos encontrados e corrigidos
+Sobre doze meses reais: **−98,7%**, com 9.664 de custo de transação sobre 10.000
+de capital, em 14.308 operações.
 
-Dois, ambos só visíveis rodando de verdade — e ambos com teste de regressão.
+Não é defeito do motor — é o motor funcionando. Uma estratégia que opera 14 mil
+vezes por ano em velas de um minuto não sobrevive ao próprio custo. Antes de
+buscar estratégia melhor, vale decidir se a granularidade de um minuto faz
+sentido para este projeto.
 
-**Divergência na soma do extrato.** `net_result` e a soma das operações
-divergiam em 9×10⁻²⁷ quando a soma era refeita em SQL. Os testes em Rust
-comparavam duas contas feitas com a mesma aritmética e concordavam sempre. A
-causa: quantidades vindas de divisão carregavam 28 dígitos — `0,01709352543…`
-BTC é uma ordem que corretora nenhuma aceita. Corrigido truncando quantidade,
-taxa, slippage e resultado a 8 casas, a precisão do satoshi. Divergência agora
-é **zero**, verificada em SQL.
+### 🟢 Escopo concluído
 
-**Saldo estourado.** A cerca avaliava o custo de uma compra como
-`quantidade × preço de referência`, mas o débito real inclui slippage e taxa.
-Capital de 1000 terminava em −15,05. Corrigido avaliando o custo de pior caso
-e descontando o custo de transação no dimensionamento padrão.
-
-A lição das duas: **verificação por fora, com outra aritmética, pega o que
-teste interno não pega.**
+Não há tarefa pendente na feature 001.
 
 ---
 
-## Portões de qualidade
+## O que vem depois
 
-```bash
-cargo test --workspace --all-features                              # 147 verdes
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo fmt --all --check
-```
+A feature 001 entregou o núcleo. A constitution define as próximas portas:
 
-O CI roda as travas de arquitetura **primeiro e isoladas**: se uma delas falha,
-o problema é arquitetural e não adianta saber se o resto passou.
+| Porta | O que exige |
+|---|---|
+| **1. Backtest** | ≥ 12 meses com mercado de baixa e evento de alta volatilidade; ≥ 100 operações; profit factor ≥ 1.3; drawdown ≤ 15% |
+| **2. Paper trading** | ≥ 30 dias ininterruptos em testnet, com o mesmo código que iria para live |
+| **3. Liberação** | Ato humano registrado |
 
-Verificado no GitHub em 2026-09-20: os três jobs passam — travas de arquitetura
-(27s), formato e lints (1m07), testes (2m03). Tudo sincronizado com o remoto.
-
----
-
-## Próximo passo
-
-Fase 5 — coleta do histórico da Bybit (T068–T083). Fatos já verificados da API
-que moldam o coletor:
-
-- `GET /v5/market/kline`, **público, sem autenticação**
-- `category` assume `linear` se omitido — `spot` é obrigatório
-- `limit` máximo 1000; 12 meses de velas de 1 minuto ≈ 526 requisições
-- Lista vem do **mais recente para o mais antigo**; o coletor inverte
-- Preços como **string**, convertidos direto para `Decimal`
-- **`closePrice` é o último preço negociado enquanto a vela não fechou** — a
-  vela em formação é descartada, ou o determinismo quebra em silêncio
-- Limite de 600 requisições por 5 segundos por IP; `retCode 10006` + HTTP 403
+Nenhuma estratégia passou a Porta 1 — a de referência não passa nem perto, e
+nem deveria. **O próximo trabalho substantivo é uma feature nova**: ou pesquisa
+de estratégia, ou o adaptador de paper trading da Bybit (feature 002).
 
 ---
 
-## Documentos do projeto
+## Documentos
 
 | Arquivo | O que é |
 |---|---|
-| `.specify/memory/constitution.md` | Governa tudo. v1.2.0 |
-| `specs/001-nucleo-execucao/spec.md` | O que o núcleo faz, 46 requisitos |
-| `specs/001-nucleo-execucao/plan.md` | Como, e por que assim |
-| `specs/001-nucleo-execucao/research.md` | As 9 decisões técnicas com alternativas |
-| `specs/001-nucleo-execucao/tasks.md` | As 105 tarefas e o que já foi feito |
-| `specs/001-nucleo-execucao/quickstart.md` | Roteiro de validação, cenários A–J |
-| `CLAUDE.md` | Diretrizes de trabalho e invariantes do repositório |
+| [README.md](README.md) | Visão geral, instalação, uso |
+| [CLAUDE.md](CLAUDE.md) | Diretrizes de trabalho e invariantes |
+| [docs/auditoria.md](docs/auditoria.md) | Consultas de reconstituição, prontas para o DBeaver |
+| [docs/desempenho.md](docs/desempenho.md) | Medições e cenários do quickstart |
+| `.specify/memory/constitution.md` | Governa o projeto |
+| `specs/001-nucleo-execucao/` | Spec, plano, pesquisa, contratos, tarefas |
