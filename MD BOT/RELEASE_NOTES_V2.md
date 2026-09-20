@@ -1,5 +1,10 @@
 # SDD Trading Bot — v2
 
+**Status:** registro histórico — **não normativo**, preservado como está  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Inclusão
 Foram formalizados os documentos 10–24.
 

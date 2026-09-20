@@ -1,5 +1,11 @@
 # 01 — Execution Engine — Bybit Low-Latency Revision
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-EXEC-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 
 Executar ordens com baixa latência, idempotência e segurança, usando o WebSocket Order Entry da Bybit como caminho preferencial para operações críticas.
@@ -31,17 +37,16 @@ Reconciliation
 ## Caminhos
 
 ### Hot path
-Preferir:
+**REQ-EXEC-001** Operações de `create`, `amend` e `cancel` MUST usar o WebSocket
+Order Entry como caminho preferencial:
 
 ```text
 WebSocket Trade
 ```
 
-para `create/amend/cancel`.
-
 ### Recovery / fallback
 
-REST pode ser usado para:
+**REQ-EXEC-002** REST MAY ser usado para:
 
 - reconciliação;
 - recuperação;
@@ -49,11 +54,12 @@ REST pode ser usado para:
 - operações não críticas;
 - contingência quando o WebSocket Order Entry estiver indisponível.
 
-Não fazer retry cego de uma ordem cujo resultado seja desconhecido.
+**REQ-EXEC-003** O sistema MUST NOT repetir uma ordem cujo resultado seja
+desconhecido antes de reconciliar o estado remoto.
 
 ## Idempotência
 
-Cada intenção:
+**REQ-EXEC-004** Cada intenção MUST carregar:
 
 ```text
 trade_intent_id
@@ -64,7 +70,7 @@ risk_version
 timestamp
 ```
 
-`reqId` deve ser único dentro da conexão para evitar duplicação; a Bybit retorna erro quando um `reqId` é duplicado. [Bybit WebSocket Trade](https://bybit-exchange.github.io/docs/v5/websocket/trade/guideline)
+**REQ-EXEC-005** `reqId` MUST ser único dentro da conexão, para evitar duplicação; a Bybit retorna erro quando um `reqId` é duplicado. [Bybit WebSocket Trade](https://bybit-exchange.github.io/docs/v5/websocket/trade/guideline)
 
 ## Estados
 
@@ -81,11 +87,13 @@ REJECTED
 UNKNOWN
 ```
 
-`UNKNOWN` exige reconciliação antes de qualquer nova ordem relacionada.
+**REQ-EXEC-006** Ordem em `UNKNOWN` MUST ser reconciliada antes de qualquer
+nova ordem relacionada a ela.
 
 ## Execution Fast
 
-Assinar `execution.fast` em paralelo ao stream completo. A Bybit descreve `execution.fast` como um stream de menor latência, mas ele entrega somente `execType=Trade` e menos campos. [Bybit Fast Execution](https://bybit-exchange.github.io/docs/v5/websocket/private/fast-execution)
+**REQ-EXEC-007** O sistema MUST assinar `execution.fast` em paralelo ao stream
+completo, e MUST NOT tratá-lo como fonte única do lifecycle. A Bybit descreve `execution.fast` como um stream de menor latência, mas ele entrega somente `execType=Trade` e menos campos. [Bybit Fast Execution](https://bybit-exchange.github.io/docs/v5/websocket/private/fast-execution)
 
 Uso:
 
@@ -97,7 +105,8 @@ order stream   → lifecycle da ordem
 
 ## Métricas
 
-Registrar timestamps monotônicos locais e timestamps da Bybit quando disponíveis:
+**REQ-EXEC-008** O sistema MUST registrar timestamps monotônicos locais e os
+timestamps da Bybit quando disponíveis:
 
 ```text
 market_received
@@ -134,6 +143,7 @@ jitter
 
 ## Conclusão
 
-**Estado: arquitetura de produção forte.**
+O ganho principal desta revisão é separar aceitação de ordem, lifecycle e
+execução efetiva.
 
-O ganho principal desta revisão é separar aceitação de ordem, lifecycle e execução efetiva. O sistema não pode interpretar ACK como fill.
+**REQ-EXEC-009** O sistema MUST NOT interpretar ACK como fill.

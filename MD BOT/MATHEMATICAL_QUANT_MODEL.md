@@ -3,6 +3,7 @@
 **Versão:** 1.1  
 **Status:** **normativo** — esta é a fonte de verdade sobre features, regime,
 EV e sizing. Os documentos `10`, `11`, `15` e `16` são índices para cá.  
+**Domínio de requisitos:** `REQ-FEATURE-*`, `REQ-REGIME-*`, `REQ-EV-*`, `REQ-SIZING-*` e `REQ-STRATEGY-*`  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Modelo matemático para geração, avaliação e controle de sinais de trading de Bitcoin
 
@@ -271,7 +272,7 @@ O drawdown deve ser uma feature independente.
 
 # 11. Regime de mercado
 
-O modelo MUST classificar o mercado no enum canônico do glossário:
+**REQ-REGIME-001** O modelo MUST classificar o mercado no enum canônico do glossário:
 
 ```rust
 enum MarketRegime {
@@ -357,8 +358,8 @@ FeatureVector {
 Nenhuma feature pode utilizar dados posteriores ao timestamp do snapshot:
 `Feature(t) = f(X[−∞, t])`.
 
-Cada feature MUST declarar `name`, `formula`, `window`, `source`, `unit`,
-`normalization`, `timestamp` e `version`.
+**REQ-FEATURE-001** Cada feature MUST declarar `name`, `formula`, `window`,
+`source`, `unit`, `normalization`, `timestamp` e `version`.
 
 Features do hot path MUST ser calculadas incrementalmente em RAM, sem E/S, sem
 varredura de histórico e sem alocação desnecessária.
@@ -414,7 +415,7 @@ P(down)R_{down}
 
 # 15. Expected Value
 
-O modelo canônico é **ternário**, consistente com a seção 13:
+**REQ-EV-001** O modelo canônico é **ternário**, consistente com a seção 13:
 
 \[
 EV_{gross} =
@@ -445,7 +446,7 @@ EV = P(win)·AvgWin − P(loss)·AvgLoss − C_total
 `P_loss = 1 − P_win`. Ela MUST NOT coexistir como fórmula independente: se
 `P_neutral > 0`, então `1 − P_win` não é `P_loss` e a projeção está errada.
 
-O sistema MUST calcular também um cenário conservador, degradando conforme
+**REQ-EV-002** O sistema MUST calcular também um cenário conservador, degradando conforme
 política versionada probabilidade, retorno favorável, slippage, fees e
 probabilidade de preenchimento:
 
@@ -460,7 +461,7 @@ EV_net > EV_min
 AND EV_conservative > EV_min_conservative
 ```
 
-Mas `EV_net > 0` sozinho MUST NOT autorizar execução: a autoridade é do Risk
+**REQ-EV-003** Mas `EV_net > 0` sozinho MUST NOT autorizar execução: a autoridade é do Risk
 Engine. A decisão MUST persistir `p_up`, `p_neutral`, `p_down`, os retornos por
 estado, os custos por categoria, `ev_gross`, `ev_net`, `ev_conservative`, os
 thresholds aplicados e as versões de modelo e features.
@@ -625,7 +626,7 @@ S = stop
 M = multiplicador do contrato
 ```
 
-O sizing ocorre **depois** de existir vantagem estatística e **antes** da
+**REQ-SIZING-001** O sizing ocorre **depois** de existir vantagem estatística e **antes** da
 autorização final de risco. Métodos admitidos: fixed fractional, risk-based,
 volatility-adjusted e fractional Kelly opcional.
 
@@ -656,7 +657,7 @@ TotalRisk =
 PositionRisk + Fees + Slippage
 \]
 
-A posição somente poderá ser autorizada quando:
+**REQ-SIZING-002** A posição MUST NOT ser autorizada exceto quando:
 
 \[
 TotalRisk \le AllowedTradeRisk
@@ -693,7 +694,7 @@ Accuracy nunca deve ser usada isoladamente.
 
 Um sinal mais forte pode aumentar a confiança estatística.
 
-Ele não pode aumentar automaticamente:
+**REQ-STRATEGY-001** Ele MUST NOT aumentar automaticamente:
 
 ```text
 Risk Budget
@@ -708,7 +709,7 @@ O Risk Engine permanece soberano.
 
 # 26. Precisão numérica
 
-Não utilizar floating point para dinheiro.
+**REQ-STRATEGY-002** Ponto flutuante MUST NOT representar dinheiro.
 
 Preferir:
 
@@ -738,9 +739,8 @@ Model Version
 Configuration
 ```
 
-o resultado deve ser reproduzível.
-
-Randomização deve ser explicitamente controlada e versionada.
+**REQ-STRATEGY-003** o resultado MUST ser reproduzível, e a randomização MUST
+ser explicitamente controlada e versionada.
 
 ---
 
@@ -770,7 +770,7 @@ ALLOW / DENY
 
 O modelo quantitativo nunca contorna o Risk Engine.
 
-Regras da cadeia:
+**REQ-STRATEGY-004** Regras da cadeia:
 
 - o Strategy Engine MAY propor uma operação; o Risk Engine MAY recusá-la;
 - o Execution Engine MUST NOT transformar uma recusa em ordem válida;

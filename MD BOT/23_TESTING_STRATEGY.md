@@ -1,9 +1,17 @@
 # 23 — Testing Strategy — v3
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-TEST-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Camadas
 Unit, integration, property-based, regression, replay, backtest, fault injection, load, stress, performance e security.
 
 ## Invariantes matemáticos
+**REQ-TEST-001** MUST existir teste automatizado para cada invariante:
+
 - Probability ∈ [0,1];
 - soma das probabilidades = 1 dentro da tolerância;
 - EV ternário inclui custos;
@@ -14,13 +22,15 @@ Unit, integration, property-based, regression, replay, backtest, fault injection
 - WorstCaseSessionExposure segue fórmula canônica.
 
 ## Risk / Recovery
-Testar múltiplos episódios, sucesso seguido de nova deterioração, budget esgotado, Emax, Amax e falha de reconciliação.
+**REQ-TEST-002** MUST ser testado: múltiplos episódios, sucesso seguido de nova deterioração, budget esgotado, Emax, Amax e falha de reconciliação.
 
 ## Bybit
-Testar ACK vs fill, duplicate prevention, partial fill, reconnect, resubscribe, sequence gap, unknown order, instrument constraints e reconciliation.
+**REQ-TEST-003** MUST ser testado: ACK vs fill, duplicate prevention, partial fill, reconnect, resubscribe, sequence gap, unknown order, instrument constraints e reconciliation.
 
 ## Performance
-Medir p50/p95/p99/p99.9/max e jitter por estágio e end-to-end interno.
+**REQ-TEST-004** MUST ser medido p50/p95/p99/p99.9/max e jitter, por estágio e
+end-to-end interno.
 
 ## Gate
-Nenhum build de produção sem testes críticos, replay/regression e benchmarks mínimos definidos no Registry.
+**REQ-TEST-005** Nenhum build de produção MAY ser promovido sem testes críticos,
+replay/regressão e os benchmarks mínimos definidos no Registry.

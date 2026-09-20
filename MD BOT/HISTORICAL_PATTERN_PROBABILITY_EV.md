@@ -3,6 +3,7 @@
 **Versão:** 1.1  
 **Status:** **normativo** — esta é a fonte de verdade sobre pattern matching,
 probabilidade e EV. Os documentos `12`, `13` e `14` são índices para cá.  
+**Domínio de requisitos:** `REQ-PATTERN-* e `REQ-PROB-*`  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Transformação de padrões históricos em probabilidade, retorno esperado e valor esperado para decisões de trading
 
@@ -124,7 +125,7 @@ Nunca:
 Feature(X_t) \leftarrow Data[>t]
 \]
 
-Esta regra é obrigatória para impedir:
+**REQ-PATTERN-001** Esta regra MUST ser respeitada, para impedir:
 
 - look-ahead bias;
 - data leakage;
@@ -152,7 +153,7 @@ onde:
 
 Os parâmetros de normalização devem ser versionados.
 
-No período de teste:
+**REQ-PATTERN-002** No período de teste:
 
 ```text
 NÃO recalcular μ e σ.
@@ -203,8 +204,9 @@ K = 100
 
 O `K` deve ser configurável e validado por walk-forward.
 
-Não assumir que `K = 100` é matematicamente ótimo. `K` é hiperparâmetro e MUST
-NOT ser otimizado no mesmo período usado para avaliar o resultado.
+**REQ-PATTERN-003** Não assumir que `K = 100` é matematicamente ótimo. `K` é
+hiperparâmetro e MUST NOT ser otimizado no mesmo período usado para avaliar o
+resultado.
 
 A métrica de distância MUST ser versionada; a linha de base é a distância
 euclidiana ponderada da seção 6. Extensões — Mahalanobis, por exemplo — só
@@ -366,7 +368,7 @@ Consequentemente:
 P(UP)+P(DOWN)+P(NEUTRAL)=1
 \]
 
-Em amostra pequena, a contagem ponderada MUST receber smoothing; a estimativa
+**REQ-PROB-001** Em amostra pequena, a contagem ponderada MUST receber smoothing; a estimativa
 MUST registrar amostra efetiva, `K`, horizonte, regime, intervalo de confiança e
 versão.
 
@@ -404,7 +406,7 @@ Não interpretar automaticamente `68,4%` como garantia de alta.
 
 # 14. Probabilidade efetiva
 
-A probabilidade bruta deve ser posteriormente calibrada.
+**REQ-PROB-002** A probabilidade bruta MUST ser calibrada antes do uso.
 
 Definir:
 
@@ -752,8 +754,8 @@ average_distance > maximum_allowed_distance
 NO_TRADE
 ```
 
-Sem amostra mínima ou sem qualidade de similaridade suficiente, o módulo MUST
-retornar `INSUFFICIENT_EVIDENCE` — não uma probabilidade de baixa confiança
+**REQ-PATTERN-004** Sem amostra mínima ou sem qualidade de similaridade
+suficiente, o módulo MUST retornar `INSUFFICIENT_EVIDENCE` — não uma probabilidade de baixa confiança
 travestida de estimativa.
 
 ---
@@ -887,7 +889,7 @@ O horizonte escolhido deve maximizar o valor esperado ajustado ao risco e aos cu
 
 # 32. Critério mínimo de qualidade
 
-Um candidato pode exigir:
+**REQ-PROB-003** Um candidato MUST satisfazer:
 
 ```text
 P_calibrated >= P_min
@@ -1072,7 +1074,7 @@ O cálculo de padrões históricos deve respeitar o corte temporal de cada perí
 
 # 38. Integridade temporal
 
-Para uma decisão em `t`:
+**REQ-PATTERN-005** Para uma decisão em `t`:
 
 ```text
 Allowed:

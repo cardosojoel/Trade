@@ -1,5 +1,10 @@
 # Audit Action Plan — P0
 
+**Status:** registro histórico — **não normativo**, preservado como está  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 1. Canonicalizar EV ternário.
 2. Separar Recovery Episode de Recovery Budget global.
 3. Formalizar WorstCaseSessionLoss.

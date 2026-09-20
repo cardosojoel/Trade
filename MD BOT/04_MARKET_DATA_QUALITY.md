@@ -1,5 +1,11 @@
 # 04 — Market Data Quality — Bybit Revision
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-DATA-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 
 Garantir que decisões sejam tomadas somente sobre dados atuais, ordenados e consistentes.
@@ -19,7 +25,8 @@ A Bybit informa atualmente frequências de 10 ms para Level 1, 20 ms para Level 
 
 ## Não confundir frequência do feed com latência do bot
 
-O SLO sub-milissegundo é para processamento interno:
+**REQ-DATA-001** O SLO sub-milissegundo aplica-se ao processamento interno, não
+à frequência do feed:
 
 ```text
 evento recebido
@@ -30,7 +37,7 @@ Não é uma exigência de que o mercado gere novos eventos a cada microssegundo.
 
 ## Order Book
 
-Processar corretamente:
+**REQ-DATA-002** O processamento do book MUST tratar corretamente:
 
 ```text
 snapshot
@@ -42,11 +49,13 @@ ts
 cts
 ```
 
-Uma nova mensagem `snapshot` exige reconstrução do book local. [Bybit Orderbook](https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook)
+**REQ-DATA-003** Uma nova mensagem `snapshot` MUST provocar reconstrução do
+book local. [Bybit Orderbook](https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook)
 
 ## Trades
 
-O stream de trades é real-time e uma mensagem pode conter até 1024 trades para Futures/Spot. Portanto o parser e o pipeline devem suportar bursts reais. [Bybit Trade](https://bybit-exchange.github.io/docs/v5/websocket/public/trade)
+O stream de trades é real-time e uma mensagem pode conter até 1024 trades para Futures/Spot. Portanto o parser e o pipeline MUST suportar bursts reais de até 1024 trades
+por mensagem (**REQ-DATA-004**). [Bybit Trade](https://bybit-exchange.github.io/docs/v5/websocket/public/trade)
 
 ## Data Age
 
@@ -54,7 +63,8 @@ O stream de trades é real-time e uma mensagem pode conter até 1024 trades para
 Age = T_{local\_receive} - T_{exchange}
 \]
 
-Classificação inicial:
+**REQ-DATA-005** A idade do dado MUST ser classificada e MUST bloquear nova
+entrada acima do limiar. Classificação inicial:
 
 ```text
 < 50 ms      NORMAL
@@ -67,7 +77,7 @@ Os limites devem ser calibrados para o feed e estratégia.
 
 ## Integridade
 
-Detectar:
+**REQ-DATA-006** O sistema MUST detectar:
 
 ```text
 sequence gap
@@ -78,10 +88,9 @@ snapshot reset
 unexpected timestamp
 ```
 
-Dados inconsistentes não devem ser corrigidos silenciosamente.
+**REQ-DATA-007** Dados inconsistentes MUST NOT ser corrigidos silenciosamente.
 
 ## Conclusão
 
-**Estado: forte e alinhado ao feed da Bybit.**
-
-O benchmark deve utilizar eventos reais/replay e bursts de até 1024 trades, e não apenas uma taxa artificial constante.
+**REQ-DATA-008** O benchmark MUST utilizar eventos reais ou replay e bursts de
+até 1024 trades, não apenas uma taxa artificial constante.

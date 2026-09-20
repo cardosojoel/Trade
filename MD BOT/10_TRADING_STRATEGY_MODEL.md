@@ -1,6 +1,6 @@
 # 10 — Trading Strategy Model
 
-**Status:** índice — **não normativo**  
+**Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md)  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 

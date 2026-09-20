@@ -1,10 +1,16 @@
 # 05 — Backtest Engine
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-BACKTEST-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 Permitir validar estratégia, modelo e Risk Engine usando dados históricos sem introduzir vieses.
 
 ## Princípio
-O backtest deve reutilizar a mesma lógica de:
+**REQ-BACKTEST-001** O backtest MUST reutilizar a mesma lógica de produção:
 ```text
 features
 signal
@@ -40,6 +46,8 @@ Metrics
 ```
 
 ## Regras
+**REQ-BACKTEST-002** O motor MUST garantir:
+
 - sem look-ahead;
 - sem future leakage;
 - custos realistas;
@@ -48,6 +56,9 @@ Metrics
 - decisões reproduzíveis.
 
 ## Walk-forward
+
+**REQ-BACKTEST-003** A avaliação MUST ser walk-forward; treino e teste MUST NOT
+compartilhar período.
 ```text
 TRAIN → VALIDATE → TEST
        ↓
@@ -57,6 +68,8 @@ TRAIN → VALIDATE → TEST
 ```
 
 ## Métricas
+**REQ-BACKTEST-004** O motor MUST produzir:
+
 ```text
 Net PnL
 Profit Factor
@@ -71,6 +84,4 @@ CVaR
 ```
 
 ## Conclusão
-**Estado: forte, mas não estado da arte ainda.**
-
 O maior risco é o simulador divergir da execução real. Para elevar o nível, incorporar dados de execução real, latência, slippage dependente de liquidez, partial fills, funding e replay determinístico de eventos.

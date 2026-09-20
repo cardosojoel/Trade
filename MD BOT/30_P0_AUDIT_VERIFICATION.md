@@ -1,5 +1,10 @@
 # 30 — P0 Audit Verification
 
+**Status:** registro histórico — **não normativo**, preservado como está  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Escopo
 Revisão da baseline após aplicação das correções P0 identificadas na auditoria cruzada.
 

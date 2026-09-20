@@ -1,28 +1,39 @@
 # 24 — Configuration & Governance — v3
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-GOV-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 Separar código, modelo, estratégia, política de risco e parâmetros operacionais, eliminando múltiplas fontes de verdade.
 
 ## Autoridade dos parâmetros
 Os MDs definem **regras e invariantes**. Valores operacionais versionados devem existir no `Configuration Registry` (`27_CONFIGURATION_REGISTRY.md`).
 
-Nenhum MD pode ser tratado como fonte concorrente de valores concretos.
+**REQ-GOV-001** Nenhum documento MAY ser fonte concorrente de valores
+concretos: regras vivem nos MDs, valores vivem no Registry.
 
 ## Categorias
 `CODE`, `MODEL`, `STRATEGY_CONFIG`, `RISK_POLICY`, `EXCHANGE_CONFIG`, `OBSERVABILITY`.
 
 ## Registro
-Cada parâmetro possui:
+**REQ-GOV-002** Cada parâmetro MUST possuir:
 `parameter_id`, `value`, `type`, `unit`, `scope`, `min`, `max`, `version`, `effective_from`, `status`, `source`.
 
 ## Sessão
-Parâmetros estruturais de risco são congelados no início da sessão.
+**REQ-GOV-003** Parâmetros estruturais de risco MUST ser congelados no início
+da sessão.
 
 ## Governança
-Alterações registram actor, timestamp, reason, previous version e new version. Alterações críticas exigem nova versão de configuração e validação.
+**REQ-GOV-004** Toda alteração MUST registrar actor, timestamp, reason, versão
+anterior e versão nova. Alterações críticas exigem nova versão de configuração e validação.
 
 ## Segurança
-Segredos nunca ficam em Markdown, SQLite em texto puro ou configuração versionada.
+**REQ-GOV-005** Segredos MUST NOT existir em Markdown, em SQLite em texto puro
+ou em configuração versionada.
 
 ## Invariantes
-Configuration pode parametrizar comportamento, mas nunca pode contornar invariantes do Risk Engine ou permissões de segurança.
+**REQ-GOV-006** Configuração MAY parametrizar comportamento e MUST NOT
+contornar invariante do Risk Engine ou permissão de segurança.

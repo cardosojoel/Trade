@@ -1,6 +1,6 @@
 # 00 — Glossário Canônico
 
-**Status:** normativo · **Versão:** 1.0 · **Atualizado em:** 2026-09-20
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20
 
 ## Regra de autoridade
 
@@ -155,7 +155,41 @@ Um mesmo termo pode aparecer em duas grafias: `MaxLossDeposit` em prosa e
 este glossário proíbe é palavra diferente para a mesma coisa, não capitalização
 diferente da mesma palavra.
 
-## 10. Linguagem normativa
+## 10. Linguagem normativa e identificação de requisito
 
 `MUST`, `MUST NOT`, `SHOULD`, `MAY` no sentido da RFC 2119. Texto que não usa
 uma dessas formas é explicação, não requisito, e não gera teste.
+
+Todo requisito recebe identificador estável no formato
+`REQ-<DOMÍNIO>-<NNN>`, escrito **onde a regra está** — nunca em lista à parte,
+que viraria uma segunda camada a manter. O identificador é imutável: um
+requisito que deixa de valer é marcado como retirado, nunca renumerado nem
+reaproveitado.
+
+Domínios em uso, um por documento normativo:
+
+| Domínio | Documento |
+|---|---|
+| `EXEC` | `01_EXECUTION_ENGINE.md` |
+| `RECON` | `02_POSITION_RECONCILIATION.md` |
+| `DATA` | `04_MARKET_DATA_QUALITY.md` |
+| `BACKTEST` | `05_BACKTEST_ENGINE.md` |
+| `SIM` | `06_EXECUTION_SIMULATOR.md` |
+| `SEC` | `08_SECURITY_OBSERVABILITY.md` |
+| `PERF` | `09_PERFORMANCE_LOW_LATENCY.md` |
+| `DB` | `19_DATABASE_SCHEMA.md` |
+| `EVENT` | `20_EVENT_MODEL.md` |
+| `REPLAY` | `21_REPLAY_ENGINE.md` |
+| `FAIL` | `22_FAILURE_RECOVERY.md` |
+| `TEST` | `23_TESTING_STRATEGY.md` |
+| `GOV` | `24_CONFIGURATION_AND_GOVERNANCE.md` |
+| `CFG` | `27_CONFIGURATION_REGISTRY.md` |
+| `BYBIT` | `28_BYBIT_INSTRUMENT_REGISTRY.md` |
+| `RUST` | `29_RUST_CONTRACTS.md` |
+| `RISK`, `RECOVERY` | `trading_risk_recovery_mathematical_spec.md` |
+| `FEATURE`, `REGIME`, `EV`, `SIZING`, `STRATEGY` | `MATHEMATICAL_QUANT_MODEL.md` |
+| `PATTERN`, `PROB` | `HISTORICAL_PATTERN_PROBABILITY_EV.md` |
+| `LEARN` | `DECISION_LEARNING.md` |
+
+A rastreabilidade de cada ID até módulo, teste e métrica vive no
+[`26_REQUIREMENTS_TRACEABILITY_MATRIX.md`](26_REQUIREMENTS_TRACEABILITY_MATRIX.md).

@@ -4,6 +4,7 @@
 **Status:** **normativo** — esta é a fonte de verdade sobre ledger de decisões,
 aprendizado, validação e promoção de modelo. Os documentos `07`, `17` e `18` são
 índices para cá.  
+**Domínio de requisitos:** `REQ-LEARN-*`  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Histórico de decisões, resultados, avaliação, aprendizado e evolução controlada do modelo
 
@@ -52,7 +53,7 @@ DecisionSnapshot
 
 Ela representa o estado completo conhecido pelo bot no momento da decisão.
 
-Depois de criado:
+**REQ-LEARN-001** Depois de criado:
 
 ```text
 DecisionSnapshot = IMMUTABLE
@@ -74,7 +75,8 @@ NO_TRADE
 DENY_BY_RISK
 ```
 
-Não registrar apenas operações executadas.
+**REQ-LEARN-002** O ledger MUST registrar toda decisão, não apenas as
+operações executadas.
 
 Isso permite medir:
 
@@ -314,7 +316,8 @@ Decision
 editar Decision depois do resultado
 ```
 
-O resultado deve ser uma entidade separada.
+**REQ-LEARN-003** O resultado MUST ser entidade separada da decisão; a decisão
+MUST NOT ser editada depois do resultado.
 
 ---
 
@@ -673,7 +676,7 @@ após o final do conjunto de treinamento antes de iniciar o teste.
 
 # 29. Data Leakage
 
-É proibido utilizar no snapshot:
+**REQ-LEARN-004** É proibido utilizar no snapshot:
 
 ```text
 future price
@@ -714,7 +717,7 @@ Essa regra deve ser testável automaticamente.
 
 # 31. Leakage Test
 
-Criar testes automatizados que verifiquem:
+**REQ-LEARN-005** MUST existir teste automatizado que verifique:
 
 ```text
 snapshot.timestamp >= feature_source.timestamp
@@ -792,7 +795,8 @@ sem correção e validação independente.
 
 # 35. Feedback Loop
 
-O modelo não deve utilizar diretamente seu próprio resultado recente para alterar parâmetros live.
+**REQ-LEARN-006** O modelo MUST NOT usar seu próprio resultado recente para
+alterar parâmetro em live.
 
 Errado:
 
@@ -850,7 +854,7 @@ Depois de aprovado para live:
 LIVE_MODEL
 ```
 
-deve ser imutável.
+MUST ser imutável (**REQ-LEARN-007**).
 
 Qualquer alteração gera:
 
@@ -888,7 +892,7 @@ AND
 candidate.performance_stable_across_regimes
 ```
 
-A promoção deve exigir todos os critérios obrigatórios, e cada um MUST ser
+**REQ-LEARN-008** A promoção MUST exigir todos os critérios obrigatórios, e cada um MUST ser
 versionado — melhoria mínima, regressão máxima de drawdown, degradação máxima de
 calibração, amostra mínima e período mínimo fora da amostra.
 
@@ -911,7 +915,7 @@ threshold violation
 ROLLBACK
 ```
 
-Rollback deve restaurar uma versão anteriormente aprovada, e MUST ser
+**REQ-LEARN-009** Rollback MUST restaurar uma versão anteriormente aprovada, e MUST ser
 automático quando um threshold crítico versionado for violado.
 
 O aprendizado MUST NOT alterar diretamente política de risco, kill switch,
@@ -1211,7 +1215,7 @@ qual horizonte funciona melhor
 qual regime favorece a estratégia
 ```
 
-O bot não pode aprender livremente:
+**REQ-LEARN-010** O bot MUST NOT aprender livremente:
 
 ```text
 quanto pode perder

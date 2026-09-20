@@ -3,6 +3,7 @@
 **Versão:** 1.1  
 **Status:** **normativo** — esta é a fonte de verdade sobre risco e Recovery.
 O `03_SESSION_STATE_MACHINE.md` é índice para cá, não fonte concorrente.  
+**Domínio de requisitos:** `REQ-RISK-* e `REQ-RECOVERY-*`  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Controle matemático de risco e recuperação de sessão  
 **Aplicação:** Bot de trading
@@ -83,7 +84,7 @@ Amax = 4
 
 # 4. Limite de perda do depósito
 
-O limite máximo de perda do capital originalmente depositado é:
+**REQ-RISK-001** O limite máximo de perda do capital originalmente depositado é:
 
 ```text
 MAX_LOSS_DEPOSIT = D × L
@@ -141,7 +142,7 @@ O Peak Equity nunca deve diminuir.
 
 # 7. Lucro realizado
 
-Somente lucro **realizado** poderá gerar Recovery Budget.
+**REQ-RECOVERY-001** Somente lucro **realizado** MAY gerar Recovery Budget.
 
 Definir:
 
@@ -231,7 +232,7 @@ RECOVERY_MAX_SESSION =
 
 # 10. Recovery Budget
 
-O orçamento máximo de Recovery é definido pelo menor dos dois limites:
+**REQ-RECOVERY-002** O orçamento máximo de Recovery MUST ser o menor dos dois limites:
 
 ```text
 RECOVERY_BUDGET_SESSION =
@@ -283,7 +284,8 @@ Ele não representa:
 
 # 12. Recovery Budget não é reposto
 
-O Recovery Budget é um orçamento **consumível**.
+**REQ-RECOVERY-003** O Recovery Budget é orçamento **consumível**: perdas o
+reduzem e ganhos MUST NOT reabastecê-lo.
 
 Se:
 
@@ -325,7 +327,7 @@ O lucro aumenta o Recovery Progress, mas não regenera o orçamento.
 
 # 13. Condição para entrar em Recovery
 
-O Recovery somente poderá ser ativado quando:
+**REQ-RECOVERY-004** O Recovery MUST NOT ser ativado exceto quando:
 
 ```text
 EQUITY <= CAPITAL_FLOOR
@@ -477,7 +479,8 @@ episódio, o orçamento pertence à sessão.
 
 # 19. Recovery Failure
 
-A recuperação falhará quando qualquer uma das condições abaixo ocorrer:
+**REQ-RECOVERY-005** A recuperação MUST falhar quando qualquer uma destas
+condições ocorrer:
 
 ```text
 RECOVERY_BUDGET_REMAINING <= 0
@@ -530,7 +533,8 @@ NORMAL_TRADE_RISK =
 
 # 21. Risco máximo por operação durante Recovery
 
-Durante Recovery, o risco deve ser calculado sobre o orçamento restante:
+**REQ-RISK-002** Durante Recovery, o risco MUST ser calculado sobre o orçamento
+restante:
 
 ```text
 RECOVERY_TRADE_RISK =
@@ -566,7 +570,7 @@ O risco diminui automaticamente.
 
 # 22. Limite global de risco
 
-O risco efetivamente permitido para uma operação será:
+**REQ-RISK-003** O risco permitido para uma operação MUST ser:
 
 ```text
 ALLOWED_TRADE_RISK =
@@ -584,7 +588,7 @@ A estratégia nunca poderá determinar sozinha o risco final.
 
 # 23. Regra anti-Martingale
 
-Uma perda nunca poderá aumentar automaticamente:
+**REQ-RISK-004** Uma perda MUST NOT aumentar automaticamente:
 
 ```text
 NORMAL_TRADE_RISK
@@ -650,7 +654,7 @@ POSITION_RISK =
 POSITION_SIZE × UNIT_RISK
 ```
 
-A posição somente poderá ser autorizada quando:
+**REQ-RISK-005** A posição MUST NOT ser autorizada exceto quando:
 
 ```text
 POSITION_RISK <= ALLOWED_TRADE_RISK
@@ -671,7 +675,7 @@ ESTIMATED_FEES
 ESTIMATED_SLIPPAGE
 ```
 
-A operação somente poderá ser autorizada quando:
+**REQ-RISK-006** A operação MUST NOT ser autorizada exceto quando:
 
 ```text
 TOTAL_RISK <= ALLOWED_TRADE_RISK
@@ -842,7 +846,7 @@ Ele não é convertido automaticamente em novo orçamento de risco.
 
 # 28. Novo episódio de Recovery
 
-Um novo episódio MUST ser condicionado a:
+**REQ-RECOVERY-006** Um novo episódio MUST ser condicionado a:
 
 ```text
 RecoveryTrigger
@@ -868,7 +872,7 @@ RecoveryBudgetRemaining
 
 # 29. Regra anti-loop
 
-É proibido:
+**REQ-RECOVERY-007** É proibido:
 
 ```text
 Recovery
@@ -981,7 +985,7 @@ RecoveryMaxSession = R$ 5
 São fontes de capital diferentes e MUST NOT ser apresentadas como uma perda
 única de R$ 15.
 
-A soma existe, tem nome próprio e significado restrito:
+**REQ-RISK-007** A soma existe, tem nome próprio e significado restrito:
 
 ```text
 WorstCaseSessionExposure = MaxLossDeposit + RecoveryMaxSession
@@ -1002,7 +1006,7 @@ Após a confirmação da sessão:
 RiskConfiguration
 ```
 
-não poderá ser alterada.
+MUST NOT ser alterada (**REQ-RISK-008**).
 
 Para alterar os parâmetros:
 
@@ -1018,7 +1022,7 @@ CREATE NEW SESSION
 
 Todos os cálculos financeiros devem ser determinísticos.
 
-É proibido utilizar:
+**REQ-RISK-009** É proibido utilizar:
 
 ```text
 f32
@@ -1047,7 +1051,7 @@ Exemplos:
 
 # 34. Invariantes matemáticos
 
-As seguintes condições nunca podem ser violadas:
+**REQ-RISK-010** As seguintes condições MUST NOT ser violadas:
 
 ```text
 D > 0
@@ -1081,7 +1085,8 @@ POSITION_RISK <= ALLOWED_TRADE_RISK
 
 # 35. Regra de falha segura
 
-Se qualquer cálculo necessário para autorizar uma operação não puder ser determinado com segurança:
+**REQ-RISK-011** Se qualquer cálculo necessário para autorizar uma operação não
+puder ser determinado com segurança, o resultado MUST ser:
 
 ```text
 DENY
@@ -1328,8 +1333,8 @@ Falha final de uma tentativa MUST NOT ser tratada como sucesso parcial.
 
 # 40. Invariantes operacionais
 
-Complementam os invariantes matemáticos da seção 34 e valem sobre o sistema
-inteiro, não apenas sobre este módulo:
+**REQ-RISK-012** Complementam os invariantes matemáticos da seção 34 e valem
+sobre o sistema inteiro, não apenas sobre este módulo:
 
 - o Risk Engine é autoridade final; nenhum outro componente autoriza ordem;
 - Recovery MUST NOT aumentar `MaxLossDeposit`;

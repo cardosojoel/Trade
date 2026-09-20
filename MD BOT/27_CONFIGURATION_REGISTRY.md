@@ -1,10 +1,16 @@
 # 27 — Configuration Registry
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-CFG-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 Ser a única fonte operacional dos valores configuráveis do sistema.
 
 ## Contrato
-Cada parâmetro possui:
+**REQ-CFG-001** Cada parâmetro MUST possuir:
 ```text
 parameter_id
 value
@@ -47,7 +53,9 @@ performance.emergency_p99_us
 Os valores concretos devem ser preenchidos por ambiente e validação; este documento define nomes, tipos e invariantes, não números arbitrários.
 
 ## Validação
-Startup deve rejeitar configuração fora dos limites ou inconsistente.
+**REQ-CFG-002** O startup MUST rejeitar configuração fora dos limites ou
+inconsistente.
 
 ## Precedência
-Runtime lê o Registry versionado. Código contém apenas invariantes que não podem ser configurados.
+**REQ-CFG-003** O runtime MUST ler o Registry versionado; o código MUST conter
+apenas invariantes não configuráveis.

@@ -1,5 +1,11 @@
 # 09 — Performance & Low-Latency — Bybit-Calibrated
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-PERF-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 
 Minimizar a latência ponta a ponta e, principalmente, tail latency e jitter, sem confundir otimização interna do Rust com latência efetiva de mercado/exchange.
@@ -58,7 +64,7 @@ WebSocket Order Entry
 execution.fast
 ```
 
-Esse caminho não deve aguardar:
+**REQ-PERF-001** O caminho de emergência MUST NOT aguardar:
 
 ```text
 SQLite
@@ -76,7 +82,7 @@ Market Event Received
 Decision Completed
 ```
 
-Meta:
+**REQ-PERF-002** Meta do caminho interno de decisão:
 
 | Métrica | SLO |
 |---|---:|
@@ -94,6 +100,8 @@ Hard Risk Trigger
         ↓
 Order Ready
 ```
+
+**REQ-PERF-003** Meta do caminho interno de emergência:
 
 | Métrica | SLO |
 |---|---:|
@@ -155,7 +163,8 @@ order stream   → order lifecycle
 
 Não assumir um valor universal.
 
-Monitorar dinamicamente:
+**REQ-PERF-004** O rate limit MUST ser monitorado dinamicamente pelos headers,
+nunca presumido:
 
 ```text
 X-Bapi-Limit
@@ -176,6 +185,8 @@ limit violation → CIRCUIT BREAKER
 
 ## SLO 6 — Memory
 
+**REQ-PERF-005** Memória:
+
 ```text
 unbounded growth = FAIL
 OOM = FAIL
@@ -192,7 +203,7 @@ como meta inicial.
 
 ## SLO 7 — CPU
 
-Operação normal:
+**REQ-PERF-006** CPU em operação normal:
 
 ```text
 < 50%
@@ -208,7 +219,7 @@ O objetivo é preservar margem para bursts.
 
 ## Hot Path
 
-Evitar:
+**REQ-PERF-007** O hot path MUST NOT conter:
 
 ```text
 SQLite
@@ -248,7 +259,8 @@ Network IN
 Execution
 ```
 
-Os budgets individuais devem ser obtidos por profiling, não presumidos.
+**REQ-PERF-008** Os budgets por estágio MUST ser obtidos por profiling e MUST
+NOT ser presumidos.
 
 ## Fórmulas
 
@@ -353,6 +365,8 @@ Usar mercado real sem enviar ordens reais.
 
 ## Critério de aprovação
 
+**REQ-PERF-009** Nenhuma promoção sem que todos estes critérios passem:
+
 ```text
 Internal p99       ≤ 500 µs
 Internal p99.9     ≤ 1 ms
@@ -367,8 +381,6 @@ Reconciliation consistent
 ```
 
 ## Conclusão
-
-**Estado: arquitetura calibrada para a infraestrutura atual da Bybit.**
 
 O ponto fundamental é separar:
 

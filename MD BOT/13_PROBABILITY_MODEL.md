@@ -1,6 +1,6 @@
 # 13 — Probability Model
 
-**Status:** índice — **não normativo**  
+**Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`HISTORICAL_PATTERN_PROBABILITY_EV.md`](HISTORICAL_PATTERN_PROBABILITY_EV.md)  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 

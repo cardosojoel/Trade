@@ -1,5 +1,10 @@
 # SDD v3 — Release Notes
 
+**Status:** registro histórico — **não normativo**, preservado como está  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## P0 aplicado
 - EV ternário canônico.
 - Recovery Episode separado de Recovery Budget.

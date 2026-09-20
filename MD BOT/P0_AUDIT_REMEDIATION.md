@@ -1,5 +1,10 @@
 # P0 — Audit Remediation v3
 
+**Status:** registro histórico — **não normativo**, preservado como está  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Status
 P0 aplicado à baseline.
 

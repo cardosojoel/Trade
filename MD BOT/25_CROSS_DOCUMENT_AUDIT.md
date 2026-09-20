@@ -1,5 +1,6 @@
 # 25 — Cross-Document Audit — SDD Trading Bot v2
 
+**Status:** registro histórico — **não normativo**  
 **Data da auditoria:** 20/09/2026  
 **Nota de 2026-09-20:** este documento é registro histórico dos achados e não foi
 reescrito. Duas ressalvas para quem o lê hoje: (a) AUD-MATH-001 e AUD-PARAM-002
@@ -7,7 +8,10 @@ foram fechados apenas nos documentos numerados e permaneciam abertos nas
 especificações matemáticas — foram fechados nelas nesta data; (b) os nomes
 usados aqui precedem o [`00_GLOSSARIO.md`](00_GLOSSARIO.md), que hoje é a
 autoridade sobre vocabulário: `WorstCaseSessionLoss` lê-se
-`WorstCaseSessionExposure`, e "ciclo" lê-se `RecoveryEpisode`.  
+`WorstCaseSessionExposure`, e "ciclo" lê-se `RecoveryEpisode`; (c) os
+identificadores `REQ-…` citados nas seções 5 e 10 eram ilustrativos e **não**
+correspondem ao catálogo real, que passou a existir em 2026-09-20 no
+[`26_REQUIREMENTS_TRACEABILITY_MATRIX.md`](26_REQUIREMENTS_TRACEABILITY_MATRIX.md).  
 **Escopo:** Frentes 01–09 + especificações matemáticas + documentos 10–24  
 **Stack:** Rust + SQLite  
 **Exchange:** Bybit  
@@ -1023,3 +1027,26 @@ Porque ele vai conectar os 24 documentos ao **código Rust, testes, benchmarks e
 
 Depois dele, eu criaria uma pequena camada de correções P0 nos documentos existentes, em vez de simplesmente continuar adicionando MDs.
 
+
+
+---
+
+# 13. Avaliação de maturidade por frente
+
+Transferida em 2026-09-20 das próprias especificações, onde vivia como
+autoavaliação no fim de cada documento. Uma especificação não se dá nota: quem
+avalia é este documento.
+
+| Frente | Avaliação registrada | O que faltava |
+|---|---|---|
+| 01 Execution Engine | arquitetura de produção forte | separar aceitação, lifecycle e execução já está feito |
+| 02 Position Reconciliation | forte | testar recuperação sob falhas reais e fault injection |
+| 04 Market Data Quality | forte, alinhada ao feed da Bybit | benchmark com eventos reais e bursts de até 1024 trades |
+| 05 Backtest Engine | forte, mas não estado da arte | latência, slippage por liquidez, partial fill, funding, replay determinístico |
+| 06 Execution Simulator | precisa de evolução significativa | calibração com fills reais e replay de microestrutura |
+| 07 Decision Ledger / Learning | conceitualmente forte, não estado da arte | model registry, lineage, dataset hashing, canary, rollback automático |
+| 08 Security / Observability | bom, não estado da arte | threat modeling, least privilege, rotação de segredo, trilha à prova de adulteração |
+| 09 Performance | calibrada para a infraestrutura atual da Bybit | budgets por estágio obtidos por profiling |
+
+A avaliação de 07 foi recuperada do histórico do repositório: aquele documento
+virou índice em 2026-09-20 e a nota teria se perdido com ele.

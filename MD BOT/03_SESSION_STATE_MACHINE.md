@@ -1,6 +1,6 @@
 # 03 — Session State Machine / Risk & Recovery
 
-**Status:** índice — **não normativo**  
+**Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`trading_risk_recovery_mathematical_spec.md`](trading_risk_recovery_mathematical_spec.md)  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 

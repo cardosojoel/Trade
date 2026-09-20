@@ -72,12 +72,21 @@ ao mesmo tempo.
 O gate que a própria SDD define: preencher `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`
 com referências reais ao código antes de abrir qualquer frente nova.
 
-Continua aberto no conjunto de documentos: linguagem normativa (MUST/SHOULD) e
-IDs de requisito por documento, cabeçalho de estado em todos, autoavaliações que
-ainda vivem dentro das especificações `01`–`09`, e um exemplo numérico único que
-atravesse o sistema inteiro — cruzando os exemplos que já existem, um depósito
-de R$ 50 com risco de 2% e stop de 1,2% pede uma posição de R$ 83, impossível em
-spot sem alavancagem, e nenhum documento cruza os dois.
+Também em 2026-09-20: os requisitos passaram a ter identificador. **127
+`REQ-<DOMÍNIO>-<NNN>` em 26 domínios**, escritos ao lado da regra na
+especificação — nunca em lista à parte, que seria uma segunda camada a manter —
+com linguagem RFC 2119. O `26_REQUIREMENTS_TRACEABILITY_MATRIX.md` deixou de ter
+seis linhas de exemplo e passou a catalogar os 127, todos em `SPECIFIED`: nenhum
+aponta para módulo Rust, teste ou métrica, porque o código existente nasceu da
+constitution e da `specs/001-nucleo-execucao/`, não desta SDD. Os 41 documentos
+ganharam cabeçalho de estado, e as autoavaliações que viviam dentro das
+especificações ("Estado: forte", "não é estado da arte ainda") foram para a
+auditoria, que é onde se avalia.
+
+Continua aberto no conjunto: um exemplo numérico único que atravesse o sistema
+inteiro. Cruzando os exemplos que já existem, um depósito de R$ 50 com risco de
+2% e stop de 1,2% pede posição de R$ 83 — impossível em spot sem alavancagem, e
+nenhum documento cruza os dois.
 
 ---
 

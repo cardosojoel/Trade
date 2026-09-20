@@ -1,6 +1,8 @@
 # Trading Bot SDD — Master Index Final v3
 
-**Status:** SDD v3.1 — camada normativa única e vocabulário canônico
+**Status:** índice do conjunto · **Versão:** 3.2 · **Atualizado em:** 2026-09-20  
+**Conteúdo:** SDD com camada normativa única, vocabulário canônico e requisitos
+identificados
 **Stack:** Rust + SQLite
 **Exchange:** Bybit
 **Ativo inicial:** BTCUSDT
@@ -117,7 +119,9 @@ O sistema mede separadamente:
 SLOs internos existentes na Frente 09 permanecem autoridade. Budgets por estágio devem ser derivados por profiling antes de serem congelados.
 
 ## 10. Traceability
-Todo requisito crítico deve seguir:
+Cada requisito tem identificador estável `REQ-<DOMÍNIO>-<NNN>`, escrito ao lado da regra na especificação. Os domínios estão no `00_GLOSSARIO.md` §10 e o catálogo no `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`.
+
+Todo requisito crítico MUST seguir:
 ```text
 Requirement
 → Specification

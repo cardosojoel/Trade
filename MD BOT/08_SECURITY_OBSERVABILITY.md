@@ -1,10 +1,16 @@
 # 08 — Security, Reliability & Observability
 
+**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
+**Domínio de requisitos:** `REQ-SEC-*`  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 ## Objetivo
 Proteger credenciais, impedir operações indevidas e tornar cada componente observável.
 
 ## Secrets
-API credentials:
+**REQ-SEC-001** As credenciais de API MUST permanecer:
 ```text
 fora do SQLite
 fora do Git
@@ -12,7 +18,9 @@ fora de logs
 withdrawal disabled
 ```
 
-Separar:
+**REQ-SEC-002** Os ambientes MUST ser separados e MUST NOT coexistir na mesma
+configuração carregada:
+
 ```text
 TESTNET
 PAPER
@@ -20,12 +28,12 @@ LIVE
 ```
 
 ## Kill Switch
-Manual:
+**REQ-SEC-003** MUST existir kill switch manual, acionável sem acesso ao código:
 ```text
 NEW ORDERS = DISABLED
 ```
 
-Automático em:
+**REQ-SEC-004** O kill switch MUST ser acionado automaticamente em:
 ```text
 reconciliation failure
 stale data
@@ -37,7 +45,7 @@ latency breach
 ```
 
 ## Observabilidade
-Logs estruturados:
+**REQ-SEC-005** Os logs MUST ser estruturados e MUST NOT conter segredo:
 ```text
 event_id
 timestamp
@@ -63,7 +71,7 @@ database latency
 ```
 
 ## Auditoria
-Eventos:
+**REQ-SEC-006** MUST ser registrado, no mínimo:
 ```text
 SESSION_CREATED
 RISK_CONFIRMED
@@ -78,6 +86,4 @@ MODEL_CHANGED
 ```
 
 ## Conclusão
-**Estado: bom, mas não estado da arte.**
-
 A base é adequada para produção. Para excelência, acrescentar threat modeling, least privilege, secret rotation, tamper-evident audit trail, alerting e testes de recuperação.

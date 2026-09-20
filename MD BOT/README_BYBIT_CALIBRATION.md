@@ -1,5 +1,10 @@
 # Bybit Calibration — Revision
 
+**Status:** registro histórico — **não normativo**, preservado como está  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
+
+---
+
 Esta revisão atualiza as Frentes 1, 2, 4 e 9 com base na documentação atual da Bybit.
 
 Principais alterações:
