@@ -51,23 +51,23 @@ antes disso.
 
 ### Tipos do domínio (`trade-domain`) — lógica crítica, teste antes
 
-- [ ] T009 [P] Escrever teste falhando de `Candle::validate` em `crates/trade-domain/src/candle.rs`: rejeita `low > high`, `low > open`, `close > high`, e qualquer preço ≤ 0; aceita `volume` e `turnover` ≥ 0
-- [ ] T010 [P] Escrever teste falhando de `ExecutionMode` em `crates/trade-domain/src/mode.rs`: `"backtest"` faz parse; `"paper"` e `"live"` retornam erro **distinto** de valor desconhecido; o tipo **não** implementa `Default`
-- [ ] T011 [P] Escrever teste de propriedade com `proptest` em `crates/trade-domain/src/position.rs`: após qualquer sequência de fills válidos, `Position::qty` nunca fica negativa (SC-010)
-- [ ] T012 [P] Escrever teste falhando de `Position::apply_fill` em `crates/trade-domain/src/position.rs`: preço médio após compras sucessivas; venda parcial mantém posição; venda total emite `Trade` e zera; venda acima do detido é erro
-- [ ] T013 [P] Escrever teste falhando de `RunMetrics` em `crates/trade-domain/src/metrics.rs`: `profit_factor` é `None` quando `gross_loss` é zero (nunca infinito); `net_result` igual à soma dos `Trade`; drawdown máximo sobre a curva de capital
-- [ ] T014 Implementar `Candle` e `Candle::validate` em `crates/trade-domain/src/candle.rs`
-- [ ] T015 Implementar `ExecutionMode` (sem `Default`, só a variante `Backtest`) em `crates/trade-domain/src/mode.rs`
-- [ ] T016 Implementar `Position` e `apply_fill` em `crates/trade-domain/src/position.rs`
-- [ ] T017 Implementar `RunMetrics` e seu cálculo em `crates/trade-domain/src/metrics.rs`
-- [ ] T018 [P] Implementar `Symbol`, `Interval`, `Side`, `Intent`, `Signal`, `SignalInputs`, `Order`, `OrderId`, `SignalId`, `Fill`, `Trade` em `crates/trade-domain/src/types.rs`, todos com valores monetários em `rust_decimal::Decimal`
-- [ ] T019 [P] Implementar `RiskLimits`, `RiskState`, `Verdict`, `RiskDecision`, `LimitBreach` (enum exaustivo com `MaxPositionSize`, `MaxTotalExposure`, `DailyLossReached`, `MaxOrdersPerWindow`, `InsufficientBalance`, `SellExceedsHoldings`, `KillSwitchEngaged`) e `Anomaly` em `crates/trade-domain/src/risk_types.rs`
+- [X] T009 [P] Escrever teste falhando de `Candle::validate` em `crates/trade-domain/src/candle.rs`: rejeita `low > high`, `low > open`, `close > high`, e qualquer preço ≤ 0; aceita `volume` e `turnover` ≥ 0
+- [X] T010 [P] Escrever teste falhando de `ExecutionMode` em `crates/trade-domain/src/mode.rs`: `"backtest"` faz parse; `"paper"` e `"live"` retornam erro **distinto** de valor desconhecido; o tipo **não** implementa `Default`
+- [X] T011 [P] Escrever teste de propriedade com `proptest` em `crates/trade-domain/src/position.rs`: após qualquer sequência de fills válidos, `Position::qty` nunca fica negativa (SC-010)
+- [X] T012 [P] Escrever teste falhando de `Position::apply_fill` em `crates/trade-domain/src/position.rs`: preço médio após compras sucessivas; venda parcial mantém posição; venda total emite `Trade` e zera; venda acima do detido é erro
+- [X] T013 [P] Escrever teste falhando de `RunMetrics` em `crates/trade-domain/src/metrics.rs`: `profit_factor` é `None` quando `gross_loss` é zero (nunca infinito); `net_result` igual à soma dos `Trade`; drawdown máximo sobre a curva de capital
+- [X] T014 Implementar `Candle` e `Candle::validate` em `crates/trade-domain/src/candle.rs`
+- [X] T015 Implementar `ExecutionMode` (sem `Default`, só a variante `Backtest`) em `crates/trade-domain/src/mode.rs`
+- [X] T016 Implementar `Position` e `apply_fill` em `crates/trade-domain/src/position.rs`
+- [X] T017 Implementar `RunMetrics` e seu cálculo em `crates/trade-domain/src/metrics.rs`
+- [X] T018 [P] Implementar `Symbol`, `Interval`, `Side`, `Intent`, `Signal`, `SignalInputs`, `Order`, `OrderId`, `SignalId`, `Fill`, `Trade` em `crates/trade-domain/src/types.rs`, todos com valores monetários em `rust_decimal::Decimal`
+- [X] T019 [P] Implementar `RiskLimits`, `RiskState`, `Verdict`, `RiskDecision`, `LimitBreach` (enum exaustivo com `MaxPositionSize`, `MaxTotalExposure`, `DailyLossReached`, `MaxOrdersPerWindow`, `InsufficientBalance`, `SellExceedsHoldings`, `KillSwitchEngaged`) e `Anomaly` em `crates/trade-domain/src/risk_types.rs`
 
 ### Portas (`trade-ports`)
 
-- [ ] T020 [P] Implementar as traits `MarketDataSource`, `OrderExecutor`, `AccountView`, `Clock`, `AuditSink` e `CandleRepository` em `crates/trade-ports/src/lib.rs`, com as assinaturas normativas de `contracts/ports.md`
-- [ ] T021 [P] Implementar `MarketError`, `ExecError`, `StorageError` e `AuditError` com `thiserror` em `crates/trade-ports/src/errors.rs` — `ExecError` agnóstico de corretora, sem nenhum código de erro da Bybit (FR-010)
-- [ ] T022 [P] Implementar os duplos de teste `FakeClock`, `InMemoryAuditSink`, `StubOrderExecutor` e `VecMarketDataSource` em `crates/trade-ports/src/testing.rs`, sob a feature `testing`
+- [X] T020 [P] Implementar as traits `MarketDataSource`, `OrderExecutor`, `AccountView`, `Clock`, `AuditSink` e `CandleRepository` em `crates/trade-ports/src/lib.rs`, com as assinaturas normativas de `contracts/ports.md`
+- [X] T021 [P] Implementar `MarketError`, `ExecError`, `StorageError` e `AuditError` com `thiserror` em `crates/trade-ports/src/errors.rs` — `ExecError` agnóstico de corretora, sem nenhum código de erro da Bybit (FR-010)
+- [X] T022 [P] Implementar os duplos de teste `FakeClock`, `InMemoryAuditSink`, `StubOrderExecutor` e `VecMarketDataSource` em `crates/trade-ports/src/testing.rs`, sob a feature `testing`
 
 ### Persistência (`trade-storage`)
 
