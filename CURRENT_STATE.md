@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**232 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**270 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
 
 ---
 
@@ -92,6 +92,31 @@ limites dizem **o que cabe**. Numa folha só, o envelope inteiro — limites dur
 da corretora e da aritmética, medidos do mercado e do capital, de autoridade, de
 promoção, e os limites da própria medição. Um desenho que não passa nessa folha
 não chega a precisar de ADR.
+
+## Em andamento: feature 002, paper trading
+
+Spec, plano e tarefas escritos. **15 das 31 tarefas que não precisam de
+credencial estão concluídas**, em quatro commits.
+
+O que existe: modo `paper` no domínio e recusado no comando `backtest`;
+credenciais lidas do ambiente com o segredo redigido em `Debug` e `Display`;
+assinatura HMAC-SHA256 conferida contra a documentação da Bybit e validada por
+vetor conhecido; verificação de que a chave não tem permissão de saque, por
+lista de negação; montagem de ordem com identificador de cliente, stop a
+mercado no gatilho e corpo JSON assinado byte a byte; tradução de erro
+separando transitório, recusa e **desconhecido**.
+
+O desconhecido é o que essa camada acrescenta e o backtest nunca teve: a
+requisição saiu, a resposta não voltou, e ninguém sabe se a ordem existe.
+Retentar pode duplicar, desistir pode deixar posição órfã. Ele é classificado
+como falha de integridade de propósito — é o que impede a retentativa
+automática e força a reconciliação.
+
+O que falta sem credencial: o executor ligando as peças, a reconciliação de
+posição e o laço contínuo. **O que só o mantenedor destrava**: criar a chave de
+testnet sem permissão de saque, e os 30 dias correrem.
+
+---
 
 ## Decidido em 2026-09-20: a constitution passou a 2.0.0
 

@@ -10,6 +10,8 @@
 //! a lógica crítica — identificador de ordem, stop obrigatório, resultado
 //! desconhecido — ficaria sem teste até alguém ter uma chave.
 
+pub mod erros;
+pub mod ordem;
 pub mod permissao;
 pub mod transporte;
 

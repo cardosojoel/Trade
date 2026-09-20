@@ -28,13 +28,13 @@ Verificável sem rede e sem credencial.
 ## Fatia 3 — o adaptador
 
 - [ ] T013 **(TF)** `OrderExecutor` para paper, contra duplo HTTP
-- [ ] T014 **(TF)** Identificador de cliente único por ordem (FR-106)
-- [ ] T015 **(TF)** Ordem de entrada carrega stop a mercado no gatilho (FR-113, REQ-EXEC-010)
+- [X] T014 **(TF)** Identificador de cliente único por ordem (FR-106)
+- [X] T015 **(TF)** Ordem de entrada carrega stop a mercado no gatilho (FR-113, REQ-EXEC-010)
 - [ ] T016 **(TF)** Stop recusado impede a posição; se já aberta, encerra (REQ-EXEC-011)
 - [ ] T017 **(TF)** Resultado desconhecido não é reenviado antes de reconciliar (FR-107)
 - [ ] T018 **(TF)** Preenchimento registra referência, obtido, taxa e moeda da taxa (FR-109)
 - [ ] T019 **(TF)** Preenchimento parcial abaixo da ordem mínima deixa resíduo, como no backtest
-- [ ] T020 Tradução de erro da Bybit para `ExecError`, com transitório e integridade separados
+- [X] T020 Tradução de erro da Bybit para `ExecError`, com transitório e integridade separados
 
 ## Fatia 4 — reconciliação
 
@@ -68,6 +68,12 @@ Verificável sem rede e sem credencial.
 - [ ] T039 Relatório da Porta 2, para a revisão que precede a Porta 3
 
 ---
+
+**Situação em 2026-09-20**: 15 de 31 tarefas das fatias 1 a 5 concluídas.
+Feito: modo `paper`, credenciais redigidas, assinatura conferida contra a
+documentação, verificação de permissão da chave, montagem de ordem com stop a
+mercado no gatilho, identificador de cliente e tradução de erro. Falta o
+executor ligando as peças, a reconciliação e o laço contínuo.
 
 **Fatias 1 a 5**: 31 tarefas, nenhuma precisa de credencial.
 **Fatias 6 e 7**: 8 tarefas, todas dependem do mantenedor criar a chave de

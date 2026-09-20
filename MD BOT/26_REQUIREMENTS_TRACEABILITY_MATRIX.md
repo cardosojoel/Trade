@@ -43,6 +43,8 @@ sobrevive à regeneração das tabelas abaixo.
 | `REQ-BYBIT-007` | `trade-cli/src/config.rs` — `validar_perfil` | `config::tests::perfil_cujo_teto_de_posicao_nao_paga_a_ordem_minima_nao_inicia` | **TESTED** |
 | `REQ-BYBIT-008` | `examples/instrumento.toml` — só `minOrderAmt` é lido | — | **IMPLEMENTED** |
 | Derivação do perfil | `trade-domain/src/perfil.rs` — `Perfil::derivar` | `perfil::tests::a_tabela_do_registry_e_reproduzida` | **TESTED** |
+| `REQ-EXEC-010` | `trade-paper/src/ordem.rs` — `corpo_de_criacao` | `ordem::tests::a_compra_leva_stop_a_mercado_no_gatilho` | **TESTED** |
+| `REQ-EXEC-003` | `trade-paper/src/erros.rs` — `de_transporte` | `erros::tests::resultado_desconhecido_e_integridade_e_nao_transitorio` | **TESTED** |
 
 A derivação usa a tabela do `27_CONFIGURATION_REGISTRY.md` como oráculo de
 teste: se código e documento divergirem, o teste quebra. É o que impede a folha
