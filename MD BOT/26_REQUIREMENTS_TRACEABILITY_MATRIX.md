@@ -160,11 +160,11 @@ especificação, não abrir exceção à convenção.
 | `REQ-FRONTEIRA-001` | A autoridade sobre o que o robô pode fazer é, nesta ordem | `00_FRONTEIRA.md` §1 | — | — | — | SPECIFIED |
 | `REQ-FRONTEIRA-002` | Se o hash mudar, toda a coluna Conformidade deste conjunto MUST ser… | `00_FRONTEIRA.md` Âncora de sincronia | — | — | — | SPECIFIED |
 | `REQ-FRONTEIRA-003` | Existe uma única saída deste conjunto para o Trade, e ela é unidirecional | `00_FRONTEIRA.md` §2 | — | — | — | SPECIFIED |
-| `REQ-FRONTEIRA-004` | Este conjunto MUST NOT alterar, direta ou indiretamente:… | `00_FRONTEIRA.md` §2 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-004` | Este conjunto MUST NOT alterar, direta ou indiretamente, nenhum arquivo do… | `00_FRONTEIRA.md` §2 | — | — | — | SPECIFIED |
 | `REQ-FRONTEIRA-005` | Todo documento normativo deste conjunto MUST declarar no cabeçalho | `00_FRONTEIRA.md` §3 | — | — | — | SPECIFIED |
 | `REQ-FRONTEIRA-006` | Uma proposta MUST nomear qual documento ela contraria. "Conflita com a… | `00_FRONTEIRA.md` §4 | — | — | — | SPECIFIED |
-| `REQ-FRONTEIRA-007` | Mover este conjunto para outro repositório MUST converter cada referência de… | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
-| `REQ-FRONTEIRA-008` | Este inventário MUST ser refeito sempre que a âncora da seção 1 mudar | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-007` | Mover este conjunto para outro repositório MUST converter cada referência… | `00_FRONTEIRA.md` Apoio factual | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-008` | Este inventário MUST ser refeito sempre que a âncora da seção 1 mudar. Foi… | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
 
 ## `REQ-GOV-*`
 

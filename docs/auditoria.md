@@ -144,6 +144,27 @@ WHERE run_id = :run AND kind IN ('halt', 'resume', 'anomaly')
 ORDER BY seq;
 ```
 
+### Transições de estado
+
+O oitavo tipo de evento. Não aparece na consulta acima porque a carga é outra:
+`halt`, `resume` e `anomaly` explicam **por que** a operação parou;
+`state_transition` registra **o que a posição era** em cada mudança de estado.
+
+```sql
+SELECT seq, datetime(at_ms/1000, 'unixepoch') AS quando,
+       json_extract(payload_json, '$.from')      AS de,
+       json_extract(payload_json, '$.to')        AS para,
+       json_extract(payload_json, '$.qty')       AS quantidade,
+       json_extract(payload_json, '$.avg_price') AS preco_medio
+FROM audit_event
+WHERE run_id = :run AND kind = 'state_transition'
+ORDER BY seq;
+```
+
+Os oito tipos de `kind` são `signal`, `order`, `risk_decision`, `fill`, `halt`,
+`resume`, `anomaly` e `state_transition`. Uma reconstituição que ignore o
+último responde o que o robô decidiu, mas não de que posição ele partiu.
+
 ---
 
 ## Sobre o histórico

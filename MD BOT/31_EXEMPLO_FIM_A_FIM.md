@@ -112,12 +112,11 @@ sizing, sozinha, produz uma ordem impossível em silêncio.
 A mesma conta reprova o exemplo que já existia no conjunto: depósito de R$ 50,
 `T = 2%` → risco de R$ 1; stop de 1,2% → posição de **R$ 83,33** sobre R$ 50.
 
-Daí a regra, registrada no quant model §22:
-
-> **REQ-SIZING-003** Em mercado à vista, `PositionNotional` MUST NOT exceder o
-> caixa disponível. Quando a fórmula de sizing produzir valor maior, a posição
-> MUST ser reduzida ao caixa e o limite vinculante MUST ser registrado — o
-> sistema MUST NOT emitir ordem impossível nem silenciar a redução.
+Daí a regra `REQ-SIZING-003`, cuja casa normativa é o
+[`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md) §22: em mercado à
+vista o nocional não excede o caixa, e a redução é registrada em vez de
+silenciada. O texto vive lá e só lá — reenunciá-lo aqui recriaria a segunda
+camada que a reorganização deste conjunto eliminou.
 
 ## 7. Risco — e o segundo problema
 

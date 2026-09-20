@@ -65,9 +65,17 @@ emenda formal à constitution   /speckit.specify de uma feature
   (ou ao CLAUDE.md / invariante)     no repositório Trade
 ```
 
-**REQ-FRONTEIRA-004** Este conjunto MUST NOT alterar, direta ou indiretamente:
-`.specify/memory/constitution.md`, `CLAUDE.md`, `specs/`, `crates/`, `tests/`,
-`limits.toml`, `Cargo.toml` ou a configuração de CI. Uma decisão de desenho que
+**REQ-FRONTEIRA-004** Este conjunto MUST NOT alterar, direta ou indiretamente,
+nenhum arquivo do repositório Trade fora de `MD BOT/`. A enumeração abaixo é
+ilustrativa e MUST NOT ser lida como exaustiva — foi por ser lida assim que o
+`CURRENT_STATE.md` ficou de fora e passou a ser editado por este lado sem que
+ninguém percebesse que era uma lacuna: `.specify/memory/constitution.md`,
+`CLAUDE.md`, `CURRENT_STATE.md`, `specs/`, `crates/`, `tests/`, `docs/`,
+`limits.toml`, `Cargo.toml` e a configuração de CI.
+
+O `CURRENT_STATE.md` tem um caso próprio: o `CLAUDE.md` do Trade manda toda
+sessão atualizá-lo. Quem o atualiza é o mantenedor do Trade, com o que
+aconteceu no Trade. Este conjunto MAY ser citado ali, e MUST NOT escrever ali. Uma decisão de desenho que
 exija qualquer dessas mudanças MUST parar em uma ADR e esperar assinatura.
 
 O caminho inverso não existe: o Trade nunca precisa consultar este conjunto para
@@ -81,14 +89,30 @@ cabeçalho:
 ```text
 Conformidade: conforme
 Conformidade: exige emenda (ADR-001)
+Conformidade: exige correção (ADR-004)
 ```
+
+Os três valores não são graus do mesmo estado, são destinos diferentes:
+
+| Valor | Significa | Destrava com |
+|---|---|---|
+| `conforme` | nada nele depende de premissa não autorizada | — |
+| `exige emenda` | depende de premissa que só uma emenda autoriza | assinatura do mantenedor |
+| `exige correção` | contradiz outro documento **deste mesmo conjunto**; não há decisão a tomar | corrigir o texto |
+
+`exige correção` existe porque a ADR-004 revelou o caso: o `29` usa `f64` onde a
+especificação de risco §33 proíbe. Não é escolha de desenho a ser arbitrada — é
+erro de redação. Marcá-lo como `exige emenda` colocaria na fila de assinatura
+algo que ninguém precisa assinar.
 
 Um documento é `conforme` quando nada nele **depende** de premissa que a
 constitution ou os invariantes do build não autorizem. Menção incidental não
 muda o estado — mas menção incidental MUST NOT virar requisito.
 
 Um documento marcado `exige emenda` continua válido como desenho. O que ele não
-pode é gerar tarefa de implementação enquanto a ADR não for aceita.
+pode é gerar tarefa de implementação enquanto a ADR não for aceita. O mesmo vale
+para `exige correção`, com a diferença de que ali a espera não é por assinatura,
+é por trabalho.
 
 ## 4. Uma fronteira só — desde a emenda 1.3.0
 
@@ -138,6 +162,14 @@ precisar de ADR.
 Este conjunto não tem dependência de build: nenhuma inclusão de arquivo, nenhum
 script compartilhado, nenhum caminho que precise resolver em tempo de
 compilação. Mover é `git mv` mais a conversão das referências abaixo.
+
+**A separação aconteceu, e não foi esta.** Em 2026-09-20 nasceu o
+`/home/c/Projetos/DsTrade`, projeto de desenho **da interface**, com fronteira
+própria em `constraints/fronteira-trade.md` e regra de só leitura cobrada por
+`.claude/settings.json`. Este conjunto — desenho de **sistema** — permaneceu no
+Trade. O inventário abaixo continua valendo como medida de acoplamento e como
+preparação, caso a mudança de endereço venha a ser decidida; ele não descreve
+nada em curso.
 
 **Verificação refeita em 2026-09-20**, depois da emenda 1.3.0, do
 `tests/no_leverage.rs` e dos documentos `00_FRONTEIRA`, `34` e `35`:

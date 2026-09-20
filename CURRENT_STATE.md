@@ -93,6 +93,26 @@ da corretora e da aritmética, medidos do mercado e do capital, de autoridade, d
 promoção, e os limites da própria medição. Um desenho que não passa nessa folha
 não chega a precisar de ADR.
 
+## Separação concluída em 2026-09-20: nasceu o DsTrade
+
+O desenho **da interface** saiu para `/home/c/Projetos/DsTrade`, repositório
+próprio, fora da árvore do Trade. O desenho **de sistema** — o `MD BOT/` —
+permaneceu aqui: são conjuntos diferentes e só um precisava sair.
+
+A regra de só leitura do DsTrade sobre o Trade não é promessa: é `deny` no
+`settings.json` para Edit/Write, mais um gancho `PreToolUse` de Bash com lista
+branca, verificado por 42 casos. O limite honesto está escrito lá — o gancho lê
+o texto do comando, e um programa que receba o caminho por `stdin` não é
+visível para ele; a rede final é este repositório estar commitado e no remoto.
+
+Dali veio o primeiro achado externo, e era real: o `docs/auditoria.md`
+documentava **sete** dos oito tipos de `kind` do `audit_event`. Faltava
+`state_transition` — o evento que registra de que posição o robô partiu a cada
+mudança de estado. Uma reconstituição que o ignore responde o que foi decidido,
+não de onde se partiu. Corrigido com consulta própria e os oito enumerados.
+
+---
+
 ## Decidido em 2026-09-20: a constitution passou a 1.3.0
 
 **A ADR-005 foi aceita.** As duas restrições que limitam a perda máxima possível

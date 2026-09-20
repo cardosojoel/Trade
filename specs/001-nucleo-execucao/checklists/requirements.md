@@ -3,7 +3,12 @@
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-20
 **Feature**: [spec.md](../spec.md)
-**Constitution**: v1.2.0
+**Constitution**: v1.2.0 — verificado contra essa versão.
+**Reverificado em 2026-09-20 contra a v1.3.0:** o resultado não muda. A emenda
+1.3.0 acrescentou *Mercado* (à vista, apenas comprado, sem alavancagem) e
+*Representação de valores monetários* (sem ponto flutuante). As duas já eram
+observadas por esta feature, e a segunda já era cobrada por `tests/no_float.rs`;
+desde a emenda, a primeira é cobrada por `tests/no_leverage.rs`.
 
 ## Content Quality
 
