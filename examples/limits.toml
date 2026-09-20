@@ -1,0 +1,19 @@
+# A cerca. Valores de partida provisórios, registrados na constitution v1.2.0
+# e aceitos pelo mantenedor em 2026-09-20 — não são medição.
+#
+# A constitution exige que sejam revistos contra o capital real e os resultados
+# observados ANTES da Porta 3, a liberação para capital real. Até lá servem
+# para construir e exercitar o sistema.
+#
+# Os valores abaixo correspondem aos percentuais da constitution sobre um
+# capital de 10.000: 2% de perda diária, 10% por posição, 20% de exposição.
+#
+# Valores monetários como STRING, entre aspas. Número em TOML passa por ponto
+# flutuante e perde exatidão antes do primeiro cálculo.
+
+max_daily_loss        = "200.00"
+max_position_size     = "1000.00"
+max_total_exposure    = "2000.00"
+max_orders_per_window = 10
+window_minutes        = 60
+max_transient_retries = 5

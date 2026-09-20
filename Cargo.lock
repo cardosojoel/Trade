@@ -1310,6 +1310,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "tempfile",
+ "thiserror",
  "toml",
  "trade-backtest",
  "trade-bybit",

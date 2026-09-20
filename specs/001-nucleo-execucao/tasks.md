@@ -71,16 +71,16 @@ antes disso.
 
 ### Persistência (`trade-storage`)
 
-- [ ] T023 [P] Escrever teste falhando de conversão `Decimal` ↔ `TEXT` em `crates/trade-storage/src/decimal_sql.rs`: ida e volta preserva o valor exato, inclusive com 8 casas decimais
-- [ ] T024 Implementar a conversão `Decimal` ↔ `TEXT` em `crates/trade-storage/src/decimal_sql.rs` — nunca via `REAL`, que é IEEE-754 e desfaria a exatidão no disco
-- [ ] T025 Criar `crates/trade-storage/src/schema_market.sql` com as tabelas `dataset`, `candle` (`PRIMARY KEY (symbol, interval, open_ms)`, `WITHOUT ROWID`, preços em `TEXT`) e `gap`, conforme data-model.md
-- [ ] T026 Criar `crates/trade-storage/src/schema_runs.sql` com as tabelas `run`, `audit_event` (`PRIMARY KEY (run_id, seq)`, `WITHOUT ROWID`), `trade` e `metrics` (`profit_factor` aceita `NULL`), conforme data-model.md
-- [ ] T027 Implementar abertura de banco e aplicação idempotente do esquema em `crates/trade-storage/src/db.rs`
+- [X] T023 [P] Escrever teste falhando de conversão `Decimal` ↔ `TEXT` em `crates/trade-storage/src/decimal_sql.rs`: ida e volta preserva o valor exato, inclusive com 8 casas decimais
+- [X] T024 Implementar a conversão `Decimal` ↔ `TEXT` em `crates/trade-storage/src/decimal_sql.rs` — nunca via `REAL`, que é IEEE-754 e desfaria a exatidão no disco
+- [X] T025 Criar `crates/trade-storage/src/schema_market.sql` com as tabelas `dataset`, `candle` (`PRIMARY KEY (symbol, interval, open_ms)`, `WITHOUT ROWID`, preços em `TEXT`) e `gap`, conforme data-model.md
+- [X] T026 Criar `crates/trade-storage/src/schema_runs.sql` com as tabelas `run`, `audit_event` (`PRIMARY KEY (run_id, seq)`, `WITHOUT ROWID`), `trade` e `metrics` (`profit_factor` aceita `NULL`), conforme data-model.md
+- [X] T027 Implementar abertura de banco e aplicação idempotente do esquema em `crates/trade-storage/src/db.rs`
 
 ### Configuração (`trade-cli`)
 
-- [ ] T028 [P] Escrever teste falhando em `crates/trade-cli/src/config.rs`: `limits.toml` e `fees.toml` com valores em **string** viram `Decimal` exato; valor numérico no TOML é rejeitado com erro claro
-- [ ] T029 Implementar a carga de `limits.toml` e `fees.toml` em `crates/trade-cli/src/config.rs` — nenhum limiar embutido no código, conforme constitution v1.2.0
+- [X] T028 [P] Escrever teste falhando em `crates/trade-cli/src/config.rs`: `limits.toml` e `fees.toml` com valores em **string** viram `Decimal` exato; valor numérico no TOML é rejeitado com erro claro
+- [X] T029 Implementar a carga de `limits.toml` e `fees.toml` em `crates/trade-cli/src/config.rs` — nenhum limiar embutido no código, conforme constitution v1.2.0
 
 **Checkpoint**: domínio, portas e persistência prontos e testados. As histórias podem começar.
 
