@@ -8,9 +8,11 @@
 //! ordens e não há credencial — o endpoint `/v5/market/kline` é público, o que
 //! mantém o Princípio VI intocado.
 
+pub mod auth;
 pub mod backoff;
 pub mod client;
 pub mod collector;
+pub mod credencial;
 pub mod errors;
 pub mod gaps;
 pub mod parse;

@@ -9,20 +9,20 @@ teste escrito e **falhando** antes da implementação, conforme o Princípio III
 
 Verificável sem rede e sem credencial.
 
-- [ ] T001 **(TF)** `ExecutionMode::Paper` passa a existir; `live` continua recusado
-- [ ] T002 **(TF)** Leitura de `BYBIT_TESTNET_KEY` e `BYBIT_TESTNET_SECRET` do ambiente
-- [ ] T003 **(TF)** Ausência de credencial aborta a inicialização em `paper` (FR-102)
-- [ ] T004 **(TF)** Chave de testnet e de produção no mesmo ambiente aborta (FR-104)
-- [ ] T005 Segredo MUST NOT aparecer em `Debug`, log ou erro — tipo que redige a si mesmo
+- [X] T001 **(TF)** `ExecutionMode::Paper` passa a existir; `live` continua recusado
+- [X] T002 **(TF)** Leitura de `BYBIT_TESTNET_KEY` e `BYBIT_TESTNET_SECRET` do ambiente
+- [X] T003 **(TF)** Ausência de credencial aborta a inicialização em `paper` (FR-102)
+- [X] T004 **(TF)** Chave de testnet e de produção no mesmo ambiente aborta (FR-104)
+- [X] T005 Segredo MUST NOT aparecer em `Debug`, log ou erro — tipo que redige a si mesmo
 - [ ] T006 [P] `trade-paper` criada, declarada no workspace, sem código ainda
 - [ ] T007 Teste de arquitetura passa a cobrar que estratégia, risco e backtest não declarem `trade-paper`
 
 ## Fatia 2 — a assinatura
 
-- [ ] T008 **(TF)** HMAC-SHA256 sobre vetor conhecido da documentação da Bybit
-- [ ] T009 **(TF)** Ordenação de parâmetros e `recv_window` na string assinada
-- [ ] T010 **(TF)** Timestamp fora da janela é recusado antes do envio
-- [ ] T011 Cliente autenticado em `trade-bybit/src/auth.rs`, sobre o `ureq` já existente
+- [X] T008 **(TF)** HMAC-SHA256 sobre vetor conhecido da documentação da Bybit
+- [X] T009 **(TF)** Ordenação de parâmetros e `recv_window` na string assinada
+- [X] T010 **(TF)** Timestamp fora da janela é recusado antes do envio
+- [X] T011 Cliente autenticado em `trade-bybit/src/auth.rs`, sobre o `ureq` já existente
 - [ ] T012 **(TF)** Verificação de permissão de saque na chave; com saque, aborta (FR-103)
 
 ## Fatia 3 — o adaptador

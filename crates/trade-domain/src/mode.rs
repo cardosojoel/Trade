@@ -9,20 +9,23 @@ use std::str::FromStr;
 /// para o modo de execução; em Rust, a forma de proibir um padrão é não
 /// fornecer o trait que o daria. Um `#[derive(Default)]` aqui seria a violação.
 ///
-/// Nesta versão só existe [`ExecutionMode::Backtest`]. `paper` e `live` são
-/// reconhecidos no parse **apenas para serem recusados com mensagem própria**
-/// (FR-003): dizer "valor inválido" sugeriria erro de digitação e convidaria a
-/// tentar de novo; dizer "ainda não implementado" informa o estado real.
+/// `backtest` e `paper` existem. `live` é reconhecido no parse **apenas para
+/// ser recusado com mensagem própria** (FR-003): dizer "valor inválido"
+/// sugeriria erro de digitação e convidaria a tentar de novo; dizer "ainda não
+/// implementado" informa o estado real. A promoção para `live` é ato humano
+/// registrado depois das portas 1 e 2, nunca uma flag que alguém descobre.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ExecutionMode {
     Backtest,
+    /// Testnet da Bybit, com o mesmo código que iria para `live`. É a Porta 2.
+    Paper,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum ModeError {
     #[error("modo '{0}' ainda não implementado — apenas 'backtest' está disponível nesta versão")]
     NotImplemented(String),
-    #[error("modo '{0}' desconhecido — modos disponíveis: backtest")]
+    #[error("modo '{0}' desconhecido — modos disponíveis: backtest, paper")]
     Unknown(String),
 }
 
@@ -30,6 +33,7 @@ impl ExecutionMode {
     pub const fn as_str(self) -> &'static str {
         match self {
             ExecutionMode::Backtest => "backtest",
+            ExecutionMode::Paper => "paper",
         }
     }
 }
@@ -40,7 +44,8 @@ impl FromStr for ExecutionMode {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.trim().to_ascii_lowercase().as_str() {
             "backtest" => Ok(ExecutionMode::Backtest),
-            m @ ("paper" | "live") => Err(ModeError::NotImplemented(m.to_string())),
+            "paper" => Ok(ExecutionMode::Paper),
+            m @ "live" => Err(ModeError::NotImplemented(m.to_string())),
             outro => Err(ModeError::Unknown(outro.to_string())),
         }
     }
@@ -57,6 +62,25 @@ mod tests {
     use super::*;
 
     #[test]
+    fn paper_faz_parse() {
+        assert_eq!(
+            "paper".parse::<ExecutionMode>().unwrap(),
+            ExecutionMode::Paper
+        );
+        assert_eq!(ExecutionMode::Paper.as_str(), "paper");
+    }
+
+    #[test]
+    fn live_continua_recusado_com_mensagem_propria() {
+        // Dizer "valor inválido" sugeriria erro de digitação e convidaria a
+        // tentar de novo. O Princípio I exige que a promoção para live seja
+        // ato humano registrado, não uma flag que alguém descobre.
+        let e = "live".parse::<ExecutionMode>().unwrap_err();
+        assert!(matches!(e, ModeError::NotImplemented(_)), "{e}");
+        assert!(e.to_string().contains("live"));
+    }
+
+    #[test]
     fn backtest_faz_parse() {
         assert_eq!(
             "backtest".parse::<ExecutionMode>().unwrap(),
@@ -69,12 +93,10 @@ mod tests {
     }
 
     #[test]
-    fn paper_e_live_sao_recusados_como_nao_implementados() {
-        for m in ["paper", "live"] {
-            match m.parse::<ExecutionMode>() {
-                Err(ModeError::NotImplemented(nome)) => assert_eq!(nome, m),
-                outro => panic!("{m} deveria ser NotImplemented, veio {outro:?}"),
-            }
+    fn live_e_recusado_como_nao_implementado() {
+        match "live".parse::<ExecutionMode>() {
+            Err(ModeError::NotImplemented(nome)) => assert_eq!(nome, "live"),
+            outro => panic!("live deveria ser NotImplemented, veio {outro:?}"),
         }
     }
 

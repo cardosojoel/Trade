@@ -36,15 +36,16 @@ fn sem_modo_falha_com_codigo_dois() {
 }
 
 #[test]
-fn modo_paper_diz_que_ainda_nao_existe() {
-    // Não é "valor inválido": isso sugeriria erro de digitação e convidaria a
-    // tentar de novo. "Ainda não implementado" informa o estado do sistema.
+fn modo_paper_nao_roda_sob_o_comando_backtest() {
+    // `paper` passou a existir, mas backtest e paper são regimes diferentes:
+    // um percorre histórico, o outro opera continuamente. Aceitar a flag aqui
+    // faria o comando prometer o que não faz.
     trade()
         .args(base())
         .args(["--mode", "paper"])
         .assert()
         .code(2)
-        .stderr(contains("ainda não implementado"));
+        .stderr(contains("só roda em modo 'backtest'"));
 }
 
 #[test]

@@ -5,6 +5,9 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+thiserror.workspace = true
+hmac.workspace = true
+sha2.workspace = true
 trade-domain.workspace = true
 trade-ports.workspace = true
 chrono.workspace = true

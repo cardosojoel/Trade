@@ -49,7 +49,11 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
     if args.mode != ExecutionMode::Backtest {
         return Err((
             ExitCode::Uso,
-            "apenas o modo 'backtest' está disponível nesta versão".into(),
+            format!(
+                "o comando `backtest` só roda em modo 'backtest', e veio '{}'. \
+                 Paper trading opera continuamente e tem comando próprio.",
+                args.mode
+            ),
         ));
     }
 
