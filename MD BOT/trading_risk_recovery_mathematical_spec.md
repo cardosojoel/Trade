@@ -1,7 +1,9 @@
 # Especificação Matemática Final — Controle de Risco e Recovery
 
-**Versão:** 1.0  
-**Status:** Final  
+**Versão:** 1.1  
+**Status:** **normativo** — esta é a fonte de verdade sobre risco e Recovery.
+O `03_SESSION_STATE_MACHINE.md` é índice para cá, não fonte concorrente.  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Controle matemático de risco e recuperação de sessão  
 **Aplicação:** Bot de trading
 
@@ -22,7 +24,7 @@ O módulo deve determinar:
 - risco máximo durante Recovery;
 - valor ainda disponível para Recovery;
 - progresso da recuperação;
-- limite de ciclos e tentativas;
+- limite de episódios e tentativas;
 - condição de encerramento da sessão.
 
 Não fazem parte deste módulo:
@@ -60,8 +62,8 @@ P  = percentual do lucro autorizado para Recovery (%)
 R  = percentual máximo do depósito que pode ser utilizado em Recovery (%)
 T  = risco máximo por operação normal (%)
 RT = risco máximo por operação durante Recovery (%)
-C  = número máximo de ciclos de Recovery
-A  = número máximo de tentativas por ciclo
+Emax = número máximo de episódios de Recovery
+Amax = número máximo de tentativas por episódio
 ```
 
 Exemplo:
@@ -73,8 +75,8 @@ P  = 30%
 R  = 10%
 T  = 2%
 RT = 25%
-C  = 3
-A  = 4
+Emax = 3
+Amax = 4
 ```
 
 ---
@@ -84,7 +86,7 @@ A  = 4
 O limite máximo de perda do capital originalmente depositado é:
 
 ```text
-LOSS_LIMIT = D × L
+MAX_LOSS_DEPOSIT = D × L
 ```
 
 Exemplo:
@@ -93,14 +95,14 @@ Exemplo:
 D = R$ 50
 L = 20%
 
-LOSS_LIMIT = 50 × 0,20
-LOSS_LIMIT = R$ 10
+MAX_LOSS_DEPOSIT = 50 × 0,20
+MAX_LOSS_DEPOSIT = R$ 10
 ```
 
 Portanto:
 
 ```text
-MAX_DEPOSIT_LOSS = R$ 10
+MAX_LOSS_DEPOSIT = R$ 10
 ```
 
 ---
@@ -110,14 +112,14 @@ MAX_DEPOSIT_LOSS = R$ 10
 O Capital Floor representa o menor valor permitido para o capital original antes de atingir o limite de perda:
 
 ```text
-CAPITAL_FLOOR = D - LOSS_LIMIT
+CAPITAL_FLOOR = D - MAX_LOSS_DEPOSIT
 ```
 
 Exemplo:
 
 ```text
 D = R$ 50
-LOSS_LIMIT = R$ 10
+MAX_LOSS_DEPOSIT = R$ 10
 
 CAPITAL_FLOOR = R$ 40
 ```
@@ -210,7 +212,7 @@ PROTECTED_PROFIT =
 Além do percentual do lucro, existe um limite máximo baseado no depósito:
 
 ```text
-RECOVERY_MAX =
+RECOVERY_MAX_SESSION =
 D × R
 ```
 
@@ -220,7 +222,7 @@ Exemplo:
 D = R$ 50
 R = 10%
 
-RECOVERY_MAX =
+RECOVERY_MAX_SESSION =
 50 × 0,10
 = R$ 5
 ```
@@ -232,10 +234,10 @@ RECOVERY_MAX =
 O orçamento máximo de Recovery é definido pelo menor dos dois limites:
 
 ```text
-INITIAL_RECOVERY_BUDGET =
+RECOVERY_BUDGET_SESSION =
 MIN(
     RECOVERY_ELIGIBLE_PROFIT,
-    RECOVERY_MAX
+    RECOVERY_MAX_SESSION
 )
 ```
 
@@ -247,9 +249,9 @@ P = 30%
 
 RECOVERY_ELIGIBLE_PROFIT = R$ 6
 
-RECOVERY_MAX = R$ 5
+RECOVERY_MAX_SESSION = R$ 5
 
-INITIAL_RECOVERY_BUDGET =
+RECOVERY_BUDGET_SESSION =
 MIN(6,5)
 
 = R$ 5
@@ -286,7 +288,7 @@ O Recovery Budget é um orçamento **consumível**.
 Se:
 
 ```text
-INITIAL_RECOVERY_BUDGET = R$ 5
+RECOVERY_BUDGET_SESSION = R$ 5
 ```
 
 e ocorrer:
@@ -332,7 +334,7 @@ EQUITY <= CAPITAL_FLOOR
 e:
 
 ```text
-INITIAL_RECOVERY_BUDGET > 0
+RECOVERY_BUDGET_SESSION > 0
 ```
 
 e:
@@ -355,7 +357,7 @@ Quando o limite de perda do depósito for atingido:
 
 ```text
 LOSS_TO_RECOVER =
-LOSS_LIMIT
+MAX_LOSS_DEPOSIT
 ```
 
 O alvo inicial será:
@@ -368,7 +370,7 @@ LOSS_TO_RECOVER
 Exemplo:
 
 ```text
-LOSS_LIMIT = R$ 10
+MAX_LOSS_DEPOSIT = R$ 10
 
 RECOVERY_TARGET = R$ 10
 ```
@@ -467,7 +469,9 @@ Resultado:
 RECOVERY_STATUS = SUCCESS
 ```
 
-Nenhum novo Recovery Budget deve ser criado automaticamente.
+O sucesso encerra o **episódio corrente** e devolve a sessão ao estado permitido
+pela política. Ele MUST NOT criar Recovery Budget novo: o alvo pertence ao
+episódio, o orçamento pertence à sessão.
 
 ---
 
@@ -482,13 +486,13 @@ RECOVERY_BUDGET_REMAINING <= 0
 ou:
 
 ```text
-RECOVERY_ATTEMPT >= MAX_RECOVERY_ATTEMPTS
+RECOVERY_ATTEMPT >= Amax
 ```
 
 ou:
 
 ```text
-RECOVERY_CYCLE >= MAX_RECOVERY_CYCLES
+RECOVERY_EPISODE >= Emax
 ```
 
 Resultado:
@@ -586,7 +590,7 @@ Uma perda nunca poderá aumentar automaticamente:
 NORMAL_TRADE_RISK
 RECOVERY_TRADE_RISK
 RECOVERY_BUDGET
-LOSS_LIMIT
+MAX_LOSS_DEPOSIT
 ```
 
 É proibido aumentar o risco em função de:
@@ -606,11 +610,14 @@ Não implementar Martingale.
 Dado:
 
 ```text
-R = risco máximo permitido
+ALLOWED_TRADE_RISK = risco máximo permitido (seção 22)
 E = preço de entrada
 S = preço do Stop Loss
 M = multiplicador do ativo
 ```
+
+`R` MUST NOT ser usado aqui: na seção 3 ele já designa o teto estrutural de
+Recovery.
 
 Calcular:
 
@@ -624,7 +631,7 @@ Então:
 ```text
 POSITION_SIZE =
 FLOOR(
-    R / UNIT_RISK
+    ALLOWED_TRADE_RISK / UNIT_RISK
 )
 ```
 
@@ -712,7 +719,7 @@ RECOVERY_ELIGIBLE_PROFIT =
 Limite absoluto:
 
 ```text
-RECOVERY_MAX =
+RECOVERY_MAX_SESSION =
 50 × 10%
 = R$ 5
 ```
@@ -833,37 +840,29 @@ Ele não é convertido automaticamente em novo orçamento de risco.
 
 ---
 
-# 28. Novo ciclo de Recovery
+# 28. Novo episódio de Recovery
 
-Um novo ciclo somente poderá ser iniciado se:
-
-```text
-RECOVERY_BUDGET_REMAINING > 0
-```
-
-e:
+Um novo episódio MUST ser condicionado a:
 
 ```text
-RECOVERY_TARGET_NOT_REACHED
+RecoveryTrigger
+AND RecoveryBudgetRemaining > 0
+AND EPISODE_COUNT < Emax
 ```
 
-e:
+A condição **não** é `RECOVERY_TARGET_NOT_REACHED`. O `RecoveryTarget` pertence
+ao episódio corrente: uma vez atingido, aquele episódio encerra em
+`RECOVERY_SUCCESS`, e a condição de alvo não alcançado seria permanentemente
+falsa — nenhum episódio posterior poderia existir. Uma deterioração nova da
+sessão é gatilho novo, não continuação do alvo antigo.
+
+O novo episódio utiliza somente:
 
 ```text
-CURRENT_CYCLE < MAX_RECOVERY_CYCLES
+RecoveryBudgetRemaining
 ```
 
-O novo ciclo utiliza somente:
-
-```text
-RECOVERY_BUDGET_REMAINING
-```
-
-Nunca recriar:
-
-```text
-INITIAL_RECOVERY_BUDGET
-```
+`RecoveryBudgetSession` MUST NOT ser recriado.
 
 ---
 
@@ -886,11 +885,11 @@ O orçamento é criado uma única vez com base no lucro realizado elegível.
 Depois disso:
 
 ```text
-INITIAL_RECOVERY_BUDGET
+RECOVERY_BUDGET_SESSION
         ↓
 CONSUMPTION
         ↓
-REMAINING_BUDGET
+RECOVERY_BUDGET_REMAINING
 ```
 
 Não existe regeneração automática.
@@ -950,10 +949,10 @@ R$ 5,00
 
 ────────────────────────────────────
 
-CICLOS MÁXIMOS
+EPISÓDIOS MÁXIMOS
 3
 
-TENTATIVAS POR CICLO
+TENTATIVAS POR EPISÓDIO
 4
 
 ════════════════════════════════════
@@ -963,30 +962,35 @@ O usuário deve confirmar explicitamente os parâmetros antes da sessão se torn
 
 ---
 
-# 31. Máxima perda da sessão
+# 31. Máxima exposição da sessão
 
-O sistema deve apresentar separadamente:
-
-```text
-MAX_DEPOSIT_LOSS
-```
-
-e:
+O sistema MUST apresentar separadamente:
 
 ```text
-MAX_PROFIT_AT_RISK
+MaxLossDeposit
+RecoveryMaxSession
 ```
 
 Exemplo:
 
 ```text
-MAX_DEPOSIT_LOSS = R$ 10
-MAX_PROFIT_AT_RISK = R$ 5
+MaxLossDeposit    = R$ 10
+RecoveryMaxSession = R$ 5
 ```
 
-Não representar esses valores como uma única perda de R$ 15.
+São fontes de capital diferentes e MUST NOT ser apresentadas como uma perda
+única de R$ 15.
 
-São fontes de capital diferentes.
+A soma existe, tem nome próprio e significado restrito:
+
+```text
+WorstCaseSessionExposure = MaxLossDeposit + RecoveryMaxSession
+```
+
+Ela representa a exposição máxima **teórica** autorizada pela política — o
+quanto a sessão pode, no pior caso, colocar em risco. Não é previsão de perda
+nem valor esperado. Uma implementação que adote netting diferente MUST declarar
+fórmula própria e impedir dupla contagem.
 
 ---
 
@@ -1048,15 +1052,15 @@ As seguintes condições nunca podem ser violadas:
 ```text
 D > 0
 
-LOSS_LIMIT >= 0
+MAX_LOSS_DEPOSIT >= 0
 
-LOSS_LIMIT <= D
+MAX_LOSS_DEPOSIT <= D
 
-RECOVERY_MAX >= 0
+RECOVERY_MAX_SESSION >= 0
 
 RECOVERY_BUDGET >= 0
 
-RECOVERY_BUDGET <= RECOVERY_MAX
+RECOVERY_BUDGET <= RECOVERY_MAX_SESSION
 
 RECOVERY_BUDGET <= RECOVERY_ELIGIBLE_PROFIT
 
@@ -1209,7 +1213,7 @@ O risco máximo diminui conforme o Recovery Budget é consumido.
 
 ### Falha
 
-Se o Recovery Budget acabar ou os limites de ciclos/tentativas forem atingidos, a sessão é encerrada.
+Se o Recovery Budget acabar ou os limites de episódios/tentativas forem atingidos, a sessão é encerrada.
 
 ### Nova sessão
 
@@ -1220,13 +1224,13 @@ Um novo Recovery Budget somente poderá ser criado em uma nova sessão com novos
 # 38. Fórmulas principais
 
 ```text
-LOSS_LIMIT =
+MAX_LOSS_DEPOSIT =
 D × L
 ```
 
 ```text
 CAPITAL_FLOOR =
-D - LOSS_LIMIT
+D - MAX_LOSS_DEPOSIT
 ```
 
 ```text
@@ -1245,15 +1249,15 @@ REALIZED_PROFIT - RECOVERY_ELIGIBLE_PROFIT
 ```
 
 ```text
-RECOVERY_MAX =
+RECOVERY_MAX_SESSION =
 D × R
 ```
 
 ```text
-INITIAL_RECOVERY_BUDGET =
+RECOVERY_BUDGET_SESSION =
 MIN(
     RECOVERY_ELIGIBLE_PROFIT,
-    RECOVERY_MAX
+    RECOVERY_MAX_SESSION
 )
 ```
 
@@ -1287,6 +1291,55 @@ ESTIMATED_FEES
 +
 ESTIMATED_SLIPPAGE
 ```
+
+---
+
+# 39. Estados da sessão
+
+```text
+CREATED
+CONFIRMING
+ACTIVE
+PROFIT_PROTECTED
+LOSS_LIMIT_REACHED
+RECOVERY
+RECOVERY_SUCCESS
+RECOVERY_FAILED
+STOPPED
+ERROR
+RECONCILIATION_REQUIRED
+EMERGENCY_STOP
+```
+
+A estrutura de episódios dentro da sessão é:
+
+```text
+Session
+ ├─ Episode #1
+ │    ├─ attempts (<= Amax)
+ │    └─ SUCCESS | FAILED
+ ├─ Episode #2
+ └─ Episode #N   (N <= Emax)
+```
+
+Falha final de uma tentativa MUST NOT ser tratada como sucesso parcial.
+
+---
+
+# 40. Invariantes operacionais
+
+Complementam os invariantes matemáticos da seção 34 e valem sobre o sistema
+inteiro, não apenas sobre este módulo:
+
+- o Risk Engine é autoridade final; nenhum outro componente autoriza ordem;
+- Recovery MUST NOT aumentar `MaxLossDeposit`;
+- Recovery MUST NOT criar crédito ilimitado;
+- `RecoveryBudgetSession` é global à sessão e consumível;
+- episódio e budget são grandezas distintas;
+- lucro não realizado MUST NOT ser elegível a Recovery;
+- falha de reconciliação bloqueia novas entradas;
+- ordem em estado `UNKNOWN` relevante bloqueia novas entradas;
+- o modelo quantitativo MUST NOT alterar política estrutural de risco.
 
 ---
 

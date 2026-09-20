@@ -1,16 +1,19 @@
 # 15 — Position Sizing
 
-Sizing ocorre depois de existir edge e antes da autorização final de risco.
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-Métodos suportados: fixed fractional, risk-based, volatility-adjusted e fractional Kelly opcional.
+Tamanho de posição entre a vantagem estatística e a autorização de risco.
 
-Para risco monetário R e distância de risco D:
-`PositionSize = R / D`
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-O cálculo final deve incorporar unidade do contrato, tick/lot size, fees e slippage.
-
-Aplicar caps de posição, notional, leverage, exposição por símbolo, exposição total e orçamento de risco.
-
-Arredondamento deve respeitar as regras do instrumento da Bybit.
-
-Registrar sizing bruto, limites aplicados e sizing final.
+| Assunto | Onde está |
+|---|---|
+| Métodos admitidos, `UnitRisk` e `PositionSize` | §22 |
+| Risco total da posição | §23 |
+| Limite global de risco (`AllowedTradeRisk`) | `trading_risk_recovery_mathematical_spec.md` §22 |
+| Position size, risco total, fees e slippage | `trading_risk_recovery_mathematical_spec.md` §24–26 |
+| Arredondamento e limites do instrumento | `28_BYBIT_INSTRUMENT_REGISTRY.md` |

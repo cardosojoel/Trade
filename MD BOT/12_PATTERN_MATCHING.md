@@ -1,15 +1,22 @@
 # 12 — Historical Pattern Matching
 
-`Current Pattern → Normalize → Candidate Filter → Distance → Top-K → Weighted Neighbors`
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`HISTORICAL_PATTERN_PROBABILITY_EV.md`](HISTORICAL_PATTERN_PROBABILITY_EV.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-O padrão é um vetor versionado de features normalizadas, com timestamp, regime e horizonte.
+Busca de estados históricos semelhantes ao estado atual.
 
-A distância deve ser versionada; baseline: distância euclidiana ponderada. Extensões como Mahalanobis só entram após validação.
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-K é hiperparâmetro e não pode ser otimizado no mesmo período usado para avaliação.
-
-Filtrar por regime, timeframe, horizonte e compatibilidade de features.
-
-Sem amostra mínima ou qualidade suficiente: `INSUFFICIENT_EVIDENCE`.
-
-O histórico não deve ser consultado diretamente no hot path; usar índice/estrutura em memória.
+| Assunto | Onde está |
+|---|---|
+| Representação do estado e regra temporal | §3–4 |
+| Normalização versionada | §5 |
+| Distância ponderada | §6 |
+| Seleção de `K`, filtros, índice em memória e versionamento da métrica | §7 |
+| Pesos de similaridade | §8–9 |
+| ESS e qualidade da similaridade; `INSUFFICIENT_EVIDENCE` | §25–26 |
+| Parâmetros que exigem validação fora da amostra | §36 |
+| Integridade temporal | §38 |

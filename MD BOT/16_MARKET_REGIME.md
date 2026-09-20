@@ -1,12 +1,18 @@
 # 16 — Market Regime
 
-Regimes baseline:
-`TREND_UP`, `TREND_DOWN`, `RANGE`, `HIGH_VOLATILITY`, `LOW_VOLATILITY`, `BREAKOUT`, `CRASH`, `UNKNOWN`.
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-Regime é hipótese estatística, não verdade absoluta.
+Classificação do estado de mercado.
 
-Usar histerese para evitar alternância excessiva. Se confiança for insuficiente, usar `UNKNOWN` e aplicar a política correspondente, podendo bloquear entradas.
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-Somente dados disponíveis no instante de classificação podem ser usados.
-
-Registrar regime, confiança, timestamp e versão.
+| Assunto | Onde está |
+|---|---|
+| Enum canônico `MarketRegime` | `00_GLOSSARIO.md` §6 |
+| Classificação, histerese, confiança, `Unknown` e registro | §11 |
+| Features usadas na classificação | §4–10 |
+| Consistência de regime na busca de padrões | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §27–28 |

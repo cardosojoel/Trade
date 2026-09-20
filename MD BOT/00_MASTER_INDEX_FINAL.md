@@ -1,12 +1,26 @@
 # Trading Bot SDD — Master Index Final v3
 
-**Status:** SDD v3 — P0 remediation applied
+**Status:** SDD v3.1 — camada normativa única e vocabulário canônico
 **Stack:** Rust + SQLite
 **Exchange:** Bybit
 **Ativo inicial:** BTCUSDT
 
 ## 1. Regra de autoridade
-A especificação é a fonte de verdade. Valores operacionais concretos vivem no `27_CONFIGURATION_REGISTRY.md`; regras do instrumento vivem no `28_BYBIT_INSTRUMENT_REGISTRY.md`; contratos de software vivem no `29_RUST_CONTRACTS.md`; rastreabilidade vive no `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`.
+A especificação é a fonte de verdade. Valores operacionais concretos vivem no `27_CONFIGURATION_REGISTRY.md`; regras do instrumento vivem no `28_BYBIT_INSTRUMENT_REGISTRY.md`; contratos de software vivem no `29_RUST_CONTRACTS.md`; rastreabilidade vive no `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`; **nomes** vivem no `00_GLOSSARIO.md`.
+
+## 1.1 Camadas: normativo e índice
+Cada assunto tem **um** documento normativo. Documentos de índice localizam o assunto e não enunciam regra própria — um assunto reenunciado em dois lugares foi, na prática, corrigido em um só.
+
+| Assunto | Normativo | Índices |
+|---|---|---|
+| Risco e Recovery da sessão | `trading_risk_recovery_mathematical_spec.md` | `03` |
+| Features, regime, EV, sizing | `MATHEMATICAL_QUANT_MODEL.md` | `10`, `11`, `15`, `16` |
+| Pattern matching, probabilidade, EV | `HISTORICAL_PATTERN_PROBABILITY_EV.md` | `12`, `13`, `14` |
+| Ledger, aprendizado, validação, promoção | `DECISION_LEARNING.md` | `07`, `17`, `18` |
+
+Os documentos `01`, `02`, `04`, `05`, `06`, `08`, `09`, `19`–`24` e `26`–`30` são normativos nos seus próprios assuntos e não têm par.
+
+Vocabulário: `00_GLOSSARIO.md` é normativo sobre nomes e símbolos. Nenhum documento introduz sinônimo para termo já definido, nem reusa símbolo já atribuído.
 
 ## 2. Baseline 01–09
 01 Execution Engine
@@ -77,14 +91,14 @@ EV binário é apenas uma projeção especial do modelo ternário.
 
 ## 7. Risk / Recovery
 ```text
-MaxLossDeposit = D0 * L
-CapitalFloor = D0 - MaxLossDeposit
-RecoveryMaxSession = D0 * R
+MaxLossDeposit = D * L
+CapitalFloor = D - MaxLossDeposit
+RecoveryMaxSession = D * R
 RecoveryBudgetSession <= RecoveryMaxSession
 WorstCaseSessionExposure = MaxLossDeposit + RecoveryMaxSession
 ```
 
-`Recovery Episode` e `Recovery Budget` são conceitos distintos. Sucesso de um episódio não cria budget novo.
+`RecoveryEpisode` e `RecoveryBudgetSession` são conceitos distintos. Sucesso de um episódio não cria budget novo. Símbolos conforme `00_GLOSSARIO.md`.
 
 ## 8. Bybit
 - WebSocket Order Entry é preferencial para hot path.
@@ -125,7 +139,7 @@ Specification
 ```
 
 ## 12. P0 status
-Aplicado:
+Aplicado — e, desde 2026-09-20, aplicado também às especificações matemáticas, onde EV binário e vocabulário duplicado de regime haviam sobrevivido:
 - EV ternário;
 - Recovery Episode/Budget;
 - WorstCaseSessionExposure;
@@ -138,3 +152,5 @@ Aplicado:
 
 ## 13. Próximo gate
 Não adicionar novas frentes antes de preencher a matriz 26 com referências reais aos módulos Rust e testes do MVP. O próximo ciclo é **Implementation Traceability & Evidence**, não criação indiscriminada de novos MDs.
+
+Pendências conhecidas, registradas no `CURRENT_STATE.md` do repositório: os quatro conflitos com a constitution do projeto (mercado spot, Recovery depois do freio, ciclo de vida da sessão, `f64` no `29_RUST_CONTRACTS.md`) continuam abertos e só se resolvem por emenda formal. Nenhum deles foi decidido aqui.

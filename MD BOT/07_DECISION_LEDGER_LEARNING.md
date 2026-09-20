@@ -1,88 +1,21 @@
 # 07 — Decision Ledger & Learning
 
-## Objetivo
-Criar histórico completo e imutável das decisões para permitir avaliação, aprendizado e evolução controlada do modelo.
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`DECISION_LEARNING.md`](DECISION_LEARNING.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-## Decision Snapshot
-Cada decisão deve registrar:
-```text
-decision_id
-timestamp
-market_state
-features
-regime
-strategy_version
-feature_version
-model_version
-risk_version
-probability
-expected_return
-expected_value
-decision
-reason_codes
-risk_state
-```
+Histórico imutável de decisões e evolução controlada do modelo.
 
-## Outcomes
-Após fechamento:
-```text
-entry
-exit
-PnL
-fees
-funding
-slippage
-MAE
-MFE
-holding_time
-outcome
-```
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-## No Trade
-Registrar também:
-```text
-NO_TRADE
-```
-
-Isso evita viés de seleção.
-
-## Aprendizado
-Pipeline:
-```text
-Decision
- ↓
-Outcome
- ↓
-Dataset
- ↓
-Evaluation
- ↓
-Candidate Model
- ↓
-Walk-forward
- ↓
-Validation
- ↓
-Promotion
-```
-
-## Não permitir
-```text
-online self-modification
-automatic model promotion
-training with future information
-```
-
-## Drift
-Monitorar:
-```text
-feature drift
-probability calibration drift
-performance drift
-regime drift
-```
-
-## Conclusão
-**Estado: conceitualmente forte, mas ainda não estado da arte.**
-
-Para nível máximo, adicionar Model Registry, lineage, dataset hashing, experiment tracking, champion/challenger, canary deployment e rollback automático.
+| Assunto | Onde está |
+|---|---|
+| DecisionSnapshot e schema conceitual | §3, §5–8 |
+| Registro de toda decisão, inclusive `NO_TRADE` e `DENY_BY_RISK` | §4, §13 |
+| DecisionOutcome, MAE e MFE | §9–12 |
+| Separação entre decisão e resultado | §14 |
+| Pipeline de aprendizado | §24, §49, §52 |
+| Proibições: leakage, look-ahead, feedback loop, auto-modificação | §29–31, §35, §37 |
+| Drift de distribuição, desempenho e calibração | §40 |

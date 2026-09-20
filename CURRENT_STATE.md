@@ -55,15 +55,29 @@ anti-Martingale, orçamento consumível e risco que diminui a cada perda. É
 disciplinado. Mas continua sendo autorização para operar depois do freio, que é
 exatamente o que o Princípio II proíbe sem emenda.
 
-Duas incoerências que a auditoria `25_CROSS_DOCUMENT_AUDIT.md` declarou
-corrigidas e que sobrevivem no texto: o EV binário ainda é a fórmula única de
-`MATHEMATICAL_QUANT_MODEL.md` §15 (AUD-MATH-001), e o vocabulário de regime
-continua duplicado entre `16_MARKET_REGIME.md` e os três documentos matemáticos
-(AUD-PARAM-002). O P0 foi aplicado aos documentos numerados, não aos
-matemáticos.
+**Corrigido em 2026-09-20 — o conjunto tinha duas camadas dizendo a mesma
+coisa.** Os quatro documentos matemáticos eram os originais; `03`, `07` e
+`10`–`18` eram versões comprimidas deles. Era essa duplicação que produzia as
+contradições da auditoria: o P0 fora aplicado aos resumos e não aos originais,
+então o EV binário e o vocabulário duplicado de regime sobreviviam onde a
+matemática de fato mora.
+
+O que mudou: cada assunto tem agora **um** documento normativo; os onze resumos
+viraram índices que apontam para ele e não enunciam regra própria; as correções
+P0 foram portadas para os originais; e o novo `00_GLOSSARIO.md` é a autoridade
+sobre nomes — incluindo o símbolo `C`, que designava custos num documento e
+ciclos de Recovery em outro, e `R`, que era teto de Recovery e risco monetário
+ao mesmo tempo.
 
 O gate que a própria SDD define: preencher `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`
 com referências reais ao código antes de abrir qualquer frente nova.
+
+Continua aberto no conjunto de documentos: linguagem normativa (MUST/SHOULD) e
+IDs de requisito por documento, cabeçalho de estado em todos, autoavaliações que
+ainda vivem dentro das especificações `01`–`09`, e um exemplo numérico único que
+atravesse o sistema inteiro — cruzando os exemplos que já existem, um depósito
+de R$ 50 com risco de 2% e stop de 1,2% pede uma posição de R$ 83, impossível em
+spot sem alavancagem, e nenhum documento cruza os dois.
 
 ---
 

@@ -1,7 +1,10 @@
 # Trading Bot — Decision Learning & Historical Learning System
 
-**Versão:** 1.0  
-**Status:** Especificação base  
+**Versão:** 1.1  
+**Status:** **normativo** — esta é a fonte de verdade sobre ledger de decisões,
+aprendizado, validação e promoção de modelo. Os documentos `07`, `17` e `18` são
+índices para cá.  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Histórico de decisões, resultados, avaliação, aprendizado e evolução controlada do modelo
 
 ---
@@ -407,8 +410,8 @@ Criar matriz:
 ```text
                     REGIME
 
-                BULL   BEAR   SIDEWAYS   HIGH_VOL
----------------------------------------------------
+           TrendUp  TrendDown  Range  HighVolatility
+----------------------------------------------------
 P > 70%
 P 60-70%
 P 50-60%
@@ -885,7 +888,12 @@ AND
 candidate.performance_stable_across_regimes
 ```
 
-A promoção deve exigir todos os critérios obrigatórios.
+A promoção deve exigir todos os critérios obrigatórios, e cada um MUST ser
+versionado — melhoria mínima, regressão máxima de drawdown, degradação máxima de
+calibração, amostra mínima e período mínimo fora da amostra.
+
+A promoção MAY passar por canary, limitando capital, símbolos e duração antes da
+exposição completa.
 
 ---
 
@@ -903,7 +911,11 @@ threshold violation
 ROLLBACK
 ```
 
-Rollback deve restaurar uma versão anteriormente aprovada.
+Rollback deve restaurar uma versão anteriormente aprovada, e MUST ser
+automático quando um threshold crítico versionado for violado.
+
+O aprendizado MUST NOT alterar diretamente política de risco, kill switch,
+credenciais ou permissões.
 
 ---
 

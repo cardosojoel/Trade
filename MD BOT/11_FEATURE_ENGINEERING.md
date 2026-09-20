@@ -1,15 +1,18 @@
 # 11 — Feature Engineering
 
-Cada feature deve possuir `name`, `formula`, `window`, `source`, `unit`, `normalization`, `timestamp` e `version`.
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-## Anti-leakage
-`Feature(t) = f(X[−∞, t])`. Nenhum dado posterior a `t` pode participar da feature.
+Transformação de histórico em variáveis quantitativas.
 
-## Classes
-Preço/retorno, volume/fluxo, volatilidade, momentum, order book, trades, funding/open interest quando disponíveis, tempo e regime.
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-## Performance
-Features do hot path devem ser calculadas incrementalmente em RAM, evitando I/O, scans históricos e alocações desnecessárias.
-
-## Testes
-Fórmula, bordas, NaN/overflow, temporalidade e regressão.
+| Assunto | Onde está |
+|---|---|
+| Retorno logarítmico e momentum | §4–5 |
+| Volatilidade e razão de volatilidade | §6 |
+| Tendência, volume, ATR e drawdown | §7–10 |
+| Feature vector, metadados obrigatórios, anti-leakage e testes | §12 |

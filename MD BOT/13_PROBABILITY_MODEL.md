@@ -1,16 +1,20 @@
 # 13 — Probability Model
 
-Estimar `P(H | Pattern, Regime, Features)` para horizonte explícito.
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`HISTORICAL_PATTERN_PROBABILITY_EV.md`](HISTORICAL_PATTERN_PROBABILITY_EV.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-Baseline:
-`P = weighted_successes / weighted_observations`
+Estimativa ternária de probabilidade para um horizonte explícito.
 
-Aplicar smoothing em amostras pequenas.
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-Registrar amostra efetiva, K, horizonte, regime, intervalo de confiança e versão.
-
-Validar com Brier Score, log loss, reliability curve e calibration error.
-
-Probability não substitui EV. Alta probabilidade pode resultar em `NO_TRADE`.
-
-Monitorar drift de calibração por regime e tempo.
+| Assunto | Onde está |
+|---|---|
+| Classificação dos resultados (`θ_up`, `θ_down`) | §11 |
+| Cálculo de `P_up`, `P_neutral`, `P_down` e smoothing | §12 |
+| Calibração e erro de calibração | §14–15 |
+| Confidence e amostra efetiva | §24–25 |
+| Probabilidade condicionada a regime e volatilidade | §28–29 |
+| Multi-horizonte | §30 |

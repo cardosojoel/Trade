@@ -1,11 +1,20 @@
 # 18 — Model Promotion
 
-`Decision Ledger → Dataset → Candidate → Validation → Champion vs Challenger → Shadow/Canary → Promotion → Monitoring → Rollback`
+**Status:** índice — **não normativo**  
+**Fonte de verdade:** [`DECISION_LEARNING.md`](DECISION_LEARNING.md)  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
-Champion é o modelo autorizado. Challenger não possui autoridade de execução.
+Passagem de `CANDIDATE_MODEL` a `LIVE_MODEL`.
 
-Promoção exige critérios objetivos versionados. Canary pode limitar capital, símbolos e tempo.
+Este documento não enuncia regra própria. Ele existe para localizar, na
+especificação normativa, o assunto que antes era reenunciado aqui — e para que
+uma correção precise ser feita **uma vez só**.
 
-Rollback deve ser automático quando thresholds críticos forem violados.
-
-O aprendizado não pode alterar diretamente Risk Policy, kill switch, credenciais ou permissões.
+| Assunto | Onde está |
+|---|---|
+| Candidate model e Model Registry | §24–25 |
+| Desacoplamento entre aprendizado e execução; model freeze | §36–37 |
+| Critérios de promoção e canary | §38 |
+| Rollback automático e limites de autoridade do aprendizado | §39 |
+| Drift e regra de parada do modelo | §40–41 |
+| MetaModel | §48 |

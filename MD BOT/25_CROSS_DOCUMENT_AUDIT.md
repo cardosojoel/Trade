@@ -1,6 +1,13 @@
 # 25 — Cross-Document Audit — SDD Trading Bot v2
 
 **Data da auditoria:** 20/09/2026  
+**Nota de 2026-09-20:** este documento é registro histórico dos achados e não foi
+reescrito. Duas ressalvas para quem o lê hoje: (a) AUD-MATH-001 e AUD-PARAM-002
+foram fechados apenas nos documentos numerados e permaneciam abertos nas
+especificações matemáticas — foram fechados nelas nesta data; (b) os nomes
+usados aqui precedem o [`00_GLOSSARIO.md`](00_GLOSSARIO.md), que hoje é a
+autoridade sobre vocabulário: `WorstCaseSessionLoss` lê-se
+`WorstCaseSessionExposure`, e "ciclo" lê-se `RecoveryEpisode`.  
 **Escopo:** Frentes 01–09 + especificações matemáticas + documentos 10–24  
 **Stack:** Rust + SQLite  
 **Exchange:** Bybit  
@@ -615,7 +622,7 @@ drift threshold
 
 ## AUD-RISK-003 — Execution simulator mismatch
 
-A própria baseline reconhece que o simulador ainda está em evolução e precisa de fills reais/microestrutura. Isso significa que backtest positivo ainda não é evidência suficiente para live. fileciteturn3file0L30-L36 fileciteturn2file4L529-L563
+A própria baseline reconhece que o simulador ainda está em evolução e precisa de fills reais/microestrutura. Isso significa que backtest positivo ainda não é evidência suficiente para live. Fonte: `06_EXECUTION_SIMULATOR.md`, Conclusão; `05_BACKTEST_ENGINE.md`, Conclusão.
 
 ---
 
@@ -637,7 +644,7 @@ new entries bloqueadas
 
 durante indisponibilidade do SQLite.
 
-O princípio de manter Risk State em RAM é correto. fileciteturn5file3L77-L90
+O princípio de manter Risk State em RAM é correto. Fonte: `19_DATABASE_SCHEMA.md`, Princípio e Integridade.
 
 ---
 
@@ -731,7 +738,7 @@ Market
 → Reconciliation
 ```
 
-Isso está alinhado com a autoridade registrada no Master Index. fileciteturn1file1L70-L105
+Isso está alinhado com a autoridade registrada no Master Index. Fonte: `00_MASTER_INDEX_FINAL.md` §6.
 
 ### Entretanto existe um risco lógico
 
@@ -746,7 +753,7 @@ Learning
 
 Isso é um ciclo intencional.
 
-O ciclo só é seguro porque o documento 18 impede Challenger de executar e exige promoção controlada. fileciteturn5file2L56-L66
+O ciclo só é seguro porque o documento 18 impede Challenger de executar e exige promoção controlada. Fonte: `DECISION_LEARNING.md` §24 e §37.
 
 Portanto:
 
@@ -768,7 +775,7 @@ features
 → risk
 ```
 
-A Frente 09 define essa cadeia como hot path, mas não define budgets individuais. fileciteturn3file3L293-L315 fileciteturn3file3L343-L375
+A Frente 09 define essa cadeia como hot path, mas não define budgets individuais. Fonte: `09_PERFORMANCE_LOW_LATENCY.md`, Hot Path e Latency Budget.
 
 ### Problema
 
@@ -802,7 +809,7 @@ com margem de segurança.
 
 ## AUD-PERF-002 — Emergency Path
 
-O Emergency SLO mede até `Order Ready`, não até fill. Isso é correto e evita atribuir à exchange uma garantia que o bot não controla. A documentação já separa explicitamente latência interna de feed, rede, exchange e execução. fileciteturn3file3L273-L291 fileciteturn3file3L645-L656
+O Emergency SLO mede até `Order Ready`, não até fill. Isso é correto e evita atribuir à exchange uma garantia que o bot não controla. A documentação já separa explicitamente latência interna de feed, rede, exchange e execução. Fonte: `09_PERFORMANCE_LOW_LATENCY.md`, SLO 2 e Conclusão.
 
 ### Porém
 
@@ -856,7 +863,7 @@ Specification
 → Real-world Evidence
 ```
 
-mas ainda não existe o nível intermediário de rastreabilidade por requisito. fileciteturn1file1L132-L145
+mas ainda não existe o nível intermediário de rastreabilidade por requisito. Fonte: `00_MASTER_INDEX_FINAL.md` §11.
 
 ## Deve ser criado
 
@@ -923,7 +930,7 @@ Market
 → Learning
 ```
 
-A separação de autoridade está correta e evita que o modelo quantitativo contorne o Risk Engine. fileciteturn1file1L98-L105
+A separação de autoridade está correta e evita que o modelo quantitativo contorne o Risk Engine. Fonte: `00_MASTER_INDEX_FINAL.md` §6; `MATHEMATICAL_QUANT_MODEL.md` §2.
 
 A integração Bybit também está conceitualmente correta:
 
@@ -937,9 +944,9 @@ order/execution
 REST recovery
 ```
 
-e ACK não é tratado como fill. fileciteturn2file0L14-L37
+e ACK não é tratado como fill. Fonte: `01_EXECUTION_ENGINE.md`, Conclusão.
 
-O hot path também está corretamente separado do SQLite e do aprendizado. fileciteturn3file3L319-L341
+O hot path também está corretamente separado do SQLite e do aprendizado. Fonte: `09_PERFORMANCE_LOW_LATENCY.md`, Hot Path.
 
 ## O que impede considerar o SDD “fechado”
 

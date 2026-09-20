@@ -1,7 +1,9 @@
 # Historical Pattern Matching → Probability → Expected Value
 
-**Versão:** 1.0  
-**Status:** Especificação matemática complementar  
+**Versão:** 1.1  
+**Status:** **normativo** — esta é a fonte de verdade sobre pattern matching,
+probabilidade e EV. Os documentos `12`, `13` e `14` são índices para cá.  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Transformação de padrões históricos em probabilidade, retorno esperado e valor esperado para decisões de trading
 
 ---
@@ -201,7 +203,18 @@ K = 100
 
 O `K` deve ser configurável e validado por walk-forward.
 
-Não assumir que `K = 100` é matematicamente ótimo.
+Não assumir que `K = 100` é matematicamente ótimo. `K` é hiperparâmetro e MUST
+NOT ser otimizado no mesmo período usado para avaliar o resultado.
+
+A métrica de distância MUST ser versionada; a linha de base é a distância
+euclidiana ponderada da seção 6. Extensões — Mahalanobis, por exemplo — só
+entram após validação fora da amostra.
+
+Os candidatos MUST ser filtrados por regime, timeframe, horizonte e
+compatibilidade de versão de features antes do cálculo de distância.
+
+O histórico MUST NOT ser consultado diretamente no hot path: a busca usa índice
+ou estrutura em memória.
 
 ---
 
@@ -353,6 +366,10 @@ Consequentemente:
 P(UP)+P(DOWN)+P(NEUTRAL)=1
 \]
 
+Em amostra pequena, a contagem ponderada MUST receber smoothing; a estimativa
+MUST registrar amostra efetiva, `K`, horizonte, regime, intervalo de confiança e
+versão.
+
 ---
 
 # 13. Exemplo
@@ -489,6 +506,11 @@ Essa forma permite auditar a origem do retorno esperado.
 
 # 18. Expected Value
 
+A forma canônica e geral do EV vive em
+[`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md) §15. O que segue é
+a sua especialização para uma operação LONG, e MUST permanecer consistente com
+ela.
+
 Para uma operação LONG:
 
 \[
@@ -529,7 +551,7 @@ C
 Definir:
 
 \[
-C =
+C_{total} =
 Fees
 +
 Slippage
@@ -730,6 +752,10 @@ average_distance > maximum_allowed_distance
 NO_TRADE
 ```
 
+Sem amostra mínima ou sem qualidade de similaridade suficiente, o módulo MUST
+retornar `INSUFFICIENT_EVIDENCE` — não uma probabilidade de baixa confiança
+travestida de estimativa.
+
 ---
 
 # 27. Regime Consistency
@@ -740,14 +766,14 @@ Exemplo:
 
 ```text
 Current:
-BULL_TREND
+TrendUp
 ```
 
 Se a maioria dos vizinhos:
 
 ```text
-SIDEWAYS
-BEAR_TREND
+Range
+TrendDown
 ```
 
 a estimativa pode ser considerada menos confiável.
@@ -773,9 +799,9 @@ P(UP|X,Regime)
 Isso permite comparar:
 
 ```text
-P(UP | BULL_TREND)
-P(UP | BEAR_TREND)
-P(UP | SIDEWAYS)
+P(UP | TrendUp)
+P(UP | TrendDown)
+P(UP | Range)
 ```
 
 ---

@@ -14,7 +14,7 @@ Unit, integration, property-based, regression, replay, backtest, fault injection
 - WorstCaseSessionExposure segue fórmula canônica.
 
 ## Risk / Recovery
-Testar múltiplos episódios, sucesso seguido de nova deterioração, budget esgotado, Cmax, Amax e falha de reconciliação.
+Testar múltiplos episódios, sucesso seguido de nova deterioração, budget esgotado, Emax, Amax e falha de reconciliação.
 
 ## Bybit
 Testar ACK vs fill, duplicate prevention, partial fill, reconnect, resubscribe, sequence gap, unknown order, instrument constraints e reconciliation.

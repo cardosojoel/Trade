@@ -1,7 +1,9 @@
 # Trading Bot — Base Matemática Quantitativa
 
-**Versão:** 1.0  
-**Status:** Especificação base  
+**Versão:** 1.1  
+**Status:** **normativo** — esta é a fonte de verdade sobre features, regime,
+EV e sizing. Os documentos `10`, `11`, `15` e `16` são índices para cá.  
+**Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Modelo matemático para geração, avaliação e controle de sinais de trading de Bitcoin
 
 ---
@@ -269,19 +271,26 @@ O drawdown deve ser uma feature independente.
 
 # 11. Regime de mercado
 
-O modelo deve classificar o mercado em categorias:
+O modelo MUST classificar o mercado no enum canônico do glossário:
 
-```text
-BULL_TREND
-BEAR_TREND
-SIDEWAYS
-HIGH_VOLATILITY
-EXTREME_VOLATILITY
-RECOVERY
-UNKNOWN
+```rust
+enum MarketRegime {
+    TrendUp,
+    TrendDown,
+    Range,
+    LowVolatility,
+    HighVolatility,
+    Breakout,
+    Crash,
+    Unknown,
+}
 ```
 
-A classificação deve utilizar múltiplas features.
+`RECOVERY` MUST NOT ser regime: é estado de sessão, definido na especificação de
+risco. A granulação `LOW`/`NORMAL`/`HIGH`/`EXTREME` usada em análise de
+desempenho é `VolatilityBucket`, grandeza distinta.
+
+A classificação MUST utilizar múltiplas features.
 
 Exemplo conceitual:
 
@@ -289,10 +298,17 @@ Exemplo conceitual:
 TrendScore > threshold
 AND
 VolatilityRatio dentro do intervalo
-→ BULL_TREND
+→ TrendUp
 ```
 
-A classificação deve ser determinística para um mesmo snapshot.
+Regime é hipótese estatística, não verdade. A classificação MUST:
+
+- ser determinística para um mesmo snapshot;
+- usar apenas dados disponíveis no instante da classificação;
+- aplicar histerese e tempo mínimo de permanência, para não alternar a cada vela;
+- registrar regime, confiança, timestamp e versão;
+- retornar `Unknown` quando a confiança for insuficiente — e a política
+  correspondente MAY bloquear entradas.
 
 ---
 
@@ -338,7 +354,17 @@ FeatureVector {
 }
 ```
 
-Nenhuma feature pode utilizar dados posteriores ao timestamp do snapshot.
+Nenhuma feature pode utilizar dados posteriores ao timestamp do snapshot:
+`Feature(t) = f(X[−∞, t])`.
+
+Cada feature MUST declarar `name`, `formula`, `window`, `source`, `unit`,
+`normalization`, `timestamp` e `version`.
+
+Features do hot path MUST ser calculadas incrementalmente em RAM, sem E/S, sem
+varredura de histórico e sem alocação desnecessária.
+
+Os testes obrigatórios de uma feature são: fórmula, bordas, NaN/overflow,
+temporalidade e regressão.
 
 ---
 
@@ -388,30 +414,59 @@ P(down)R_{down}
 
 # 15. Expected Value
 
-Para uma operação:
+O modelo canônico é **ternário**, consistente com a seção 13:
 
 \[
-EV =
-P(win)\times AvgWin
--
-P(loss)\times AvgLoss
--
-Costs
+EV_{gross} =
+P_{up}R_{up}
++
+P_{neutral}R_{neutral}
++
+P_{down}R_{down}
+\]
+
+\[
+EV_{net} = EV_{gross} - C_{total}
 \]
 
 Onde:
 
 ```text
-Costs = fees + estimated_slippage + outros custos mensuráveis
+C_total = fees + spread + slippage + funding + custo de execução
 ```
 
-Uma operação só pode ser considerada quantitativamente favorável quando:
+A forma binária:
 
 ```text
-EV > 0
+EV = P(win)·AvgWin − P(loss)·AvgLoss − C_total
 ```
 
-Mas `EV > 0` sozinho não autoriza execução.
+é **apenas a projeção** do modelo ternário quando `P_neutral = 0` e, portanto,
+`P_loss = 1 − P_win`. Ela MUST NOT coexistir como fórmula independente: se
+`P_neutral > 0`, então `1 − P_win` não é `P_loss` e a projeção está errada.
+
+O sistema MUST calcular também um cenário conservador, degradando conforme
+política versionada probabilidade, retorno favorável, slippage, fees e
+probabilidade de preenchimento:
+
+```text
+EV_conservative
+```
+
+Uma operação só é quantitativamente elegível quando:
+
+```text
+EV_net > EV_min
+AND EV_conservative > EV_min_conservative
+```
+
+Mas `EV_net > 0` sozinho MUST NOT autorizar execução: a autoridade é do Risk
+Engine. A decisão MUST persistir `p_up`, `p_neutral`, `p_down`, os retornos por
+estado, os custos por categoria, `ev_gross`, `ev_net`, `ev_conservative`, os
+thresholds aplicados e as versões de modelo e features.
+
+Invariantes: `0 <= P_state <= 1`; a soma das probabilidades é 1 dentro da
+tolerância numérica declarada; o EV MUST incluir custos.
 
 ---
 
@@ -564,11 +619,15 @@ O `k` deve ser otimizado apenas dentro de processo de validação fora da amostr
 Se:
 
 ```text
-R = risco monetário permitido
+AllowedTradeRisk = risco monetário permitido pelo Risk Engine
 E = preço de entrada
 S = stop
-M = multiplicador
+M = multiplicador do contrato
 ```
+
+O sizing ocorre **depois** de existir vantagem estatística e **antes** da
+autorização final de risco. Métodos admitidos: fixed fractional, risk-based,
+volatility-adjusted e fractional Kelly opcional.
 
 Então:
 
@@ -578,10 +637,15 @@ UnitRisk = |E-S|\times M
 
 \[
 PositionSize =
-floor(R/UnitRisk)
+floor(AllowedTradeRisk/UnitRisk)
 \]
 
 Sempre arredondar para baixo.
+
+O arredondamento final MUST respeitar `tick_size`, `qty_step`, mínimos e
+máximos do instrumento, conforme o
+[`28_BYBIT_INSTRUMENT_REGISTRY.md`](28_BYBIT_INSTRUMENT_REGISTRY.md). O sistema
+MUST registrar o sizing bruto, os limites aplicados e o sizing final.
 
 ---
 
@@ -705,6 +769,22 @@ ALLOW / DENY
 ```
 
 O modelo quantitativo nunca contorna o Risk Engine.
+
+Regras da cadeia:
+
+- o Strategy Engine MAY propor uma operação; o Risk Engine MAY recusá-la;
+- o Execution Engine MUST NOT transformar uma recusa em ordem válida;
+- `NO_TRADE` é resultado válido e MUST ser registrado como decisão;
+- mesmos insumos, versões e configuração MUST produzir a mesma decisão, salvo
+  componente estocástico explicitamente versionado.
+
+Pré-condições para que uma operação seja sequer avaliada: dados válidos,
+freshness aceitável, regime válido ou explicitamente `Unknown`, evidência
+estatística mínima, probabilidade e EV válidos, sizing permitido e Risk Engine
+aprovado.
+
+Toda decisão MUST registrar `strategy_version`, `feature_version`,
+`model_version`, `risk_policy_version` e `config_version`.
 
 ---
 
