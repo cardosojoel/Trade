@@ -135,29 +135,64 @@ precisar de ADR.
 
 ## 5. Portabilidade
 
-Este conjunto é quase autossuficiente. A verificação encontrou **oito**
-referências dele para fora, em 45 documentos:
+Este conjunto não tem dependência de build: nenhuma inclusão de arquivo, nenhum
+script compartilhado, nenhum caminho que precise resolver em tempo de
+compilação. Mover é `git mv` mais a conversão das referências abaixo.
 
-| Referência | Documentos |
-|---|---|
-| `CURRENT_STATE.md` | `00_MASTER_INDEX_FINAL`, `29` |
-| `market.db` | `27` (duas vezes) |
-| `.specify/memory/constitution.md` | `32` |
-| `tests/no_float.rs` | `29` |
-| `specs/001-nucleo-execucao/` | `26` |
-| `limits.toml` | `33` |
+**Verificação refeita em 2026-09-20**, depois da emenda 1.3.0, do
+`tests/no_leverage.rs` e dos documentos `00_FRONTEIRA`, `34` e `35`:
+**43 referências para fora, em 8 arquivos-alvo e 10 dos 47 documentos** — não
+contado o inventário desta seção, que é a lista e não uma referência. A
+contagem anterior, de oito, media o conjunto antes de a camada de governança
+existir.
+
+**REQ-FRONTEIRA-008** Este inventário MUST ser refeito sempre que a âncora da
+seção 1 mudar. Foi por não ser refeito que ele passou a afirmar duas coisas
+falsas: que `00_MASTER_INDEX_FINAL` citava o `CURRENT_STATE.md`, quando a
+citação já tinha sido removida, e que `32_NAO_OBJETIVOS` tinha uma referência,
+quando tem três.
+
+As referências têm duas naturezas, e só uma delas dá trabalho ao mover.
+
+### Apoio factual — precisa virar citação
+
+Um documento de desenho apoiando-se num arquivo do Trade como fonte. São
+**quatro ocorrências em três arquivos-alvo**, e são estas que se quebram ao
+mudar de endereço.
+
+| Alvo no Trade | Documento | Ocorrências | Para que serve ali |
+|---|---|---:|---|
+| `data/market.db` | `27` | 2 | origem das 525.600 velas de onde saíram os limites medidos |
+| `specs/001-nucleo-execucao/` | `26` | 1 | de onde o código existente nasceu, e não desta SDD |
+| `limits.toml` | `33` | 1 | os limiares que hoje governam sem racional registrado |
 
 **REQ-FRONTEIRA-007** Mover este conjunto para outro repositório MUST converter
-essas oito referências em citação com origem declarada — repositório, caminho e
-data da leitura — nunca em caminho relativo que só resolve de um lado.
+cada referência de apoio factual em citação com origem declarada — repositório,
+caminho e data da leitura — nunca em caminho relativo que só resolve de um lado.
 
-Nada mais precisa mudar. Não há inclusão de arquivo, script compartilhado ou
-dependência de build. A mudança de endereço é `git mv` mais esta lista; a
-decisão de mover é do mantenedor e não altera nenhuma regra deste documento.
+### Nomeação de autoridade — muda de endereço, não de natureza
+
+As outras **39** são a camada de governança nomeando a regra que a governa:
+`00_FRONTEIRA`, `34` e `35` ao fixar o que decide, e `00_GLOSSARIO`,
+`00_MASTER_INDEX_FINAL`, `29`, `32` e `33` ao registrar o que contrariam.
+Nomear a autoridade é a função desses trechos — a referência não desaparece com
+a mudança de endereço, muda de destino.
+
+| Alvo no Trade | Documentos | Ocorrências |
+|---|---|---:|
+| `CLAUDE.md` | `00_FRONTEIRA`, `00_GLOSSARIO`, `00_MASTER_INDEX_FINAL`, `32`, `33`, `34` | 19 |
+| `tests/no_float.rs` | `00_FRONTEIRA`, `29`, `32`, `34`, `35` | 9 |
+| `.specify/memory/constitution.md` | `00_FRONTEIRA`, `32`, `34` | 5 |
+| `tests/no_leverage.rs` | `32`, `33`, `34`, `35` | 4 |
+| `limits.toml` | `00_FRONTEIRA` | 1 |
+| `Cargo.toml` | `00_FRONTEIRA` | 1 |
 
 Ao ser movido, a âncora da seção 1 passa a acompanhar uma cópia somente leitura
-em `constraints/constitution-trade.md`, e o hash registrado é o que detecta
-divergência.
+em `constraints/constitution-trade.md`, e essas referências passam a apontar
+para `constraints/` — não para o repositório Trade. O hash registrado continua
+sendo o que detecta divergência.
+
+A decisão de mover é do mantenedor e não altera nenhuma regra deste documento.
 
 ## 6. Colisão de sigla
 

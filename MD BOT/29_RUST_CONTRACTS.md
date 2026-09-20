@@ -74,10 +74,17 @@ alocação não controlada.
 Os exemplos desta página usam `f64` para `tick_size`, `qty_step`, `min_notional`
 e para os campos de `ExpectedValue`. Isso conflita com a
 `trading_risk_recovery_mathematical_spec.md` §33, que proíbe ponto flutuante em
-caminho monetário, e é reprovado pelo `tests/no_float.rs` do repositório. O
-conflito está registrado no `CURRENT_STATE.md` e **não foi decidido aqui**:
-resolvê-lo é escolher entre emendar a constitution do projeto e corrigir estes
-contratos.
+caminho monetário, e com a constitution do repositório Trade — *Restrições
+Operacionais e de Segurança* → **Representação de valores monetários**, desde a
+emenda 1.3.0 —, cobrada pelo `tests/no_float.rs`.
+
+A divergência está registrada como [ADR-004](34_ADR_EMENDAS.md#adr-004), e lá
+já foi classificada: é **erro de redação desta página**, não escolha de
+desenho — dois documentos deste mesmo conjunto se contradizem. **Não há decisão
+a tomar aqui e não cabe emenda.** O encaminhamento é corrigir estes contratos
+para `Decimal` em todo campo monetário e de quantidade, mantendo `f64` apenas
+onde a grandeza é adimensional e não alimenta cálculo de dinheiro —
+probabilidade, por exemplo.
 
 ## Objetivo
 Este documento é contrato arquitetural; tipos concretos, crates e assinaturas finais serão congelados após profiling e revisão do código MVP.

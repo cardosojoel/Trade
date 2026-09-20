@@ -13,7 +13,7 @@ Uma especificação que só diz o que o sistema faz cresce por acréscimo: cada
 frente nova parece compatível porque nada a proíbe. Este documento fixa o
 contorno — e torna visível quando uma proposta está fora dele.
 
-**A constitution do repositório (`.specify/memory/constitution.md`, v1.2.0)
+**A constitution do repositório (`.specify/memory/constitution.md`, v1.3.0)
 prevalece sobre este documento e sobre todo o resto da SDD.** Onde os dois
 divergirem, o conflito está listado na seção 3 e resolve-se por emenda formal,
 nunca por decisão de implementação.

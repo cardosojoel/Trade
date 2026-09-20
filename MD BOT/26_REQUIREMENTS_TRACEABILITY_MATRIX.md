@@ -30,7 +30,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**161 requisitos em 30 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**162 requisitos em 30 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -163,7 +163,8 @@ especificação, não abrir exceção à convenção.
 | `REQ-FRONTEIRA-004` | Este conjunto MUST NOT alterar, direta ou indiretamente:… | `00_FRONTEIRA.md` §2 | — | — | — | SPECIFIED |
 | `REQ-FRONTEIRA-005` | Todo documento normativo deste conjunto MUST declarar no cabeçalho | `00_FRONTEIRA.md` §3 | — | — | — | SPECIFIED |
 | `REQ-FRONTEIRA-006` | Uma proposta MUST nomear qual documento ela contraria. "Conflita com a… | `00_FRONTEIRA.md` §4 | — | — | — | SPECIFIED |
-| `REQ-FRONTEIRA-007` | Mover este conjunto para outro repositório MUST converter essas oito… | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-007` | Mover este conjunto para outro repositório MUST converter cada referência de… | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-008` | Este inventário MUST ser refeito sempre que a âncora da seção 1 mudar | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
 
 ## `REQ-GOV-*`
 

@@ -36,19 +36,24 @@ um limite e não dois.
 
 ### A SDD v3 (`MD BOT/`) está no repositório como referência, não como plano
 
-Quarenta documentos de especificação — nove frentes de baseline, nove de
-estratégia e quant, seis de plataforma, cinco de governança P0 e quatro
-especificações matemáticas. **Nada dela foi implementado, e ela não descreve o
-que existe hoje.** Versionada em 2026-09-20 para que a discussão aconteça sobre
+Quarenta e sete documentos — três de índice, glossário e fronteira, nove
+frentes de baseline, nove de estratégia e quant, seis de plataforma, cinco de
+governança P0, cinco de escopo, decisões e limites, quatro especificações
+matemáticas e cinco de registro histórico. **Nada dela foi implementado, e ela
+não descreve o que existe hoje.** Versionada em 2026-09-20 para que a discussão aconteça sobre
 texto rastreável.
 
-Três pontos conflitam com a constitution e só uma emenda formal resolve:
+**Quatro divergências entre o conjunto e o que o Trade autoriza**, todas
+registradas como ADR em `MD BOT/34_ADR_EMENDAS.md` e nenhuma decidida. Desde a
+emenda 1.3.0 as quatro contrariam a **constitution**; antes dela, duas
+contrariavam apenas o `CLAUDE.md`, e foi essa verificação que expôs a lacuna.
 
-| Conflito | SDD | Constitution |
+| Divergência | ADR | O que o conjunto pressupõe |
 |---|---|---|
-| **Mercado** | derivativos — `leverage_min/max`, funding, `reduce-only`, "execução de derivativos em alta volatilidade" | spot, **apenas comprado**, sem alavancagem |
-| **Recovery** | depois de atingido o limite de perda, recoloca lucro realizado em risco com risco por operação maior (`RT` 25% contra `T` 2%) | atingido o limite, **cessar a abertura** até o próximo período, "sem exceção configurável em tempo de execução" |
-| **Tipos** | `29_RUST_CONTRACTS.md` usa `f64` para `tick_size`, `qty_step`, `min_notional` e EV | `tests/no_float.rs` reprova `f64` em caminho monetário — e a própria `trading_risk_recovery_mathematical_spec.md` §33 proíbe |
+| **Mercado** | ADR-001 | derivativos — `leverage_min/max`, funding, `reduce-only`, microestrutura de derivativos no simulador |
+| **Recovery** | ADR-002 | depois de atingido o limite de perda, recolocar lucro realizado em risco com risco por operação maior (`RT` 25% contra `T` 2%) |
+| **Sessão** | ADR-003 | ciclo com depósito, estado `STOPPED` e confirmação humana para retomar, contra a retomada automática na virada do período |
+| **Tipos** | ADR-004 | `f64` para `tick_size`, `qty_step`, `min_notional` e EV — que a própria ADR-004 já classificou como erro de redação do `29`, não escolha de desenho: não há decisão a tomar, há correção a fazer |
 
 O Recovery é o conflito de fundo, e não é descuido: a especificação tem regra
 anti-Martingale, orçamento consumível e risco que diminui a cada perda. É
@@ -79,7 +84,7 @@ uma saída única e unidirecional: proposta vira ADR em `MD BOT/34_ADR_EMENDAS.m
 e só chega ao código depois de aceita, como emenda ou como feature nova pelo
 Spec Kit. Todo documento normativo passou a declarar `Conformidade: conforme` ou
 `exige emenda (ADR-NNN)`; seis declaram o segundo. A constitution está ancorada
-por hash (`82b24e3c…`), e hash diferente obriga a reavaliar todas as
+por hash (`38814ec1…`, 251 linhas), e hash diferente obriga a reavaliar todas as
 conformidades.
 
 O `MD BOT/35_LIMITES.md` completa o par: a fronteira diz **quem decide**, os
@@ -141,11 +146,19 @@ constitution**, e a divergência de mercado à vista ganhou trava de build. A
 distinção de autoridade fica registrada aqui porque foi ela que expôs a lacuna,
 não porque ainda valha.
 
-**Portabilidade medida:** o conjunto tem oito referências para fora dele, em 45
-documentos. Movê-lo para outro repositório é `git mv` mais a conversão dessas
-oito em citação com origem declarada. Nada mais — não há inclusão de arquivo,
-script compartilhado nem dependência de build. A decisão de mover continua
-aberta e ficou barata nos dois sentidos.
+**Portabilidade medida, e remedida em 2026-09-20.** O conjunto tem 43
+referências para fora, em 8 arquivos-alvo e 10 dos 47 documentos. Só **quatro**
+são apoio factual e se quebram ao mudar de endereço — `market.db` no `27`,
+`specs/001` no `26` e `limits.toml` no `33`. As outras 39 são a camada de
+governança nomeando a autoridade, e ao mover passam a apontar para a cópia
+somente leitura em `constraints/`. Não há inclusão de arquivo, script
+compartilhado nem dependência de build. A decisão de mover continua aberta e
+ficou barata nos dois sentidos.
+
+A contagem anterior deste arquivo — oito referências em 45 documentos — media o
+conjunto antes de a camada de governança existir, e já afirmava duas coisas
+falsas. `REQ-FRONTEIRA-008` passou a exigir que o inventário seja refeito
+sempre que a âncora de hash mudar.
 
 **Auditoria de risco contra a documentação da Bybit — 2026-09-20.** Onze
 achados; o relatório completo está publicado como artefato privado
@@ -216,13 +229,13 @@ versão deste registro dizia que capital maior baixava a barra de 63,9% para
 60,6%, e isso **estava errado**: vinha de um teto fixado à mão em 100%, não
 derivado. A correção está registrada no `27_CONFIGURATION_REGISTRY.md`.
 
-Também em 2026-09-20: os requisitos passaram a ter identificador. **127
-`REQ-<DOMÍNIO>-<NNN>` em 26 domínios**, escritos ao lado da regra na
+Também em 2026-09-20: os requisitos passaram a ter identificador. **162
+`REQ-<DOMÍNIO>-<NNN>` em 30 domínios**, escritos ao lado da regra na
 especificação — nunca em lista à parte, que seria uma segunda camada a manter —
 com linguagem RFC 2119. O `26_REQUIREMENTS_TRACEABILITY_MATRIX.md` deixou de ter
-seis linhas de exemplo e passou a catalogar os 127, todos em `SPECIFIED`: nenhum
+seis linhas de exemplo e passou a catalogar os 162, todos em `SPECIFIED`: nenhum
 aponta para módulo Rust, teste ou métrica, porque o código existente nasceu da
-constitution e da `specs/001-nucleo-execucao/`, não desta SDD. Os 41 documentos
+constitution e da `specs/001-nucleo-execucao/`, não desta SDD. Os 47 documentos
 ganharam cabeçalho de estado, e as autoavaliações que viviam dentro das
 especificações ("Estado: forte", "não é estado da arte ainda") foram para a
 auditoria, que é onde se avalia.
@@ -301,7 +314,7 @@ a calibração que a constitution exige antes da Porta 3.
 | **Linguagem** | Rust estável 1.98.1, edition 2024 |
 | **Armazenamento** | SQLite em dois arquivos: `market.db` (cache) e `runs.db` (auditoria) |
 
-A constitution (`.specify/memory/constitution.md`, **v1.2.0**) governa tudo e
+A constitution (`.specify/memory/constitution.md`, **v1.3.0**) governa tudo e
 tem precedência sobre qualquer outra prática.
 
 ---
