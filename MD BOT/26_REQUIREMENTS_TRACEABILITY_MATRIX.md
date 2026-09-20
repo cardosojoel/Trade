@@ -29,7 +29,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**133 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**135 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -66,6 +66,8 @@ especificação, não abrir exceção à convenção.
 | `REQ-CFG-002` | O startup MUST rejeitar configuração fora dos limites ou inconsistente | `27_CONFIGURATION_REGISTRY.md` Validação | — | — | — | SPECIFIED |
 | `REQ-CFG-003` | O runtime MUST ler o Registry versionado; o código MUST conter apenas… | `27_CONFIGURATION_REGISTRY.md` Precedência | — | — | — | SPECIFIED |
 | `REQ-CFG-004` | Todo parâmetro MUST declarar a origem do seu valor em source, com um destes… | `27_CONFIGURATION_REGISTRY.md` Origem do valor | — | — | — | SPECIFIED |
+| `REQ-CFG-005` | Todo perfil MUST declarar o resultado operacional esperado sem vantagem — o… | `27_CONFIGURATION_REGISTRY.md` Resultado esperado sem vantagem | — | — | — | SPECIFIED |
+| `REQ-CFG-006` | O método que produz esse número MUST ser reproduzível e MUST declarar… | `27_CONFIGURATION_REGISTRY.md` Resultado esperado sem vantagem | — | — | — | SPECIFIED |
 
 ## `REQ-DATA-*`
 
@@ -175,11 +177,11 @@ especificação, não abrir exceção à convenção.
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
 | `REQ-PERF-001` | O caminho de emergência MUST NOT aguardar | `09_PERFORMANCE_LOW_LATENCY.md` Emergency Path | — | — | — | SPECIFIED |
-| `REQ-PERF-002` | Meta do caminho interno de decisão | `09_PERFORMANCE_LOW_LATENCY.md` SLO 1 — Internal Decision Path | — | — | — | SPECIFIED |
-| `REQ-PERF-003` | Meta do caminho interno de emergência | `09_PERFORMANCE_LOW_LATENCY.md` SLO 2 — Emergency Internal Path | — | — | — | SPECIFIED |
-| `REQ-PERF-004` | O rate limit MUST ser monitorado dinamicamente pelos headers, nunca… | `09_PERFORMANCE_LOW_LATENCY.md` SLO 5 — Rate Limit | — | — | — | SPECIFIED |
-| `REQ-PERF-005` | Memória | `09_PERFORMANCE_LOW_LATENCY.md` SLO 6 — Memory | — | — | — | SPECIFIED |
-| `REQ-PERF-006` | CPU em operação normal | `09_PERFORMANCE_LOW_LATENCY.md` SLO 7 — CPU | — | — | — | SPECIFIED |
+| `REQ-PERF-002` | Meta do caminho interno de decisão | `09_PERFORMANCE_LOW_LATENCY.md` SLO 1 | — | — | — | SPECIFIED |
+| `REQ-PERF-003` | Meta do caminho interno de emergência | `09_PERFORMANCE_LOW_LATENCY.md` SLO 2 | — | — | — | SPECIFIED |
+| `REQ-PERF-004` | O rate limit MUST ser monitorado dinamicamente pelos headers, nunca… | `09_PERFORMANCE_LOW_LATENCY.md` SLO 5 | — | — | — | SPECIFIED |
+| `REQ-PERF-005` | Memória | `09_PERFORMANCE_LOW_LATENCY.md` SLO 6 | — | — | — | SPECIFIED |
+| `REQ-PERF-006` | CPU em operação normal | `09_PERFORMANCE_LOW_LATENCY.md` SLO 7 | — | — | — | SPECIFIED |
 | `REQ-PERF-007` | O hot path MUST NOT conter | `09_PERFORMANCE_LOW_LATENCY.md` Hot Path | — | — | — | SPECIFIED |
 | `REQ-PERF-008` | Os budgets por estágio MUST ser obtidos por profiling e MUST NOT ser… | `09_PERFORMANCE_LOW_LATENCY.md` Latency Budget | — | — | — | SPECIFIED |
 | `REQ-PERF-009` | Nenhuma promoção sem que todos estes critérios passem | `09_PERFORMANCE_LOW_LATENCY.md` Critério de aprovação | — | — | — | SPECIFIED |

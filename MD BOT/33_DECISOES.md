@@ -56,6 +56,8 @@ anterior.
 | D-18 | Avaliação de maturidade sai da especificação e vai para a auditoria | uma especificação não se dá nota | `25` §13 |
 | D-19 | Stop, teto de posição, alvo, limite diário e teto de operações passam a sair de medição sobre os doze meses coletados, em dois perfis de banca | custo de 0,25% por operação excede o movimento mediano do BTC abaixo de 1 hora — os percentuais precisam ser derivados do custo, não escolhidos | `27` §Perfis medidos |
 | D-20 | Todo parâmetro declara a origem do valor: `MEASURED`, `EXCHANGE`, `DERIVED`, `CONSTITUTION` ou `ASSUMED` | a lista da seção D deste documento existiu porque ninguém registrava de onde vinha cada número | `REQ-CFG-004` |
+| D-21 | A pessoa informa o depósito; stop, teto, risco, prazo e limites são **derivados**, não configurados | parâmetro que o operador escolhe é parâmetro que o operador afrouxa — e a derivação expôs que o perfil anterior, escolhido à mão, era subótimo | `27` §Função de derivação |
+| D-22 | Todo perfil declara o resultado operacional esperado **sem vantagem**, com método de simulação reproduzível | um perfil sem essa linha só pode ser executado às cegas: não há como saber se operar é melhor que não operar | `REQ-CFG-005`, `REQ-CFG-006` |
 
 ---
 

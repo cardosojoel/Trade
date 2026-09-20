@@ -91,12 +91,28 @@ característica da `sma-cross` — é aritmética do par custo/volatilidade, e
 nenhum ajuste de parâmetro a contorna. É a resposta quantificada para a dúvida
 que já estava registrada aqui sobre a granularidade de um minuto.
 
+**O projeto passou a ter um número que nunca teve: o resultado esperado sem
+vantagem.** Simulação Monte Carlo sobre a distribuição medida — 8.736 operações
+reamostradas em 20.000 execuções de 30 dias, com custo, limite diário, parada
+por drawdown e chão de operação aplicados — diz que uma banca de $100 termina o
+mês em **−8,5%** se a estratégia acertar a hora de entrar tão bem quanto o
+acaso, e que 16% das contas batem a parada por drawdown antes do fim do mês.
+Empatar exige **59,4%** de acerto entre as operações que resolvem, contra os
+46,5% que o acaso entrega: uma lacuna de **12,9 pontos percentuais**. Esse
+número substitui `profit factor ≥ 1.3` como alvo de desenvolvimento, porque é
+medível hoje contra os mesmos dados, sem esperar por porta nenhuma.
+
+A pessoa informa apenas o depósito; stop, teto, risco, prazo e limites são
+derivados por função registrada. Acima de $11,76 os percentuais **congelam** —
+$200, $500 e $900 recebem configuração idêntica. Capital maior não baixa a barra
+de acerto: compra granularidade, saída parcial e folga até o chão.
+
 Em spot vale também `risco por operação ≤ distância do stop`, sempre, porque o
-teto de posição não passa de 100%. Com 12 USDT o teto é forçado a 100% pela
-ordem mínima, o stop fica amarrado ao risco e o custo pesa 25% do valor
-arriscado; com 100 USDT o teto se solta, o stop dobra mantendo o risco em 1% e o
-custo cai para 12,5%. É esse o ganho de capital — não é retorno, é o preço do
-seguro.
+teto de posição não passa de 100%. Com banca pequena o teto sobe e o stop encurta, mas a
+derivação correta mantém o acerto necessário praticamente constante — a primeira
+versão deste registro dizia que capital maior baixava a barra de 63,9% para
+60,6%, e isso **estava errado**: vinha de um teto fixado à mão em 100%, não
+derivado. A correção está registrada no `27_CONFIGURATION_REGISTRY.md`.
 
 Também em 2026-09-20: os requisitos passaram a ter identificador. **127
 `REQ-<DOMÍNIO>-<NNN>` em 26 domínios**, escritos ao lado da regra na
