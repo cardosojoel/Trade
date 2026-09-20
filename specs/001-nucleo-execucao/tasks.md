@@ -255,13 +255,13 @@ provedores de mercado distintos.
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T099 [P] Escrever `README.md` na raiz com instalação, os dois comandos e um exemplo de ponta a ponta
-- [ ] T100 [P] Versionar `examples/limits.toml` e `examples/fees.toml` com os valores de partida provisórios da constitution v1.2.0, marcados como tal
-- [ ] T101 Executar o roteiro completo de `specs/001-nucleo-execucao/quickstart.md`, cenários A a J, e registrar o resultado de cada um
-- [ ] T102 Medir o backtest de 12 meses de velas de 1 minuto e registrar o tempo em `docs/desempenho.md`, confirmando execução abaixo de 60 segundos
-- [ ] T103 Comparar o uso de memória entre um backtest de 5 dias e um de 5 anos e registrar em `docs/desempenho.md`, confirmando que é constante em relação ao período
-- [ ] T104 [P] Documentar em `docs/auditoria.md` as consultas SQL de reconstituição e de conferência, prontas para colar no DBeaver
-- [ ] T105 Revisar a superfície pública de `crates/trade-ports/src/lib.rs`, `crates/trade-risk/src/guard.rs` e `crates/trade-domain/src/lib.rs`, reduzindo ao mínimo o que é `pub` — cada item público é uma porta a mais para contornar uma fronteira
+- [X] T099 [P] Escrever `README.md` na raiz com instalação, os dois comandos e um exemplo de ponta a ponta
+- [X] T100 [P] Versionar `examples/limits.toml` e `examples/fees.toml` com os valores de partida provisórios da constitution v1.2.0, marcados como tal
+- [X] T101 Executar o roteiro completo de `specs/001-nucleo-execucao/quickstart.md`, cenários A a J, e registrar o resultado de cada um
+- [X] T102 Medir o backtest de 12 meses de velas de 1 minuto e registrar o tempo em `docs/desempenho.md`, confirmando execução abaixo de 60 segundos
+- [X] T103 Comparar o uso de memória entre um backtest de 5 dias e um de 5 anos e registrar em `docs/desempenho.md`, confirmando que é constante em relação ao período
+- [X] T104 [P] Documentar em `docs/auditoria.md` as consultas SQL de reconstituição e de conferência, prontas para colar no DBeaver
+- [X] T105 Revisar a superfície pública de `crates/trade-ports/src/lib.rs`, `crates/trade-risk/src/guard.rs` e `crates/trade-domain/src/lib.rs`, reduzindo ao mínimo o que é `pub` — cada item público é uma porta a mais para contornar uma fronteira
 
 ---
 
