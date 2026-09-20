@@ -72,6 +72,33 @@ ao mesmo tempo.
 O gate que a própria SDD define: preencher `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`
 com referências reais ao código antes de abrir qualquer frente nova.
 
+**Auditoria de risco contra a documentação da Bybit — 2026-09-20.** Onze
+achados; o relatório completo está publicado como artefato privado
+(`claude.ai/artifact/HSzcFir83CmzKVvLKzyLFk`) e os três acionáveis viraram
+requisito:
+
+| Achado | Virou | O que estabelece |
+|---|---|---|
+| Pó da moeda base | `REQ-SIZING-004`, `REQ-BYBIT-004/005` | a taxa do spot é cobrada **em BTC** e a quantidade recebida não é múltiplo de `qty_step`; o resíduo é saldo e soma-se à ordem seguinte |
+| Piso muda dias 3 e 17 | `REQ-BYBIT-006/007/008` | instrumento relido a cada sessão; perfil invalidado impede o início; `min_order_qty` está deprecado |
+| Banda de preço | `REQ-EXEC-010/011` | stop vai a mercado no gatilho; posição sem stop aceito não existe |
+
+**O número que a auditoria mudou:** sem o tratamento do resíduo, o custo real
+por operação sai de 0,25% para **0,94%** numa posição de US$ 5,88. A banca de
+US$ 10 deixa de existir — empatar exigiria **89%** de acerto — e a de US$ 100 vê
+a barra subir de 59,4% para **63,0%**. Daí o `REQ-CFG-007`: enquanto o resíduo
+não for tratado, depósito abaixo de US$ 160 não é executável.
+
+Duas premissas foram confirmadas, e uma delas era a mais perigosa: **o stop
+existe no mercado à vista da Bybit** — se não existisse, todo o modelo de risco
+cairia. E os doze meses coletados **cumprem o requisito de dados da Porta 1**:
+queda de 54,1% em 267 dias e o par −14,02%/+11,92% de fevereiro de 2026. É o
+único requisito formal de validação que o projeto cumpre hoje.
+
+O que a auditoria não alcançou, por não ter credencial: taxa efetiva da conta,
+tipo de conta e permissões da chave. A taxa é 80% do custo — confirmá-la muda
+mais o resultado do que qualquer recalibração.
+
 **Os primeiros valores com origem medida.** O
 `MD BOT/27_CONFIGURATION_REGISTRY.md` deixou de ser só contrato e passou a
 guardar dois perfis completos — `banca-12` e `banca-100` — derivados de medição

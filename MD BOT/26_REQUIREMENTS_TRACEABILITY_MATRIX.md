@@ -29,7 +29,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**135 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**145 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -57,6 +57,11 @@ especificação, não abrir exceção à convenção.
 | `REQ-BYBIT-001` | A validação de ordem MUST garantir | `28_BYBIT_INSTRUMENT_REGISTRY.md` Regras | — | — | — | SPECIFIED |
 | `REQ-BYBIT-002` | O adapter MUST obter, atualizar e versionar as especificações do… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Atualização | — | — | — | SPECIFIED |
 | `REQ-BYBIT-003` | Mudança de instrumento MUST NOT aumentar automaticamente o risco permitido… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Segurança | — | — | — | SPECIFIED |
+| `REQ-BYBIT-004` | O adapter MUST registrar, por execução, a quantidade efetivamente recebida… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Moeda da taxa e quantização | — | — | — | SPECIFIED |
+| `REQ-BYBIT-005` | O saldo residual da moeda base — o que sobra abaixo de qty_step ou abaixo… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Moeda da taxa e quantização | — | — | — | SPECIFIED |
+| `REQ-BYBIT-006` | A especificação MUST ser relida no início de toda sessão e MUST NOT ser… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Atualização | — | — | — | SPECIFIED |
+| `REQ-BYBIT-007` | Se a releitura invalidar o perfil derivado — por exemplo, se min_order_amt… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Atualização | — | — | — | SPECIFIED |
+| `REQ-BYBIT-008` | min_order_qty está deprecado na API e MUST NOT ser usado como critério de… | `28_BYBIT_INSTRUMENT_REGISTRY.md` Atualização | — | — | — | SPECIFIED |
 
 ## `REQ-CFG-*`
 
@@ -68,6 +73,7 @@ especificação, não abrir exceção à convenção.
 | `REQ-CFG-004` | Todo parâmetro MUST declarar a origem do seu valor em source, com um destes… | `27_CONFIGURATION_REGISTRY.md` Origem do valor | — | — | — | SPECIFIED |
 | `REQ-CFG-005` | Todo perfil MUST declarar o resultado operacional esperado sem vantagem — o… | `27_CONFIGURATION_REGISTRY.md` Resultado esperado sem vantagem | — | — | — | SPECIFIED |
 | `REQ-CFG-006` | O método que produz esse número MUST ser reproduzível e MUST declarar… | `27_CONFIGURATION_REGISTRY.md` Resultado esperado sem vantagem | — | — | — | SPECIFIED |
+| `REQ-CFG-007` | Enquanto REQ-SIZING-004 e REQ-BYBIT-005 não estiverem implementados e… | `27_CONFIGURATION_REGISTRY.md` Condição de validade dos números acima | — | — | — | SPECIFIED |
 
 ## `REQ-DATA-*`
 
@@ -120,6 +126,8 @@ especificação, não abrir exceção à convenção.
 | `REQ-EXEC-007` | O sistema MUST assinar execution.fast em paralelo ao stream completo, e… | `01_EXECUTION_ENGINE.md` Execution Fast | — | — | — | SPECIFIED |
 | `REQ-EXEC-008` | O sistema MUST registrar timestamps monotônicos locais e os timestamps da… | `01_EXECUTION_ENGINE.md` Métricas | — | — | — | SPECIFIED |
 | `REQ-EXEC-009` | O sistema MUST NOT interpretar ACK como fill | `01_EXECUTION_ENGINE.md` Conclusão | — | — | — | SPECIFIED |
+| `REQ-EXEC-010` | O stop MUST ser enviado como ordem a mercado no gatilho (slOrderType:… | `01_EXECUTION_ENGINE.md` Stop no mercado à vista | — | — | — | SPECIFIED |
+| `REQ-EXEC-011` | A confirmação de que o stop foi aceito MUST preceder a existência da… | `01_EXECUTION_ENGINE.md` Stop no mercado à vista | — | — | — | SPECIFIED |
 
 ## `REQ-FAIL-*`
 
@@ -291,6 +299,7 @@ especificação, não abrir exceção à convenção.
 | `REQ-SIZING-001` | O sizing ocorre depois de existir vantagem estatística e antes da… | `MATHEMATICAL_QUANT_MODEL.md` §22 | — | — | — | SPECIFIED |
 | `REQ-SIZING-002` | A posição MUST NOT ser autorizada exceto quando | `MATHEMATICAL_QUANT_MODEL.md` §23 | — | — | — | SPECIFIED |
 | `REQ-SIZING-003` | Em mercado à vista, PositionNotional MUST NOT exceder o caixa disponível.… | `MATHEMATICAL_QUANT_MODEL.md` §22 | — | — | — | SPECIFIED |
+| `REQ-SIZING-004` | O sizing MUST partir do saldo efetivo da moeda base — o que a conta de fato… | `MATHEMATICAL_QUANT_MODEL.md` §22 | — | — | — | SPECIFIED |
 
 ## `REQ-STRATEGY-*`
 
@@ -310,3 +319,4 @@ especificação, não abrir exceção à convenção.
 | `REQ-TEST-003` | MUST ser testado: ACK vs fill, duplicate prevention, partial fill,… | `23_TESTING_STRATEGY.md` Bybit | — | — | — | SPECIFIED |
 | `REQ-TEST-004` | MUST ser medido p50/p95/p99/p99.9/max e jitter, por estágio e end-to-end… | `23_TESTING_STRATEGY.md` Performance | — | — | — | SPECIFIED |
 | `REQ-TEST-005` | Nenhum build de produção MAY ser promovido sem testes críticos,… | `23_TESTING_STRATEGY.md` Gate | — | — | — | SPECIFIED |
+| `REQ-TEST-006` | MUST ser testado: resíduo da moeda base somado à ordem seguinte; quantidade… | `23_TESTING_STRATEGY.md` Instrumento e resíduo | — | — | — | SPECIFIED |

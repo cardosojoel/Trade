@@ -90,6 +90,25 @@ UNKNOWN
 **REQ-EXEC-006** Ordem em `UNKNOWN` MUST ser reconciliada antes de qualquer
 nova ordem relacionada a ela.
 
+## Stop no mercado à vista
+
+A Bybit aceita stop loss e take profit na criação da ordem à vista, e também
+ordens condicionais por preço de gatilho, com saída a mercado ou limitada.
+Mas restringe a distância entre o preço de uma ordem **limitada** e o preço
+corrente: o instrumento BTCUSDT declara hoje `priceLimitRatioX` 0,005 e
+`priceLimitRatioY` 0,01. Ordem limitada fora da banda é **cancelada** por padrão
+— ou tem o preço corrigido em silêncio, se a correção automática estiver ativa.
+
+O stop dos perfis fica a 2% do preço de entrada, fora dessa banda.
+
+**REQ-EXEC-010** O stop MUST ser enviado como ordem a mercado no gatilho
+(`slOrderType: Market`). Stop enviado como ordem limitada fora da banda de preço
+MAY ser recusado, e posição sem stop aceito é posição sem limite de perda.
+
+**REQ-EXEC-011** A confirmação de que o stop foi aceito MUST preceder a
+existência da posição. Se o stop for recusado, a posição MUST NOT ser aberta;
+se a recusa ocorrer com posição já aberta, o sistema MUST encerrá-la.
+
 ## Execution Fast
 
 **REQ-EXEC-007** O sistema MUST assinar `execution.fast` em paralelo ao stream

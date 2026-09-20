@@ -653,6 +653,14 @@ caixa disponível. Quando a fórmula acima produzir valor maior, a posição MUS
 ser reduzida ao caixa e o limite vinculante MUST ser registrado: o sistema MUST
 NOT emitir ordem impossível nem silenciar a redução.
 
+**REQ-SIZING-004** O sizing MUST partir do saldo **efetivo** da moeda base — o
+que a conta de fato possui, incluindo o resíduo de operações anteriores — e não
+da quantidade nominal da última ordem. A taxa cobrada na moeda base e o
+arredondamento por `qty_step` fazem a quantidade possuída ser menor que a
+comprada; tratar as duas como iguais produz resíduo preso a cada ciclo. Ver
+[`28_BYBIT_INSTRUMENT_REGISTRY.md`](28_BYBIT_INSTRUMENT_REGISTRY.md)
+§Moeda da taxa e quantização.
+
 A identidade `PositionNotional = AllowedTradeRisk / StopDistance%` implica que,
 em spot, o risco por operação só é alcançável quando a distância do stop for
 maior ou igual à fração de risco autorizada. Com stop mais curto, `T` é

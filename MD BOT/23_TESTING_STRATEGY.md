@@ -27,6 +27,13 @@ Unit, integration, property-based, regression, replay, backtest, fault injection
 ## Bybit
 **REQ-TEST-003** MUST ser testado: ACK vs fill, duplicate prevention, partial fill, reconnect, resubscribe, sequence gap, unknown order, instrument constraints e reconciliation.
 
+## Instrumento e resíduo
+
+**REQ-TEST-006** MUST ser testado: resíduo da moeda base somado à ordem
+seguinte; quantidade recebida diferente da solicitada por conta da taxa;
+releitura do instrumento invalidando o perfil derivado; `min_order_amt` alterado
+entre sessões; stop recusado antes e depois da abertura da posição.
+
 ## Performance
 **REQ-TEST-004** MUST ser medido p50/p95/p99/p99.9/max e jitter, por estágio e
 end-to-end interno.

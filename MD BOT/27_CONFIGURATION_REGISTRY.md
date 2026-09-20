@@ -1,6 +1,6 @@
 # 27 — Configuration Registry
 
-**Status:** normativo · **Versão:** 3.0 · **Atualizado em:** 2026-09-20  
+**Status:** normativo · **Versão:** 3.1 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-CFG-*`  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
@@ -257,6 +257,37 @@ Entre 55% e 62% de acerto — sete pontos — o resultado mensal de $100 vai de
 −3,0% a +1,8%. Cada ponto percentual de acerto vale cerca de 0,7% ao mês.
 **Um ponto de acerto vale mais que qualquer recalibração de percentual de
 risco.**
+
+## Condição de validade dos números acima
+
+A tabela anterior supõe custo de **0,25%** por operação. Esse número só vale se
+`REQ-SIZING-004` e `REQ-BYBIT-005` estiverem implementados — isto é, se o robô
+somar o resíduo da moeda base à ordem seguinte em vez de montar cada ordem do
+zero.
+
+Sem eles, a taxa cobrada em BTC e o arredondamento por `qty_step` deixam presos
+cerca de **US$ 0,04 por ida e volta**, e o custo real passa a depender do
+tamanho da posição:
+
+| Depósito | Posição | Resíduo, % da posição | Custo real | Resultado em 30 dias | Contas paradas |
+|---:|---:|---:|---:|---:|---:|
+| $10 | $5,88 | 0,691% | **0,94%** | **−14,4%** | **67%** |
+| $100 | $50,00 | 0,081% | 0,33% | −10,5% | 28% |
+| $200 | $100,00 | 0,041% | 0,29% | −9,5% | 22% |
+| $500 | $250,00 | 0,016% | 0,27% | −8,9% | 18% |
+| $900 | $450,00 | 0,009% | 0,26% | −8,8% | 17% |
+
+**O perfil de $10 deixa de existir nessa condição:** empatar exigiria 89% de
+acerto, contra os 59,5% do custo modelado. O de $100 sobrevive, mas a barra sobe
+de 59,4% para 63,0%.
+
+**REQ-CFG-007** Enquanto `REQ-SIZING-004` e `REQ-BYBIT-005` não estiverem
+implementados e testados, nenhum perfil com depósito abaixo de **US$ 160** MAY
+ser executado — abaixo disso o resíduo passa de 20% do custo total. Abaixo de
+US$ 100 passa de um terço.
+
+Origem: auditoria de risco de 2026-09-20, sobre a documentação da Bybit e os
+limites do instrumento lidos ao vivo.
 
 ## Método de simulação — `REQ-CFG-006`
 
