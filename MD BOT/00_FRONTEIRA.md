@@ -113,6 +113,13 @@ comprado, sem alavancagem" estar apenas ali é, em si, um risco**: é a restriç
 que impede a perda de exceder o depósito, e hoje qualquer sessão pode reescrevê-la
 sem cerimônia. Ver ADR-005.
 
+## 4.1 O envelope
+
+A fronteira diz **quem decide**. [`35_LIMITES.md`](35_LIMITES.md) diz **o que
+cabe**: os limites duros da corretora e da aritmética, os medidos do mercado e do
+capital, e os de autoridade. Um desenho que não passa naquela folha não chega a
+precisar de ADR.
+
 ## 5. Portabilidade
 
 Este conjunto é quase autossuficiente. A verificação encontrou **oito**

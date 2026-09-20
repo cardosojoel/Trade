@@ -30,7 +30,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**156 requisitos em 29 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**161 requisitos em 30 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -190,6 +190,16 @@ especificação, não abrir exceção à convenção.
 | `REQ-LEARN-008` | A promoção MUST exigir todos os critérios obrigatórios, e cada um MUST ser… | `DECISION_LEARNING.md` §38 | — | — | — | SPECIFIED |
 | `REQ-LEARN-009` | Rollback MUST restaurar uma versão anteriormente aprovada, e MUST ser… | `DECISION_LEARNING.md` §39 | — | — | — | SPECIFIED |
 | `REQ-LEARN-010` | O bot MUST NOT aprender livremente | `DECISION_LEARNING.md` §51 | — | — | — | SPECIFIED |
+
+## `REQ-LIMITE-*`
+
+| ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
+|---|---|---|---|---|---|---|
+| `REQ-LIMITE-001` | Uma proposta que viole limite duro MUST ser recusada na origem: não há ADR… | `35_LIMITES.md` Três naturezas, três consequências | — | — | — | SPECIFIED |
+| `REQ-LIMITE-002` | Um limite medido MAY ser revisto, e apenas por medição nova com método… | `35_LIMITES.md` Três naturezas, três consequências | — | — | — | SPECIFIED |
+| `REQ-LIMITE-003` | Um limite de autoridade MUST passar por… | `35_LIMITES.md` Três naturezas, três consequências | — | — | — | SPECIFIED |
+| `REQ-LIMITE-004` | Esta tabela MUST declarar a data da leitura. Tabela sem data é valor… | `35_LIMITES.md` §1 | — | — | — | SPECIFIED |
+| `REQ-LIMITE-005` | Um número desta folha MUST NOT ser citado sem a limitação correspondente… | `35_LIMITES.md` §7 | — | — | — | SPECIFIED |
 
 ## `REQ-PATTERN-*`
 

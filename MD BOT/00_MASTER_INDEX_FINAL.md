@@ -8,8 +8,8 @@ identificados
 **Exchange:** Bybit
 **Ativo inicial:** BTCUSDT
 
-## 0. Fronteira
-Antes de tudo: [`00_FRONTEIRA.md`](00_FRONTEIRA.md). Este conjunto **propõe**; quem **governa** é a constitution do repositório Trade. A única passagem daqui para o código é uma ADR aceita, registrada em [`34_ADR_EMENDAS.md`](34_ADR_EMENDAS.md).
+## 0. Fronteira e limites
+Antes de tudo: [`00_FRONTEIRA.md`](00_FRONTEIRA.md) para saber quem decide, e [`35_LIMITES.md`](35_LIMITES.md) para saber o que cabe. Este conjunto **propõe**; quem **governa** é a constitution do repositório Trade. A única passagem daqui para o código é uma ADR aceita, registrada em [`34_ADR_EMENDAS.md`](34_ADR_EMENDAS.md).
 
 ## 1. Regra de autoridade
 A especificação é a fonte de verdade. Valores operacionais concretos vivem no `27_CONFIGURATION_REGISTRY.md`; regras do instrumento vivem no `28_BYBIT_INSTRUMENT_REGISTRY.md`; contratos de software vivem no `29_RUST_CONTRACTS.md`; rastreabilidade vive no `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`; **nomes** vivem no `00_GLOSSARIO.md`.
@@ -65,11 +65,12 @@ Vocabulário: `00_GLOSSARIO.md` é normativo sobre nomes e símbolos. Nenhum doc
 28 Bybit Instrument Registry
 29 Rust Contracts
 
-## 5.1 Escopo, exemplo e decisões 31–34
+## 5.1 Escopo, exemplo, decisões e limites 31–35
 31 Exemplo numérico fim a fim — atravessa a cadeia com os mesmos números
 32 Não-objetivos — o contorno do sistema e os quatro conflitos com a constitution
 33 Registro de decisões — inclui os valores que hoje governam sem racional registrado
 34 ADR — as cinco decisões que exigem assinatura do mantenedor
+35 Limites do desenho — o envelope: duro, medido e de autoridade, numa folha só
 
 ## 6. Matemática canônica
 ```text

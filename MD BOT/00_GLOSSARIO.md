@@ -202,6 +202,7 @@ Domínios em uso, um por documento normativo:
 | `SCOPE` | `32_NAO_OBJETIVOS.md` |
 | `FRONTEIRA` | `00_FRONTEIRA.md` |
 | `ADR` | `34_ADR_EMENDAS.md` |
+| `LIMITE` | `35_LIMITES.md` |
 | `RISK`, `RECOVERY` | `trading_risk_recovery_mathematical_spec.md` |
 | `FEATURE`, `REGIME`, `EV`, `SIZING`, `STRATEGY` | `MATHEMATICAL_QUANT_MODEL.md` |
 | `PATTERN`, `PROB` | `HISTORICAL_PATTERN_PROBABILITY_EV.md` |

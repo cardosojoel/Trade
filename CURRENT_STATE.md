@@ -82,6 +82,12 @@ Spec Kit. Todo documento normativo passou a declarar `Conformidade: conforme` ou
 por hash (`82b24e3c…`), e hash diferente obriga a reavaliar todas as
 conformidades.
 
+O `MD BOT/35_LIMITES.md` completa o par: a fronteira diz **quem decide**, os
+limites dizem **o que cabe**. Numa folha só, o envelope inteiro — limites duros
+da corretora e da aritmética, medidos do mercado e do capital, de autoridade, de
+promoção, e os limites da própria medição. Um desenho que não passa nessa folha
+não chega a precisar de ADR.
+
 **A verificação da fronteira desmentiu uma coisa que este arquivo vinha
 afirmando.** Eu repeti quatro vezes que havia "quatro conflitos com a
 constitution". São quatro divergências, mas **só duas são com a constitution**:
