@@ -18,9 +18,9 @@ recusados explicitamente.
 
 ---
 
-## Uma decisão esperando por você
+## Decisões esperando por você
 
-Não bloqueia o que existe. Muda comportamento e não é minha para tomar.
+Nenhuma bloqueia o que existe. Mudam comportamento e não são minhas para tomar.
 
 ### `max_total_exposure` hoje não morde
 
@@ -31,6 +31,39 @@ sempre vence. Na configuração atual (1000 vs 2000), a exposição é decorativ
 Não é defeito: os dois só divergem com múltiplos ativos ou posições
 simultâneas, ambos fora do escopo desta feature. Mas hoje você tem, na prática,
 um limite e não dois.
+
+---
+
+### A SDD v3 (`MD BOT/`) está no repositório como referência, não como plano
+
+Quarenta documentos de especificação — nove frentes de baseline, nove de
+estratégia e quant, seis de plataforma, cinco de governança P0 e quatro
+especificações matemáticas. **Nada dela foi implementado, e ela não descreve o
+que existe hoje.** Versionada em 2026-09-20 para que a discussão aconteça sobre
+texto rastreável.
+
+Três pontos conflitam com a constitution e só uma emenda formal resolve:
+
+| Conflito | SDD | Constitution |
+|---|---|---|
+| **Mercado** | derivativos — `leverage_min/max`, funding, `reduce-only`, "execução de derivativos em alta volatilidade" | spot, **apenas comprado**, sem alavancagem |
+| **Recovery** | depois de atingido o limite de perda, recoloca lucro realizado em risco com risco por operação maior (`RT` 25% contra `T` 2%) | atingido o limite, **cessar a abertura** até o próximo período, "sem exceção configurável em tempo de execução" |
+| **Tipos** | `29_RUST_CONTRACTS.md` usa `f64` para `tick_size`, `qty_step`, `min_notional` e EV | `tests/no_float.rs` reprova `f64` em caminho monetário — e a própria `trading_risk_recovery_mathematical_spec.md` §33 proíbe |
+
+O Recovery é o conflito de fundo, e não é descuido: a especificação tem regra
+anti-Martingale, orçamento consumível e risco que diminui a cada perda. É
+disciplinado. Mas continua sendo autorização para operar depois do freio, que é
+exatamente o que o Princípio II proíbe sem emenda.
+
+Duas incoerências que a auditoria `25_CROSS_DOCUMENT_AUDIT.md` declarou
+corrigidas e que sobrevivem no texto: o EV binário ainda é a fórmula única de
+`MATHEMATICAL_QUANT_MODEL.md` §15 (AUD-MATH-001), e o vocabulário de regime
+continua duplicado entre `16_MARKET_REGIME.md` e os três documentos matemáticos
+(AUD-PARAM-002). O P0 foi aplicado aos documentos numerados, não aos
+matemáticos.
+
+O gate que a própria SDD define: preencher `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`
+com referências reais ao código antes de abrir qualquer frente nova.
 
 ---
 
@@ -201,5 +234,6 @@ de estratégia, ou o adaptador de paper trading da Bybit (feature 002).
 | [CLAUDE.md](CLAUDE.md) | Diretrizes de trabalho e invariantes |
 | [docs/auditoria.md](docs/auditoria.md) | Consultas de reconstituição, prontas para o DBeaver |
 | [docs/desempenho.md](docs/desempenho.md) | Medições e cenários do quickstart |
+| `MD BOT/` | SDD v3 — especificação de referência, não implementada |
 | `.specify/memory/constitution.md` | Governa o projeto |
 | `specs/001-nucleo-execucao/` | Spec, plano, pesquisa, contratos, tarefas |
