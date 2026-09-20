@@ -2,6 +2,7 @@
 
 **Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-DATA-*`  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---

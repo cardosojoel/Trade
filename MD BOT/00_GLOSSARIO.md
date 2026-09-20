@@ -1,6 +1,7 @@
 # 00 — Glossário Canônico
 
-**Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20
+**Status:** normativo · **Versão:** 1.2 · **Atualizado em:** 2026-09-20  
+**Conformidade:** conforme
 
 ## Regra de autoridade
 
@@ -125,6 +126,16 @@ A granulação de volatilidade usada em análise de desempenho — `LOW`, `NORMA
 | `DecisionSnapshot` | Estado imutável conhecido no instante da decisão. |
 | `DecisionOutcome` | Resultado observado, entidade separada do snapshot. |
 
+## 7.1 Fronteira e governança
+
+| Termo canônico | Definição |
+|---|---|
+| **Spec Kit** | O fluxo de desenvolvimento do repositório Trade: `constitution → specify → plan → tasks → implement`, com artefatos em `.specify/` e `specs/`. MUST NOT ser chamado de "SDD", ainda que "Spec-Driven Development" produza a mesma sigla. |
+| **SDD** | *System Design Document* — designa **este conjunto**, `MD BOT/`, e nada mais. |
+| **Conformidade** | Campo obrigatório no cabeçalho de todo documento normativo: `conforme` ou `exige emenda (ADR-NNN)`. Declara se o documento depende de premissa que a constitution ou os invariantes do build não autorizam. |
+| **ADR** | Registro de decisão que exige assinatura do mantenedor, em [`34_ADR_EMENDAS.md`](34_ADR_EMENDAS.md). É a **única** passagem deste conjunto para o repositório Trade. |
+| **Emenda** | Alteração formal da constitution, com racional escrito e aprovação registrada. Distinta de alterar o `CLAUDE.md`, que é decisão de rotina — ver [`00_FRONTEIRA.md`](00_FRONTEIRA.md) §4. |
+
 ## 8. Termos aposentados
 
 Cada linha existia em pelo menos um documento e não deve reaparecer.
@@ -146,6 +157,8 @@ Cada linha existia em pelo menos um documento e não deve reaparecer.
 | `EXTREME_VOLATILITY` (como regime) | `HighVolatility` + `VolatilityBucket::Extreme` | quant model |
 | `RECOVERY` (como regime) | estado de sessão | quant model §11 |
 | champion / challenger | `LIVE_MODEL` / `CANDIDATE_MODEL` | `18` |
+| "SDD" para o fluxo do repositório Trade | `Spec Kit` | uso informal |
+| "conflita com a constitution" como fórmula genérica | nomear o documento contrariado | `25`, `32`, índice |
 | `EV = P(win)·AvgWin − P(loss)·AvgLoss − Costs` como fórmula independente | projeção binária do EV ternário | quant model §15 |
 
 ## 9. Notação
@@ -187,6 +200,8 @@ Domínios em uso, um por documento normativo:
 | `BYBIT` | `28_BYBIT_INSTRUMENT_REGISTRY.md` |
 | `RUST` | `29_RUST_CONTRACTS.md` |
 | `SCOPE` | `32_NAO_OBJETIVOS.md` |
+| `FRONTEIRA` | `00_FRONTEIRA.md` |
+| `ADR` | `34_ADR_EMENDAS.md` |
 | `RISK`, `RECOVERY` | `trading_risk_recovery_mathematical_spec.md` |
 | `FEATURE`, `REGIME`, `EV`, `SIZING`, `STRATEGY` | `MATHEMATICAL_QUANT_MODEL.md` |
 | `PATTERN`, `PROB` | `HISTORICAL_PATTERN_PROBABILITY_EV.md` |

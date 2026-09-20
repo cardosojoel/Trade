@@ -2,6 +2,7 @@
 
 **Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md)  
+**Conformidade:** exige emenda (ADR-001) — herdada da fonte  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 Tamanho de posição entre a vantagem estatística e a autorização de risco.

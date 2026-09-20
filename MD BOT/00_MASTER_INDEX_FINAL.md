@@ -1,11 +1,15 @@
 # Trading Bot SDD — Master Index Final v3
 
 **Status:** índice do conjunto · **Versão:** 3.2 · **Atualizado em:** 2026-09-20  
+**Conformidade:** conforme  
 **Conteúdo:** SDD com camada normativa única, vocabulário canônico e requisitos
 identificados
 **Stack:** Rust + SQLite
 **Exchange:** Bybit
 **Ativo inicial:** BTCUSDT
+
+## 0. Fronteira
+Antes de tudo: [`00_FRONTEIRA.md`](00_FRONTEIRA.md). Este conjunto **propõe**; quem **governa** é a constitution do repositório Trade. A única passagem daqui para o código é uma ADR aceita, registrada em [`34_ADR_EMENDAS.md`](34_ADR_EMENDAS.md).
 
 ## 1. Regra de autoridade
 A especificação é a fonte de verdade. Valores operacionais concretos vivem no `27_CONFIGURATION_REGISTRY.md`; regras do instrumento vivem no `28_BYBIT_INSTRUMENT_REGISTRY.md`; contratos de software vivem no `29_RUST_CONTRACTS.md`; rastreabilidade vive no `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`; **nomes** vivem no `00_GLOSSARIO.md`.
@@ -61,10 +65,11 @@ Vocabulário: `00_GLOSSARIO.md` é normativo sobre nomes e símbolos. Nenhum doc
 28 Bybit Instrument Registry
 29 Rust Contracts
 
-## 5.1 Escopo, exemplo e decisões 31–33
+## 5.1 Escopo, exemplo e decisões 31–34
 31 Exemplo numérico fim a fim — atravessa a cadeia com os mesmos números
 32 Não-objetivos — o contorno do sistema e os quatro conflitos com a constitution
 33 Registro de decisões — inclui os valores que hoje governam sem racional registrado
+34 ADR — as cinco decisões que exigem assinatura do mantenedor
 
 ## 6. Matemática canônica
 ```text
@@ -162,4 +167,4 @@ Aplicado — e, desde 2026-09-20, aplicado também às especificações matemát
 ## 13. Próximo gate
 Não adicionar novas frentes antes de preencher a matriz 26 com referências reais aos módulos Rust e testes do MVP. O próximo ciclo é **Implementation Traceability & Evidence**, não criação indiscriminada de novos MDs.
 
-Pendências conhecidas, registradas no `CURRENT_STATE.md` do repositório: os quatro conflitos com a constitution do projeto (mercado spot, Recovery depois do freio, ciclo de vida da sessão, `f64` no `29_RUST_CONTRACTS.md`) continuam abertos e só se resolvem por emenda formal. Nenhum deles foi decidido aqui.
+Pendências conhecidas: quatro divergências entre este conjunto e o repositório Trade, todas registradas como ADR em `34_ADR_EMENDAS.md` e nenhuma decidida. Duas contrariam a **constitution** (Recovery depois do freio, retomada por confirmação humana) e duas contrariam o **`CLAUDE.md` e um invariante de build** (derivativos e alavancagem, `f64` em caminho monetário) — a distinção importa porque o ato que as resolve é diferente, e está explicada em `00_FRONTEIRA.md` §4. A ADR-005 propõe fechar a lacuna que essa verificação expôs: as duas restrições que limitam a perda máxima não estão na constitution.

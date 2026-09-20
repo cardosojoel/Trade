@@ -2,6 +2,7 @@
 
 **Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`DECISION_LEARNING.md`](DECISION_LEARNING.md)  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 Passagem de `CANDIDATE_MODEL` a `LIVE_MODEL`.

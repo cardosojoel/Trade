@@ -3,6 +3,7 @@
 **Status:** normativo · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-SIZING-*` (a regra que este exemplo motivou vive
 em [`MATHEMATICAL_QUANT_MODEL.md`](MATHEMATICAL_QUANT_MODEL.md) §22)  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---

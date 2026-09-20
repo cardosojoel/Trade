@@ -1,6 +1,7 @@
 # 26 — Requirements Traceability Matrix
 
 **Status:** normativo · **Versão:** 2.0 · **Atualizado em:** 2026-09-20  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---
@@ -29,7 +30,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**145 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**156 requisitos em 29 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -40,6 +41,14 @@ Este catálogo é a primeira passagem. Texto que ainda diz "deve" sem `MUST` é,
 por convenção do glossário, explicação e não requisito — mas se numa releitura
 algum deles se revelar obrigação, o correto é promovê-lo a `REQ-…` na própria
 especificação, não abrir exceção à convenção.
+
+## `REQ-ADR-*`
+
+| ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
+|---|---|---|---|---|---|---|
+| `REQ-ADR-001` | Toda ADR MUST declarar: o que contraria, onde essa regra vive, qual ato a… | `34_ADR_EMENDAS.md` Como funciona | — | — | — | SPECIFIED |
+| `REQ-ADR-002` | Status possíveis: proposta, aceita, recusada, substituída por ADR-NNN.… | `34_ADR_EMENDAS.md` Como funciona | — | — | — | SPECIFIED |
+| `REQ-ADR-003` | Enquanto uma ADR estiver em proposta, nenhum documento que dela dependa MAY… | `34_ADR_EMENDAS.md` Como funciona | — | — | — | SPECIFIED |
 
 ## `REQ-BACKTEST-*`
 
@@ -143,6 +152,18 @@ especificação, não abrir exceção à convenção.
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
 | `REQ-FEATURE-001` | Cada feature MUST declarar name, formula, window, source, unit,… | `MATHEMATICAL_QUANT_MODEL.md` §12 | — | — | — | SPECIFIED |
+
+## `REQ-FRONTEIRA-*`
+
+| ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
+|---|---|---|---|---|---|---|
+| `REQ-FRONTEIRA-001` | A autoridade sobre o que o robô pode fazer é, nesta ordem | `00_FRONTEIRA.md` §1 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-002` | Se o hash mudar, toda a coluna Conformidade deste conjunto MUST ser… | `00_FRONTEIRA.md` Âncora de sincronia | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-003` | Existe uma única saída deste conjunto para o Trade, e ela é unidirecional | `00_FRONTEIRA.md` §2 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-004` | Este conjunto MUST NOT alterar, direta ou indiretamente:… | `00_FRONTEIRA.md` §2 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-005` | Todo documento normativo deste conjunto MUST declarar no cabeçalho | `00_FRONTEIRA.md` §3 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-006` | Uma proposta MUST nomear qual documento ela contraria. "Conflita com a… | `00_FRONTEIRA.md` §4 | — | — | — | SPECIFIED |
+| `REQ-FRONTEIRA-007` | Mover este conjunto para outro repositório MUST converter essas oito… | `00_FRONTEIRA.md` §5 | — | — | — | SPECIFIED |
 
 ## `REQ-GOV-*`
 
@@ -269,7 +290,8 @@ especificação, não abrir exceção à convenção.
 | `REQ-SCOPE-001` | O sistema MUST NOT operar fora destes limites | `32_NAO_OBJETIVOS.md` §1 | — | — | — | SPECIFIED |
 | `REQ-SCOPE-002` | Estes itens MUST NOT ser implementados antes da evidência que cada um exige | `32_NAO_OBJETIVOS.md` §2 | — | — | — | SPECIFIED |
 | `REQ-SCOPE-003` | Nenhuma frente nova MAY ser aberta antes de o… | `32_NAO_OBJETIVOS.md` §2 | — | — | — | SPECIFIED |
-| `REQ-SCOPE-004` | Nenhum destes quatro MAY ser implementado antes de emenda formal à… | `32_NAO_OBJETIVOS.md` §3 | — | — | — | SPECIFIED |
+| `REQ-SCOPE-004` | Nenhum destes quatro MAY ser implementado antes de a ADR correspondente ser… | `32_NAO_OBJETIVOS.md` §3 | — | — | — | SPECIFIED |
+| `REQ-SCOPE-005` | Uma proposta MUST nomear o documento que contraria. "Conflita com a… | `32_NAO_OBJETIVOS.md` §3 | — | — | — | SPECIFIED |
 
 ## `REQ-SEC-*`
 

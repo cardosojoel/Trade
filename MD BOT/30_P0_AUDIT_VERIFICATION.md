@@ -1,6 +1,7 @@
 # 30 — P0 Audit Verification
 
 **Status:** registro histórico — **não normativo**, preservado como está  
+**Conformidade:** não se aplica — registro histórico  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---

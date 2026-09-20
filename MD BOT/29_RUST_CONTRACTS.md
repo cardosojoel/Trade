@@ -2,6 +2,7 @@
 
 **Status:** normativo · **Versão:** 1.1 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-RUST-*`  
+**Conformidade:** exige emenda (ADR-004)  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---

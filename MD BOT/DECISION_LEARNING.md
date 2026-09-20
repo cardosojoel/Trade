@@ -5,6 +5,7 @@
 aprendizado, validação e promoção de modelo. Os documentos `07`, `17` e `18` são
 índices para cá.  
 **Domínio de requisitos:** `REQ-LEARN-*`  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Histórico de decisões, resultados, avaliação, aprendizado e evolução controlada do modelo
 

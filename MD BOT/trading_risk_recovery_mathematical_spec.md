@@ -4,6 +4,7 @@
 **Status:** **normativo** — esta é a fonte de verdade sobre risco e Recovery.
 O `03_SESSION_STATE_MACHINE.md` é índice para cá, não fonte concorrente.  
 **Domínio de requisitos:** `REQ-RISK-* e `REQ-RECOVERY-*`  
+**Conformidade:** exige emenda (ADR-002, ADR-003)  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Controle matemático de risco e recuperação de sessão  
 **Aplicação:** Bot de trading

@@ -2,6 +2,7 @@
 
 **Status:** normativo quanto às decisões registradas · **Versão:** 1.0 ·
 **Atualizado em:** 2026-09-20  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---
@@ -61,6 +62,9 @@ anterior.
 | D-23 | O resíduo da moeda base é saldo, não perda: soma-se à ordem seguinte | a taxa do spot é cobrada em BTC e a quantidade recebida não é múltiplo de `qty_step`; montar cada ordem do zero deixa US$ 0,04 presos por ciclo e multiplica o custo real por até 3,8 | `REQ-SIZING-004`, `REQ-BYBIT-005` |
 | D-24 | A especificação do instrumento é relida a cada sessão, e perfil invalidado impede o início | a Bybit revisa `min_order_amt` nos dias 3 e 17 de cada mês; reduzir o perfil em silêncio para caber nos novos limites seria derivação não confirmada | `REQ-BYBIT-006`, `REQ-BYBIT-007` |
 | D-25 | O stop vai como ordem a mercado no gatilho, e posição sem stop aceito não existe | a banda de preço de ordens limitadas (0,5% e 1%) é mais estreita que o stop de 2%: enviado como limitada, ele pode ser cancelado em silêncio | `REQ-EXEC-010`, `REQ-EXEC-011` |
+| D-26 | Este conjunto declara fronteira explícita com o Trade: autoridade em três níveis, saída única por ADR e campo `Conformidade` em todo documento | desenho e implementação precisam evoluir em paralelo; sem contrato de fronteira, uma proposta vira plano sem que ninguém assine | `00_FRONTEIRA.md` |
+| D-27 | `SDD` designa só o System Design Document; o fluxo do Trade chama-se `Spec Kit` | a mesma sigla servia a duas coisas em repositórios que vão se separar | `00_GLOSSARIO.md` §7.1 |
+| D-28 | Divergência passa a nomear o documento contrariado, nunca "a constitution" genericamente | duas das quatro divergências contrariam o `CLAUDE.md`, não a constitution — e o ato que as resolve é outro | `REQ-FRONTEIRA-006`, `REQ-SCOPE-005` |
 
 ---
 

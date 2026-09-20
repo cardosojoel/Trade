@@ -4,6 +4,7 @@
 **Status:** **normativo** — esta é a fonte de verdade sobre pattern matching,
 probabilidade e EV. Os documentos `12`, `13` e `14` são índices para cá.  
 **Domínio de requisitos:** `REQ-PATTERN-* e `REQ-PROB-*`  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Transformação de padrões históricos em probabilidade, retorno esperado e valor esperado para decisões de trading
 

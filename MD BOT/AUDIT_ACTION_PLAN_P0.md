@@ -1,6 +1,7 @@
 # Audit Action Plan — P0
 
 **Status:** registro histórico — **não normativo**, preservado como está  
+**Conformidade:** não se aplica — registro histórico  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---

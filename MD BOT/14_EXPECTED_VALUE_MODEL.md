@@ -2,6 +2,7 @@
 
 **Status:** índice — **não normativo** · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Fonte de verdade:** [`HISTORICAL_PATTERN_PROBABILITY_EV.md`](HISTORICAL_PATTERN_PROBABILITY_EV.md)  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 Conversão de distribuição prevista em vantagem econômica líquida.

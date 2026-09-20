@@ -4,6 +4,7 @@
 **Status:** **normativo** — esta é a fonte de verdade sobre features, regime,
 EV e sizing. Os documentos `10`, `11`, `15` e `16` são índices para cá.  
 **Domínio de requisitos:** `REQ-FEATURE-*`, `REQ-REGIME-*`, `REQ-EV-*`, `REQ-SIZING-*` e `REQ-STRATEGY-*`  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)  
 **Escopo:** Modelo matemático para geração, avaliação e controle de sinais de trading de Bitcoin
 

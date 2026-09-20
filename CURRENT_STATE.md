@@ -72,6 +72,41 @@ ao mesmo tempo.
 O gate que a própria SDD define: preencher `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`
 com referências reais ao código antes de abrir qualquer frente nova.
 
+**Fronteira declarada: o desenho pode andar em paralelo sem tocar no código.**
+`MD BOT/00_FRONTEIRA.md` fixa autoridade em três níveis — constitution governa,
+`CLAUDE.md` e invariantes do build cobram, o conjunto de desenho **propõe** — e
+uma saída única e unidirecional: proposta vira ADR em `MD BOT/34_ADR_EMENDAS.md`
+e só chega ao código depois de aceita, como emenda ou como feature nova pelo
+Spec Kit. Todo documento normativo passou a declarar `Conformidade: conforme` ou
+`exige emenda (ADR-NNN)`; seis declaram o segundo. A constitution está ancorada
+por hash (`82b24e3c…`), e hash diferente obriga a reavaliar todas as
+conformidades.
+
+**A verificação da fronteira desmentiu uma coisa que este arquivo vinha
+afirmando.** Eu repeti quatro vezes que havia "quatro conflitos com a
+constitution". São quatro divergências, mas **só duas são com a constitution**:
+
+| Divergência | Onde a regra contrária realmente vive |
+|---|---|
+| Recovery depois do freio | constitution, Princípio II, linha 44 |
+| Retomada por confirmação humana | constitution, Princípio II, linha 45 |
+| Derivativos e alavancagem | `CLAUDE.md` linhas 91–92 — **não está na constitution** |
+| `f64` em caminho monetário | `CLAUDE.md` e `tests/no_float.rs` — **não está na constitution** |
+
+A constitution não menciona spot, alavancagem, venda a descoberto, float nem
+decimal em nenhuma das suas 220 linhas. Isso é uma lacuna, não um detalhe: as
+duas regras que limitam a perda máxima possível — o pior caso ser o depósito, e
+o cálculo do saldo estar certo — vivem num arquivo de diretrizes que qualquer
+sessão reescreve sem racional nem aprovação. A segunda ao menos tem o
+`tests/no_float.rs` barrando o merge; **a primeira não tem nenhuma proteção
+executável.** A ADR-005 propõe promovê-las à constitution; é decisão sua.
+
+**Portabilidade medida:** o conjunto tem oito referências para fora dele, em 45
+documentos. Movê-lo para outro repositório é `git mv` mais a conversão dessas
+oito em citação com origem declarada. Nada mais — não há inclusão de arquivo,
+script compartilhado nem dependência de build. A decisão de mover continua
+aberta e ficou barata nos dois sentidos.
+
 **Auditoria de risco contra a documentação da Bybit — 2026-09-20.** Onze
 achados; o relatório completo está publicado como artefato privado
 (`claude.ai/artifact/HSzcFir83CmzKVvLKzyLFk`) e os três acionáveis viraram

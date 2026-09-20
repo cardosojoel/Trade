@@ -2,6 +2,7 @@
 
 **Status:** normativo · **Versão:** 1.0 · **Atualizado em:** 2026-09-20  
 **Domínio de requisitos:** `REQ-SCOPE-*`  
+**Conformidade:** conforme  
 **Vocabulário:** [`00_GLOSSARIO.md`](00_GLOSSARIO.md)
 
 ---
@@ -48,20 +49,34 @@ apontar para código e teste reais.
 
 ## 3. O que esta SDD pressupõe e o projeto não autoriza
 
-Quatro pontos onde a SDD assume um sistema que a constitution não permite.
-**Nenhum foi decidido.** Estão aqui para que a divergência seja visível a quem
-ler a SDD isoladamente.
+Quatro pontos onde a SDD assume um sistema que o projeto não autoriza. **Nenhum
+foi decidido**, e cada um tem ADR aberta em
+[`34_ADR_EMENDAS.md`](34_ADR_EMENDAS.md).
 
-| # | A SDD pressupõe | A constitution determina |
-|---|---|---|
-| 1 | derivativos — `leverage_min/max`, funding, `reduce-only`, microestrutura de derivativos | spot, apenas comprado, sem alavancagem |
-| 2 | Recovery: recolocar lucro realizado em risco depois de atingido o limite de perda, com risco por operação maior | atingido o limite, cessar a abertura até o próximo período, sem exceção configurável em tempo de execução |
-| 3 | sessão com depósito, `CapitalFloor` e `STOPPED` — nova sessão exige confirmação humana | período diário, com retomada automática na virada |
-| 4 | `f64` para `tick_size`, `qty_step`, `min_notional` e EV em `29_RUST_CONTRACTS.md` | nenhum ponto flutuante em caminho monetário — e a própria `trading_risk_recovery_mathematical_spec.md` §33 proíbe |
+Verificação de 2026-09-20: os quatro **não** contrariam a mesma autoridade, e
+tratá-los como se contrariassem enfraquece as duas. A coluna do meio nomeia
+quem realmente determina o contrário.
 
-**REQ-SCOPE-004** Nenhum destes quatro MAY ser implementado antes de emenda
-formal à constitution. Implementar primeiro e regularizar depois é a ordem
+| # | A SDD pressupõe | A regra contrária vive em | ADR |
+|---|---|---|---|
+| 1 | derivativos — `leverage_min/max`, funding, `reduce-only` | `CLAUDE.md` linhas 91–92 — **não está na constitution** | ADR-001 |
+| 2 | Recovery depois de atingido o limite de perda diária | **constitution**, Princípio II, linha 44 | ADR-002 |
+| 3 | sessão com depósito e confirmação humana para retomar | **constitution**, Princípio II, linha 45 | ADR-003 |
+| 4 | `f64` para `tick_size`, `qty_step`, `min_notional` e EV | `CLAUDE.md` e `tests/no_float.rs` — **não está na constitution** | ADR-004 |
+
+**REQ-SCOPE-004** Nenhum destes quatro MAY ser implementado antes de a ADR
+correspondente ser aceita. Implementar primeiro e regularizar depois é a ordem
 inversa da que o projeto adotou.
+
+**REQ-SCOPE-005** Uma proposta MUST nomear o documento que contraria. "Conflita
+com a constitution" MUST NOT ser usado como fórmula genérica — duas das quatro
+divergências acima contrariam uma diretriz de trabalho, cujo ato de mudança é
+muito mais leve que uma emenda.
+
+A ADR-005 trata da lacuna que essa verificação expôs: **as duas restrições que
+limitam a perda máxima possível — mercado à vista sem alavancagem e ausência de
+ponto flutuante em caminho monetário — não estão na constitution**, e a
+primeira não tem nenhuma proteção executável.
 
 O ponto 2 merece nota: o Recovery é disciplinado — orçamento consumível, risco
 decrescente, regra anti-Martingale explícita. A objeção não é à qualidade do

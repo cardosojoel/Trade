@@ -1,6 +1,7 @@
 # 25 — Cross-Document Audit — SDD Trading Bot v2
 
 **Status:** registro histórico — **não normativo**  
+**Conformidade:** não se aplica — registro histórico  
 **Data da auditoria:** 20/09/2026  
 **Nota de 2026-09-20:** este documento é registro histórico dos achados e não foi
 reescrito. Duas ressalvas para quem o lê hoje: (a) AUD-MATH-001 e AUD-PARAM-002
