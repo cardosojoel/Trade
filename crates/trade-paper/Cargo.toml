@@ -1,0 +1,32 @@
+# Adaptador de paper trading contra a testnet da Bybit.
+#
+# Depende de trade-bybit pela credencial e pela assinatura, e de trade-ports
+# pela interface que implementa. NÃO depende de trade-strategy nem de
+# trade-risk: quem compõe é a CLI, e é isso que mantém o Princípio V de pé —
+# o mesmo motivo pelo qual trade-bybit também não os conhece.
+
+[package]
+name = "trade-paper"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+trade-domain.workspace = true
+trade-ports.workspace = true
+trade-bybit.workspace = true
+rust_decimal.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[features]
+testing = []
+
+[dev-dependencies]
+trade-paper = { workspace = true, features = ["testing"] }
+
+[lints]
+workspace = true

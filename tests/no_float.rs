@@ -9,7 +9,14 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const MONETARY_CRATES: &[&str] = &["trade-domain", "trade-risk", "trade-backtest"];
+const MONETARY_CRATES: &[&str] = &[
+    "trade-domain",
+    "trade-risk",
+    "trade-backtest",
+    // O adaptador de paper carrega preço, quantidade e taxa vindos da
+    // corretora: é caminho monetário como qualquer outro.
+    "trade-paper",
+];
 
 fn rs_files(dir: &Path, out: &mut Vec<PathBuf>) {
     let Ok(entries) = fs::read_dir(dir) else {

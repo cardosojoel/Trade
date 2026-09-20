@@ -24,6 +24,7 @@ const CRATES: &[&str] = &[
     "trade-backtest",
     "trade-storage",
     "trade-bybit",
+    "trade-paper",
     "trade-cli",
 ];
 

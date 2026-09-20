@@ -15,6 +15,7 @@ const ISOLATED: &[&str] = &["trade-strategy", "trade-risk", "trade-backtest"];
 /// Adaptador de corretora e clientes de rede.
 const FORBIDDEN: &[&str] = &[
     "trade-bybit",
+    "trade-paper",
     "trade-storage",
     "ureq",
     "reqwest",

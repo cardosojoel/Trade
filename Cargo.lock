@@ -1409,6 +1409,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "trade-paper"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "trade-bybit",
+ "trade-domain",
+ "trade-paper",
+ "trade-ports",
+]
+
+[[package]]
 name = "trade-ports"
 version = "0.1.0"
 dependencies = [

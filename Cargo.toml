@@ -26,6 +26,7 @@ members = [
     "crates/trade-backtest",
     "crates/trade-storage",
     "crates/trade-bybit",
+    "crates/trade-paper",
     "crates/trade-cli",
 ]
 resolver = "3"
@@ -65,6 +66,7 @@ trade-strategy = { path = "crates/trade-strategy" }
 trade-backtest = { path = "crates/trade-backtest" }
 trade-storage  = { path = "crates/trade-storage" }
 trade-bybit    = { path = "crates/trade-bybit" }
+trade-paper    = { path = "crates/trade-paper" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

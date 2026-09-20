@@ -14,8 +14,8 @@ Verificável sem rede e sem credencial.
 - [X] T003 **(TF)** Ausência de credencial aborta a inicialização em `paper` (FR-102)
 - [X] T004 **(TF)** Chave de testnet e de produção no mesmo ambiente aborta (FR-104)
 - [X] T005 Segredo MUST NOT aparecer em `Debug`, log ou erro — tipo que redige a si mesmo
-- [ ] T006 [P] `trade-paper` criada, declarada no workspace, sem código ainda
-- [ ] T007 Teste de arquitetura passa a cobrar que estratégia, risco e backtest não declarem `trade-paper`
+- [X] T006 [P] `trade-paper` criada, declarada no workspace, sem código ainda
+- [X] T007 Teste de arquitetura passa a cobrar que estratégia, risco e backtest não declarem `trade-paper`
 
 ## Fatia 2 — a assinatura
 
@@ -23,7 +23,7 @@ Verificável sem rede e sem credencial.
 - [X] T009 **(TF)** Ordenação de parâmetros e `recv_window` na string assinada
 - [X] T010 **(TF)** Timestamp fora da janela é recusado antes do envio
 - [X] T011 Cliente autenticado em `trade-bybit/src/auth.rs`, sobre o `ureq` já existente
-- [ ] T012 **(TF)** Verificação de permissão de saque na chave; com saque, aborta (FR-103)
+- [X] T012 **(TF)** Verificação de permissão de saque na chave; com saque, aborta (FR-103)
 
 ## Fatia 3 — o adaptador
 
