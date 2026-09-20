@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "Trade",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.trimTrailingWhitespace": true,
+		"files.insertFinalNewline": true
+	},
+	"extensions": {
+		"recommendations": []
+	}
+}
