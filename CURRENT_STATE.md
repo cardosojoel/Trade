@@ -83,10 +83,28 @@ ganharam cabeçalho de estado, e as autoavaliações que viviam dentro das
 especificações ("Estado: forte", "não é estado da arte ainda") foram para a
 auditoria, que é onde se avalia.
 
-Continua aberto no conjunto: um exemplo numérico único que atravesse o sistema
-inteiro. Cruzando os exemplos que já existem, um depósito de R$ 50 com risco de
-2% e stop de 1,2% pede posição de R$ 83 — impossível em spot sem alavancagem, e
-nenhum documento cruza os dois.
+**O exemplo fim a fim foi escrito, e mudou o que se sabe sobre os limiares.**
+O `31_EXEMPLO_FIM_A_FIM.md` atravessa a cadeia inteira com os mesmos números e
+expõe três coisas que nenhum documento via sozinho:
+
+1. `PositionNotional = AllowedTradeRisk / StopDistance%`. Com risco de 2% e stop
+   de 1,2%, o sizing pede **1,67 vez o depósito** — ordem impossível em spot.
+   Em mercado à vista, o risco por operação só é alcançável quando a distância
+   do stop for maior ou igual à fração de risco. Virou `REQ-SIZING-003`.
+2. Com o teto de posição de 10%, o risco efetivo por operação cai para **0,12%
+   do capital contra os 2% autorizados** — um fator de 16,7. O limite de risco
+   por operação nunca chega a ser consultado; quem governa o tamanho é o teto
+   de posição. É o mesmo achado do `max_total_exposure` decorativo, um nível
+   acima, e é insumo direto para a calibração que a constitution exige.
+3. Com posição de 1.000, o custo come 57% do EV bruto e o cenário conservador
+   inverte o sinal: EV nominal +1,91, conservador −0,76 → `NO_TRADE`.
+
+Também entraram o `32_NAO_OBJETIVOS.md`, que fixa o contorno do sistema e
+registra os quatro conflitos com a constitution como pendentes de emenda, e o
+`33_DECISOES.md`, que registra 18 decisões com seu racional — e, mais útil,
+**doze valores que hoje governam comportamento sem racional registrado**: `K`,
+`k` do stop, `λ`, os limiares de amostra, os SLOs de latência, a idade máxima do
+dado, o headroom de rate limit. Nenhum é errado; nenhum é defensável.
 
 ---
 

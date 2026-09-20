@@ -648,6 +648,17 @@ máximos do instrumento, conforme o
 [`28_BYBIT_INSTRUMENT_REGISTRY.md`](28_BYBIT_INSTRUMENT_REGISTRY.md). O sistema
 MUST registrar o sizing bruto, os limites aplicados e o sizing final.
 
+**REQ-SIZING-003** Em mercado à vista, `PositionNotional` MUST NOT exceder o
+caixa disponível. Quando a fórmula acima produzir valor maior, a posição MUST
+ser reduzida ao caixa e o limite vinculante MUST ser registrado: o sistema MUST
+NOT emitir ordem impossível nem silenciar a redução.
+
+A identidade `PositionNotional = AllowedTradeRisk / StopDistance%` implica que,
+em spot, o risco por operação só é alcançável quando a distância do stop for
+maior ou igual à fração de risco autorizada. Com stop mais curto, `T` é
+inatingível e o caixa passa a ser o limite vinculante — ver
+[`31_EXEMPLO_FIM_A_FIM.md`](31_EXEMPLO_FIM_A_FIM.md) §6.
+
 ---
 
 # 23. Risco total

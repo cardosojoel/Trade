@@ -186,6 +186,7 @@ Domínios em uso, um por documento normativo:
 | `CFG` | `27_CONFIGURATION_REGISTRY.md` |
 | `BYBIT` | `28_BYBIT_INSTRUMENT_REGISTRY.md` |
 | `RUST` | `29_RUST_CONTRACTS.md` |
+| `SCOPE` | `32_NAO_OBJETIVOS.md` |
 | `RISK`, `RECOVERY` | `trading_risk_recovery_mathematical_spec.md` |
 | `FEATURE`, `REGIME`, `EV`, `SIZING`, `STRATEGY` | `MATHEMATICAL_QUANT_MODEL.md` |
 | `PATTERN`, `PROB` | `HISTORICAL_PATTERN_PROBABILITY_EV.md` |

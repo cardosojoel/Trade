@@ -29,7 +29,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**127 requisitos em 26 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**132 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -40,7 +40,6 @@ Este catálogo é a primeira passagem. Texto que ainda diz "deve" sem `MUST` é,
 por convenção do glossário, explicação e não requisito — mas se numa releitura
 algum deles se revelar obrigação, o correto é promovê-lo a `REQ-…` na própria
 especificação, não abrir exceção à convenção.
-
 
 ## `REQ-BACKTEST-*`
 
@@ -93,9 +92,9 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-EV-001` | O modelo canônico é ternário, consistente com a seção 13 | `MATHEMATICAL_QUANT_MODEL.md` §15. | — | — | — | SPECIFIED |
-| `REQ-EV-002` | O sistema MUST calcular também um cenário conservador, degradando conforme… | `MATHEMATICAL_QUANT_MODEL.md` §15. | — | — | — | SPECIFIED |
-| `REQ-EV-003` | Mas EV_net > 0 sozinho MUST NOT autorizar execução: a autoridade é do Risk… | `MATHEMATICAL_QUANT_MODEL.md` §15. | — | — | — | SPECIFIED |
+| `REQ-EV-001` | O modelo canônico é ternário, consistente com a seção 13 | `MATHEMATICAL_QUANT_MODEL.md` §15 | — | — | — | SPECIFIED |
+| `REQ-EV-002` | O sistema MUST calcular também um cenário conservador, degradando conforme… | `MATHEMATICAL_QUANT_MODEL.md` §15 | — | — | — | SPECIFIED |
+| `REQ-EV-003` | Mas EV_net > 0 sozinho MUST NOT autorizar execução: a autoridade é do Risk… | `MATHEMATICAL_QUANT_MODEL.md` §15 | — | — | — | SPECIFIED |
 
 ## `REQ-EVENT-*`
 
@@ -132,7 +131,7 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-FEATURE-001` | Cada feature MUST declarar name, formula, window, source, unit,… | `MATHEMATICAL_QUANT_MODEL.md` §12. | — | — | — | SPECIFIED |
+| `REQ-FEATURE-001` | Cada feature MUST declarar name, formula, window, source, unit,… | `MATHEMATICAL_QUANT_MODEL.md` §12 | — | — | — | SPECIFIED |
 
 ## `REQ-GOV-*`
 
@@ -149,26 +148,26 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-LEARN-001` | Depois de criado | `DECISION_LEARNING.md` §3. | — | — | — | SPECIFIED |
-| `REQ-LEARN-002` | O ledger MUST registrar toda decisão, não apenas as operações executadas | `DECISION_LEARNING.md` §4. | — | — | — | SPECIFIED |
-| `REQ-LEARN-003` | O resultado MUST ser entidade separada da decisão; a decisão MUST NOT ser… | `DECISION_LEARNING.md` §14. | — | — | — | SPECIFIED |
-| `REQ-LEARN-004` | É proibido utilizar no snapshot | `DECISION_LEARNING.md` §29. | — | — | — | SPECIFIED |
-| `REQ-LEARN-005` | MUST existir teste automatizado que verifique | `DECISION_LEARNING.md` §31. | — | — | — | SPECIFIED |
-| `REQ-LEARN-006` | O modelo MUST NOT usar seu próprio resultado recente para alterar parâmetro… | `DECISION_LEARNING.md` §35. | — | — | — | SPECIFIED |
-| `REQ-LEARN-007` | ) | `DECISION_LEARNING.md` §37. | — | — | — | SPECIFIED |
-| `REQ-LEARN-008` | A promoção MUST exigir todos os critérios obrigatórios, e cada um MUST ser… | `DECISION_LEARNING.md` §38. | — | — | — | SPECIFIED |
-| `REQ-LEARN-009` | Rollback MUST restaurar uma versão anteriormente aprovada, e MUST ser… | `DECISION_LEARNING.md` §39. | — | — | — | SPECIFIED |
-| `REQ-LEARN-010` | O bot MUST NOT aprender livremente | `DECISION_LEARNING.md` §51. | — | — | — | SPECIFIED |
+| `REQ-LEARN-001` | Depois de criado | `DECISION_LEARNING.md` §3 | — | — | — | SPECIFIED |
+| `REQ-LEARN-002` | O ledger MUST registrar toda decisão, não apenas as operações executadas | `DECISION_LEARNING.md` §4 | — | — | — | SPECIFIED |
+| `REQ-LEARN-003` | O resultado MUST ser entidade separada da decisão; a decisão MUST NOT ser… | `DECISION_LEARNING.md` §14 | — | — | — | SPECIFIED |
+| `REQ-LEARN-004` | É proibido utilizar no snapshot | `DECISION_LEARNING.md` §29 | — | — | — | SPECIFIED |
+| `REQ-LEARN-005` | MUST existir teste automatizado que verifique | `DECISION_LEARNING.md` §31 | — | — | — | SPECIFIED |
+| `REQ-LEARN-006` | O modelo MUST NOT usar seu próprio resultado recente para alterar parâmetro… | `DECISION_LEARNING.md` §35 | — | — | — | SPECIFIED |
+| `REQ-LEARN-007` | ) | `DECISION_LEARNING.md` §37 | — | — | — | SPECIFIED |
+| `REQ-LEARN-008` | A promoção MUST exigir todos os critérios obrigatórios, e cada um MUST ser… | `DECISION_LEARNING.md` §38 | — | — | — | SPECIFIED |
+| `REQ-LEARN-009` | Rollback MUST restaurar uma versão anteriormente aprovada, e MUST ser… | `DECISION_LEARNING.md` §39 | — | — | — | SPECIFIED |
+| `REQ-LEARN-010` | O bot MUST NOT aprender livremente | `DECISION_LEARNING.md` §51 | — | — | — | SPECIFIED |
 
 ## `REQ-PATTERN-*`
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-PATTERN-001` | Esta regra MUST ser respeitada, para impedir | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §4. | — | — | — | SPECIFIED |
-| `REQ-PATTERN-002` | No período de teste | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §5. | — | — | — | SPECIFIED |
-| `REQ-PATTERN-003` | Não assumir que K = 100 é matematicamente ótimo. K é hiperparâmetro e MUST… | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §7. | — | — | — | SPECIFIED |
-| `REQ-PATTERN-004` | Sem amostra mínima ou sem qualidade de similaridade suficiente, o módulo… | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §26. | — | — | — | SPECIFIED |
-| `REQ-PATTERN-005` | Para uma decisão em t | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §38. | — | — | — | SPECIFIED |
+| `REQ-PATTERN-001` | Esta regra MUST ser respeitada, para impedir | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §4 | — | — | — | SPECIFIED |
+| `REQ-PATTERN-002` | No período de teste | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §5 | — | — | — | SPECIFIED |
+| `REQ-PATTERN-003` | Não assumir que K = 100 é matematicamente ótimo. K é hiperparâmetro e MUST… | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §7 | — | — | — | SPECIFIED |
+| `REQ-PATTERN-004` | Sem amostra mínima ou sem qualidade de similaridade suficiente, o módulo… | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §26 | — | — | — | SPECIFIED |
+| `REQ-PATTERN-005` | Para uma decisão em t | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §38 | — | — | — | SPECIFIED |
 
 ## `REQ-PERF-*`
 
@@ -188,9 +187,9 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-PROB-001` | Em amostra pequena, a contagem ponderada MUST receber smoothing; a… | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §12. | — | — | — | SPECIFIED |
-| `REQ-PROB-002` | A probabilidade bruta MUST ser calibrada antes do uso | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §14. | — | — | — | SPECIFIED |
-| `REQ-PROB-003` | Um candidato MUST satisfazer | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §32. | — | — | — | SPECIFIED |
+| `REQ-PROB-001` | Em amostra pequena, a contagem ponderada MUST receber smoothing; a… | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §12 | — | — | — | SPECIFIED |
+| `REQ-PROB-002` | A probabilidade bruta MUST ser calibrada antes do uso | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §14 | — | — | — | SPECIFIED |
+| `REQ-PROB-003` | Um candidato MUST satisfazer | `HISTORICAL_PATTERN_PROBABILITY_EV.md` §32 | — | — | — | SPECIFIED |
 
 ## `REQ-RECON-*`
 
@@ -206,19 +205,19 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-RECOVERY-001` | Somente lucro realizado MAY gerar Recovery Budget | `trading_risk_recovery_mathematical_spec.md` §7. | — | — | — | SPECIFIED |
-| `REQ-RECOVERY-002` | O orçamento máximo de Recovery MUST ser o menor dos dois limites | `trading_risk_recovery_mathematical_spec.md` §10. | — | — | — | SPECIFIED |
-| `REQ-RECOVERY-003` | O Recovery Budget é orçamento consumível: perdas o reduzem e ganhos MUST… | `trading_risk_recovery_mathematical_spec.md` §12. | — | — | — | SPECIFIED |
-| `REQ-RECOVERY-004` | O Recovery MUST NOT ser ativado exceto quando | `trading_risk_recovery_mathematical_spec.md` §13. | — | — | — | SPECIFIED |
-| `REQ-RECOVERY-005` | A recuperação MUST falhar quando qualquer uma destas condições ocorrer | `trading_risk_recovery_mathematical_spec.md` §19. | — | — | — | SPECIFIED |
-| `REQ-RECOVERY-006` | Um novo episódio MUST ser condicionado a | `trading_risk_recovery_mathematical_spec.md` §28. | — | — | — | SPECIFIED |
-| `REQ-RECOVERY-007` | É proibido | `trading_risk_recovery_mathematical_spec.md` §29. | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-001` | Somente lucro realizado MAY gerar Recovery Budget | `trading_risk_recovery_mathematical_spec.md` §7 | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-002` | O orçamento máximo de Recovery MUST ser o menor dos dois limites | `trading_risk_recovery_mathematical_spec.md` §10 | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-003` | O Recovery Budget é orçamento consumível: perdas o reduzem e ganhos MUST… | `trading_risk_recovery_mathematical_spec.md` §12 | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-004` | O Recovery MUST NOT ser ativado exceto quando | `trading_risk_recovery_mathematical_spec.md` §13 | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-005` | A recuperação MUST falhar quando qualquer uma destas condições ocorrer | `trading_risk_recovery_mathematical_spec.md` §19 | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-006` | Um novo episódio MUST ser condicionado a | `trading_risk_recovery_mathematical_spec.md` §28 | — | — | — | SPECIFIED |
+| `REQ-RECOVERY-007` | É proibido | `trading_risk_recovery_mathematical_spec.md` §29 | — | — | — | SPECIFIED |
 
 ## `REQ-REGIME-*`
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-REGIME-001` | O modelo MUST classificar o mercado no enum canônico do glossário | `MATHEMATICAL_QUANT_MODEL.md` §11. | — | — | — | SPECIFIED |
+| `REQ-REGIME-001` | O modelo MUST classificar o mercado no enum canônico do glossário | `MATHEMATICAL_QUANT_MODEL.md` §11 | — | — | — | SPECIFIED |
 
 ## `REQ-REPLAY-*`
 
@@ -232,18 +231,18 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-RISK-001` | O limite máximo de perda do capital originalmente depositado é | `trading_risk_recovery_mathematical_spec.md` §4. | — | — | — | SPECIFIED |
-| `REQ-RISK-002` | Durante Recovery, o risco MUST ser calculado sobre o orçamento restante | `trading_risk_recovery_mathematical_spec.md` §21. | — | — | — | SPECIFIED |
-| `REQ-RISK-003` | O risco permitido para uma operação MUST ser | `trading_risk_recovery_mathematical_spec.md` §22. | — | — | — | SPECIFIED |
-| `REQ-RISK-004` | Uma perda MUST NOT aumentar automaticamente | `trading_risk_recovery_mathematical_spec.md` §23. | — | — | — | SPECIFIED |
-| `REQ-RISK-005` | A posição MUST NOT ser autorizada exceto quando | `trading_risk_recovery_mathematical_spec.md` §25. | — | — | — | SPECIFIED |
-| `REQ-RISK-006` | A operação MUST NOT ser autorizada exceto quando | `trading_risk_recovery_mathematical_spec.md` §26. | — | — | — | SPECIFIED |
-| `REQ-RISK-007` | A soma existe, tem nome próprio e significado restrito | `trading_risk_recovery_mathematical_spec.md` §31. | — | — | — | SPECIFIED |
-| `REQ-RISK-008` | ) | `trading_risk_recovery_mathematical_spec.md` §32. | — | — | — | SPECIFIED |
-| `REQ-RISK-009` | É proibido utilizar | `trading_risk_recovery_mathematical_spec.md` §33. | — | — | — | SPECIFIED |
-| `REQ-RISK-010` | As seguintes condições MUST NOT ser violadas | `trading_risk_recovery_mathematical_spec.md` §34. | — | — | — | SPECIFIED |
-| `REQ-RISK-011` | Se qualquer cálculo necessário para autorizar uma operação não puder ser… | `trading_risk_recovery_mathematical_spec.md` §35. | — | — | — | SPECIFIED |
-| `REQ-RISK-012` | Complementam os invariantes matemáticos da seção 34 e valem sobre o sistema… | `trading_risk_recovery_mathematical_spec.md` §40. | — | — | — | SPECIFIED |
+| `REQ-RISK-001` | O limite máximo de perda do capital originalmente depositado é | `trading_risk_recovery_mathematical_spec.md` §4 | — | — | — | SPECIFIED |
+| `REQ-RISK-002` | Durante Recovery, o risco MUST ser calculado sobre o orçamento restante | `trading_risk_recovery_mathematical_spec.md` §21 | — | — | — | SPECIFIED |
+| `REQ-RISK-003` | O risco permitido para uma operação MUST ser | `trading_risk_recovery_mathematical_spec.md` §22 | — | — | — | SPECIFIED |
+| `REQ-RISK-004` | Uma perda MUST NOT aumentar automaticamente | `trading_risk_recovery_mathematical_spec.md` §23 | — | — | — | SPECIFIED |
+| `REQ-RISK-005` | A posição MUST NOT ser autorizada exceto quando | `trading_risk_recovery_mathematical_spec.md` §25 | — | — | — | SPECIFIED |
+| `REQ-RISK-006` | A operação MUST NOT ser autorizada exceto quando | `trading_risk_recovery_mathematical_spec.md` §26 | — | — | — | SPECIFIED |
+| `REQ-RISK-007` | A soma existe, tem nome próprio e significado restrito | `trading_risk_recovery_mathematical_spec.md` §31 | — | — | — | SPECIFIED |
+| `REQ-RISK-008` | ) | `trading_risk_recovery_mathematical_spec.md` §32 | — | — | — | SPECIFIED |
+| `REQ-RISK-009` | É proibido utilizar | `trading_risk_recovery_mathematical_spec.md` §33 | — | — | — | SPECIFIED |
+| `REQ-RISK-010` | As seguintes condições MUST NOT ser violadas | `trading_risk_recovery_mathematical_spec.md` §34 | — | — | — | SPECIFIED |
+| `REQ-RISK-011` | Se qualquer cálculo necessário para autorizar uma operação não puder ser… | `trading_risk_recovery_mathematical_spec.md` §35 | — | — | — | SPECIFIED |
+| `REQ-RISK-012` | Complementam os invariantes matemáticos da seção 34 e valem sobre o sistema… | `trading_risk_recovery_mathematical_spec.md` §40 | — | — | — | SPECIFIED |
 
 ## `REQ-RUST-*`
 
@@ -251,6 +250,15 @@ especificação, não abrir exceção à convenção.
 |---|---|---|---|---|---|---|
 | `REQ-RUST-001` | Os tipos MUST garantir | `29_RUST_CONTRACTS.md` Regras de segurança de tipos | — | — | — | SPECIFIED |
 | `REQ-RUST-002` | Interfaces críticas MUST NOT exigir I/O síncrono, lock global ou alocação… | `29_RUST_CONTRACTS.md` Hot path | — | — | — | SPECIFIED |
+
+## `REQ-SCOPE-*`
+
+| ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
+|---|---|---|---|---|---|---|
+| `REQ-SCOPE-001` | O sistema MUST NOT operar fora destes limites | `32_NAO_OBJETIVOS.md` §1 | — | — | — | SPECIFIED |
+| `REQ-SCOPE-002` | Estes itens MUST NOT ser implementados antes da evidência que cada um exige | `32_NAO_OBJETIVOS.md` §2 | — | — | — | SPECIFIED |
+| `REQ-SCOPE-003` | Nenhuma frente nova MAY ser aberta antes de o… | `32_NAO_OBJETIVOS.md` §2 | — | — | — | SPECIFIED |
+| `REQ-SCOPE-004` | Nenhum destes quatro MAY ser implementado antes de emenda formal à… | `32_NAO_OBJETIVOS.md` §3 | — | — | — | SPECIFIED |
 
 ## `REQ-SEC-*`
 
@@ -277,17 +285,18 @@ especificação, não abrir exceção à convenção.
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-SIZING-001` | O sizing ocorre depois de existir vantagem estatística e antes da… | `MATHEMATICAL_QUANT_MODEL.md` §22. | — | — | — | SPECIFIED |
-| `REQ-SIZING-002` | A posição MUST NOT ser autorizada exceto quando | `MATHEMATICAL_QUANT_MODEL.md` §23. | — | — | — | SPECIFIED |
+| `REQ-SIZING-001` | O sizing ocorre depois de existir vantagem estatística e antes da… | `MATHEMATICAL_QUANT_MODEL.md` §22 | — | — | — | SPECIFIED |
+| `REQ-SIZING-002` | A posição MUST NOT ser autorizada exceto quando | `MATHEMATICAL_QUANT_MODEL.md` §23 | — | — | — | SPECIFIED |
+| `REQ-SIZING-003` | Em mercado à vista, PositionNotional MUST NOT exceder o caixa disponível.… | `MATHEMATICAL_QUANT_MODEL.md` §22 | — | — | — | SPECIFIED |
 
 ## `REQ-STRATEGY-*`
 
 | ID | Rótulo | Especificação | Módulo Rust | Teste | Métrica | Status |
 |---|---|---|---|---|---|---|
-| `REQ-STRATEGY-001` | Ele MUST NOT aumentar automaticamente | `MATHEMATICAL_QUANT_MODEL.md` §25. | — | — | — | SPECIFIED |
-| `REQ-STRATEGY-002` | Ponto flutuante MUST NOT representar dinheiro | `MATHEMATICAL_QUANT_MODEL.md` §26. | — | — | — | SPECIFIED |
-| `REQ-STRATEGY-003` | o resultado MUST ser reproduzível, e a randomização MUST ser explicitamente… | `MATHEMATICAL_QUANT_MODEL.md` §27. | — | — | — | SPECIFIED |
-| `REQ-STRATEGY-004` | Regras da cadeia | `MATHEMATICAL_QUANT_MODEL.md` §28. | — | — | — | SPECIFIED |
+| `REQ-STRATEGY-001` | Ele MUST NOT aumentar automaticamente | `MATHEMATICAL_QUANT_MODEL.md` §25 | — | — | — | SPECIFIED |
+| `REQ-STRATEGY-002` | Ponto flutuante MUST NOT representar dinheiro | `MATHEMATICAL_QUANT_MODEL.md` §26 | — | — | — | SPECIFIED |
+| `REQ-STRATEGY-003` | o resultado MUST ser reproduzível, e a randomização MUST ser explicitamente… | `MATHEMATICAL_QUANT_MODEL.md` §27 | — | — | — | SPECIFIED |
+| `REQ-STRATEGY-004` | Regras da cadeia | `MATHEMATICAL_QUANT_MODEL.md` §28 | — | — | — | SPECIFIED |
 
 ## `REQ-TEST-*`
 

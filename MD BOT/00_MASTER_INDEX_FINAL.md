@@ -20,7 +20,7 @@ Cada assunto tem **um** documento normativo. Documentos de índice localizam o a
 | Pattern matching, probabilidade, EV | `HISTORICAL_PATTERN_PROBABILITY_EV.md` | `12`, `13`, `14` |
 | Ledger, aprendizado, validação, promoção | `DECISION_LEARNING.md` | `07`, `17`, `18` |
 
-Os documentos `01`, `02`, `04`, `05`, `06`, `08`, `09`, `19`–`24` e `26`–`30` são normativos nos seus próprios assuntos e não têm par.
+Os documentos `01`, `02`, `04`, `05`, `06`, `08`, `09`, `19`–`24`, `26`–`29` e `31`–`33` são normativos nos seus próprios assuntos e não têm par. O `25` e o `30` são registro histórico.
 
 Vocabulário: `00_GLOSSARIO.md` é normativo sobre nomes e símbolos. Nenhum documento introduz sinônimo para termo já definido, nem reusa símbolo já atribuído.
 
@@ -60,6 +60,11 @@ Vocabulário: `00_GLOSSARIO.md` é normativo sobre nomes e símbolos. Nenhum doc
 27 Configuration Registry
 28 Bybit Instrument Registry
 29 Rust Contracts
+
+## 5.1 Escopo, exemplo e decisões 31–33
+31 Exemplo numérico fim a fim — atravessa a cadeia com os mesmos números
+32 Não-objetivos — o contorno do sistema e os quatro conflitos com a constitution
+33 Registro de decisões — inclui os valores que hoje governam sem racional registrado
 
 ## 6. Matemática canônica
 ```text
