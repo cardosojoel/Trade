@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{LimitBreach, Position, Side, Verdict};
+use trade_domain::{FeeModel, LimitBreach, Position, Side, Verdict};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -69,6 +69,7 @@ fn bloqueado_nenhuma_compra_passa() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -93,6 +94,7 @@ fn bloqueado_a_venda_continua_permitida() {
             balance: dec!(0),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );

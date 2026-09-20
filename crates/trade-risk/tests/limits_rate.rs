@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{LimitBreach, Position, RiskLimits, Side, Verdict};
+use trade_domain::{FeeModel, LimitBreach, Position, RiskLimits, Side, Verdict};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -30,6 +30,7 @@ fn compra(g: &mut RiskGuard<StubOrderExecutor>, id: u64, hora: u32) -> trade_dom
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, hora),
+            fees: FeeModel::default(),
         },
         &mut rec,
     )
@@ -77,6 +78,7 @@ fn ordens_recusadas_nao_consomem_a_janela() {
                 balance: dec!(1),
                 reference_price: dec!(100),
                 now: at(1, 0),
+                fees: FeeModel::default(),
             },
             &mut rec,
         );

@@ -123,9 +123,16 @@ impl BacktestEngine {
                 if let Some(side) = side {
                     let referencia = candle.open;
                     let qty = sinal.qty.unwrap_or_else(|| match side {
-                        // Sem tamanho sugerido, o motor usa o que há. A cerca
-                        // recusa o que passar dela — não ajusta para caber.
-                        Side::Buy if referencia > Decimal::ZERO => balance / referencia,
+                        // Sem tamanho sugerido, o motor usa o que há — mas o
+                        // que há precisa descontar o custo de transação, ou a
+                        // ordem é recusada por saldo justamente por ter sido
+                        // dimensionada ignorando o que ela custa.
+                        Side::Buy if referencia > Decimal::ZERO => {
+                            let unitario = referencia
+                                * (Decimal::ONE + cfg.fees.slippage_rate)
+                                * (Decimal::ONE + cfg.fees.taker_fee_rate);
+                            balance / unitario
+                        }
                         Side::Buy => Decimal::ZERO,
                         Side::Sell => position.qty(),
                     });
@@ -153,6 +160,7 @@ impl BacktestEngine {
                                 balance,
                                 reference_price: referencia,
                                 now: clock.now(),
+                                fees: cfg.fees.clone(),
                             },
                             audit,
                         );

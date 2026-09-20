@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{LimitBreach, Position, RiskLimits, Side, Verdict};
+use trade_domain::{FeeModel, LimitBreach, Position, RiskLimits, Side, Verdict};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -34,6 +34,7 @@ fn ordem_que_ultrapassaria_a_exposicao_e_recusada() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -59,6 +60,7 @@ fn exposicao_exatamente_no_limite_e_aceita() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -82,6 +84,7 @@ fn venda_nao_e_barrada_por_exposicao() {
             balance: dec!(0),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );

@@ -6,7 +6,9 @@ use crate::rules::{Judgment, evaluate};
 use crate::state::GuardState;
 use chrono::{DateTime, Utc};
 use trade_domain::AuditKind;
-use trade_domain::{Anomaly, Fill, Money, Order, Position, RiskDecision, RiskLimits, Verdict};
+use trade_domain::{
+    Anomaly, FeeModel, Fill, Money, Order, Position, RiskDecision, RiskLimits, Verdict,
+};
 use trade_ports::{ExecError, OrderExecutor, Recorder};
 
 /// O que o motor informa ao guard sobre o instante corrente.
@@ -17,6 +19,8 @@ pub struct RiskContext<'a> {
     pub reference_price: Money,
     /// Instante **simulado**, vindo do `Clock`.
     pub now: DateTime<Utc>,
+    /// Custo de transação vigente, para a avaliação de saldo.
+    pub fees: FeeModel,
 }
 
 /// O resultado de submeter uma ordem.
@@ -102,6 +106,7 @@ impl<E: OrderExecutor> RiskGuard<E> {
             orders_in_window,
             daily_loss_blocked: self.state.daily_loss_blocked,
             kill_switch_engaged: self.kill_switch.is_engaged(),
+            fees: ctx.fees.clone(),
         };
 
         let violacao = evaluate(&julgamento, &self.limits);

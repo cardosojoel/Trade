@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{LimitBreach, Position, Side, Verdict};
+use trade_domain::{FeeModel, LimitBreach, Position, Side, Verdict};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -14,6 +14,7 @@ fn ctx<'a>(pos: &'a Position, preco: rust_decimal::Decimal) -> RiskContext<'a> {
         balance: dec!(1_000_000),
         reference_price: preco,
         now: at(1, 0),
+        fees: FeeModel::default(),
     }
 }
 

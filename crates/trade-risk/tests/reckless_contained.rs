@@ -7,7 +7,7 @@ mod common;
 
 use common::*;
 use rust_decimal::{Decimal, dec};
-use trade_domain::{AuditKind, LimitBreach, Position, Side, Verdict};
+use trade_domain::{AuditKind, FeeModel, LimitBreach, Position, Side, Verdict};
 use trade_ports::Recorder;
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
@@ -43,6 +43,7 @@ fn nenhuma_tentativa_imprudente_ultrapassa_a_cerca() {
                 balance: saldo,
                 reference_price: dec!(100),
                 now: at(1, hora),
+                fees: FeeModel::default(),
             },
             &mut rec,
         );
@@ -96,6 +97,7 @@ fn toda_ordem_tem_decisao_registrada() {
                 balance: dec!(10_000),
                 reference_price: dec!(100),
                 now: at(1, 0),
+                fees: FeeModel::default(),
             },
             &mut rec,
         );
@@ -129,6 +131,7 @@ fn a_recusa_registrada_diz_qual_limite_e_contra_o_que() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );

@@ -5,7 +5,7 @@ mod common;
 use common::*;
 use rust_decimal::dec;
 use tempfile::tempdir;
-use trade_domain::{LimitBreach, Position, Side, Verdict};
+use trade_domain::{FeeModel, LimitBreach, Position, Side, Verdict};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -26,6 +26,7 @@ fn acionado_nenhuma_ordem_e_aceita() {
                 balance: dec!(1_000_000),
                 reference_price: dec!(100),
                 now: at(1, 0),
+                fees: FeeModel::default(),
             },
             &mut rec,
         );
@@ -55,6 +56,7 @@ fn acionado_a_posicao_aberta_e_mantida_e_reportada() {
             balance: dec!(0),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -90,6 +92,7 @@ fn e_acionavel_sem_alteracao_de_codigo_por_arquivo_sentinela() {
         balance: dec!(1_000_000),
         reference_price: dec!(100),
         now,
+        fees: FeeModel::default(),
     };
 
     assert_eq!(

@@ -145,3 +145,37 @@ fn o_saldo_final_nunca_fica_negativo() {
         r.final_balance
     );
 }
+
+#[test]
+fn compra_com_todo_o_saldo_nao_estoura_a_conta() {
+    // A camada de risco recusa a compra cujo custo exceda o saldo, mas o custo
+    // que ela avalia é `quantidade × preço de referência` — sem taxa e sem
+    // slippage. O que o motor debita é `preço efetivo × quantidade + taxa`, e
+    // o preço efetivo já traz o slippage. A diferença é pequena por ordem e
+    // suficiente para uma compra com todo o saldo terminar no vermelho.
+    let candles = velas(&[(0, dec!(100)), (1, dec!(100)), (2, dec!(100))]);
+    // Sem quantidade sugerida: o motor usa todo o saldo.
+    let mut estrategia = ScriptedStrategy::new(vec![(0, Intent::Buy, None)]);
+    let mut rec = recorder();
+
+    let r = BacktestEngine::new(config(
+        dec!(1000),
+        20,
+        dec!(0.01),  // taxa de 1%
+        dec!(0.005), // slippage de 0,5%
+        limites_folgados(),
+    ))
+    .run(
+        &mut estrategia,
+        &fonte(candles),
+        KillSwitch::disarmed(),
+        &mut rec,
+    )
+    .unwrap();
+
+    assert!(
+        r.final_balance >= Decimal::ZERO,
+        "saldo ficou negativo: {}",
+        r.final_balance
+    );
+}

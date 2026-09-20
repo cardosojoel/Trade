@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{Anomaly, IntegrityCause, Position, Side, Verdict};
+use trade_domain::{Anomaly, FeeModel, IntegrityCause, Position, Side, Verdict};
 use trade_ports::ExecError;
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::anomaly::{classify, implausible_price, position_divergence};
@@ -109,6 +109,7 @@ fn falha_transitoria_retenta_sozinha_e_prossegue() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -134,6 +135,7 @@ fn tentativas_esgotadas_viram_falha_de_integridade() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );

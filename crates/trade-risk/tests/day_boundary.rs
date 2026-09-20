@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{Position, Side, Verdict};
+use trade_domain::{FeeModel, Position, Side, Verdict};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -52,6 +52,7 @@ fn apos_a_virada_a_operacao_volta_a_ser_aceita() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(2, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );

@@ -4,7 +4,7 @@ mod common;
 
 use common::*;
 use rust_decimal::dec;
-use trade_domain::{Position, Side};
+use trade_domain::{FeeModel, Position, Side};
 use trade_ports::testing::StubOrderExecutor;
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
 
@@ -24,6 +24,7 @@ fn ordem_aceita_produz_decisao() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -46,6 +47,7 @@ fn ordem_recusada_produz_decisao() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
@@ -70,6 +72,7 @@ fn ordem_autorizada_que_falha_na_execucao_ainda_produz_decisao() {
             balance: dec!(1_000_000),
             reference_price: dec!(100),
             now: at(1, 0),
+            fees: FeeModel::default(),
         },
         &mut rec,
     );
