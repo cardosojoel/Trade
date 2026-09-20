@@ -29,7 +29,7 @@ Execution, Reconciliation, Security ou Performance MAY chegar a `VERIFIED` por
 revisão documental.
 
 ## Estado de hoje
-**132 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
+**133 requisitos em 27 domínios, todos em `SPECIFIED`.** Nenhum aponta para
 módulo Rust, teste ou métrica: a implementação que existe no repositório foi
 construída a partir da constitution e da `specs/001-nucleo-execucao/`, não desta
 SDD, e nenhuma correspondência foi verificada linha a linha. Preencher as três
@@ -65,6 +65,7 @@ especificação, não abrir exceção à convenção.
 | `REQ-CFG-001` | Cada parâmetro MUST possuir | `27_CONFIGURATION_REGISTRY.md` Contrato | — | — | — | SPECIFIED |
 | `REQ-CFG-002` | O startup MUST rejeitar configuração fora dos limites ou inconsistente | `27_CONFIGURATION_REGISTRY.md` Validação | — | — | — | SPECIFIED |
 | `REQ-CFG-003` | O runtime MUST ler o Registry versionado; o código MUST conter apenas… | `27_CONFIGURATION_REGISTRY.md` Precedência | — | — | — | SPECIFIED |
+| `REQ-CFG-004` | Todo parâmetro MUST declarar a origem do seu valor em source, com um destes… | `27_CONFIGURATION_REGISTRY.md` Origem do valor | — | — | — | SPECIFIED |
 
 ## `REQ-DATA-*`
 

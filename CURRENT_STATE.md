@@ -72,6 +72,32 @@ ao mesmo tempo.
 O gate que a própria SDD define: preencher `26_REQUIREMENTS_TRACEABILITY_MATRIX.md`
 com referências reais ao código antes de abrir qualquer frente nova.
 
+**Os primeiros valores com origem medida.** O
+`MD BOT/27_CONFIGURATION_REGISTRY.md` deixou de ser só contrato e passou a
+guardar dois perfis completos — `banca-12` e `banca-100` — derivados de medição
+sobre os doze meses do `market.db` e dos limites reais do instrumento, lidos da
+API da Bybit (`minOrderAmt` 5 USDT).
+
+O que a medição estabeleceu, e vale para qualquer capital:
+
+| Medição | Resultado |
+|---|---|
+| Custo ÷ movimento mediano do BTC | 5 min **4,5×** · 1 h **1,3×** · 4 h 0,61× · 24 h 0,19× |
+| Entrada aleatória, bracket 1:1, doze meses | perde 0,26% a 0,38% por operação — o custo, mais assimetria |
+| Acerto que a estratégia precisa adicionar sobre o acaso | ~14 pontos percentuais |
+
+Abaixo de uma hora o custo excede o movimento típico do ativo. Isso não é
+característica da `sma-cross` — é aritmética do par custo/volatilidade, e
+nenhum ajuste de parâmetro a contorna. É a resposta quantificada para a dúvida
+que já estava registrada aqui sobre a granularidade de um minuto.
+
+Em spot vale também `risco por operação ≤ distância do stop`, sempre, porque o
+teto de posição não passa de 100%. Com 12 USDT o teto é forçado a 100% pela
+ordem mínima, o stop fica amarrado ao risco e o custo pesa 25% do valor
+arriscado; com 100 USDT o teto se solta, o stop dobra mantendo o risco em 1% e o
+custo cai para 12,5%. É esse o ganho de capital — não é retorno, é o preço do
+seguro.
+
 Também em 2026-09-20: os requisitos passaram a ter identificador. **127
 `REQ-<DOMÍNIO>-<NNN>` em 26 domínios**, escritos ao lado da regra na
 especificação — nunca em lista à parte, que seria uma segunda camada a manter —

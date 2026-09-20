@@ -54,6 +54,8 @@ anterior.
 | D-16 | Vocabulário canônico, com símbolos exclusivos | `C` designava custos e ciclos; `R` designava teto de Recovery e risco monetário | `00_GLOSSARIO.md` |
 | D-17 | Identificador de requisito ao lado da regra, não em lista à parte | lista separada recria a segunda camada que D-15 eliminou | `00_GLOSSARIO.md` §10 |
 | D-18 | Avaliação de maturidade sai da especificação e vai para a auditoria | uma especificação não se dá nota | `25` §13 |
+| D-19 | Stop, teto de posição, alvo, limite diário e teto de operações passam a sair de medição sobre os doze meses coletados, em dois perfis de banca | custo de 0,25% por operação excede o movimento mediano do BTC abaixo de 1 hora — os percentuais precisam ser derivados do custo, não escolhidos | `27` §Perfis medidos |
+| D-20 | Todo parâmetro declara a origem do valor: `MEASURED`, `EXCHANGE`, `DERIVED`, `CONSTITUTION` ou `ASSUMED` | a lista da seção D deste documento existiu porque ninguém registrava de onde vinha cada número | `REQ-CFG-004` |
 
 ---
 
@@ -63,10 +65,15 @@ Cada linha abaixo é um número que hoje governa comportamento sem que exista, e
 nenhum documento, a derivação que o justifique. Nenhum deles é errado — mas
 nenhum é defensável, e a distinção importa antes de qualquer promoção.
 
+Atualização de 2026-09-20: os perfis `banca-12` e `banca-100` do
+[`27_CONFIGURATION_REGISTRY.md`](27_CONFIGURATION_REGISTRY.md) deram origem
+medida a cinco valores que estavam nesta lista — stop, teto de posição, alvo,
+limite diário e teto de operações por dia. Os demais continuam sem origem.
+
 | Valor | Onde aparece | O que se sabe |
 |---|---|---|
 | `K = 100` vizinhos | quant §18, pattern §7 | apresentado como valor inicial; os próprios documentos mandam validar por walk-forward e não assumir ótimo |
-| `k = 1,5` no stop por ATR | quant §21 | exemplo, não derivação; o documento diz que `k` só deve ser otimizado fora da amostra |
+| `k = 1,5` no stop por ATR | quant §21 | **substituído nos perfis**: o stop passou a ser medido pela excursão adversa real, não por múltiplo de ATR de 1 min — que vale 0,061% e produziria stop dentro do custo |
 | Faixas de amostra 100 / 500 / 2.000 | quant §17, learning §23 | rotuladas "devem ser validadas empiricamente" |
 | `λ` do peso exponencial | pattern §9 | declarado hiperparâmetro, sem valor nem faixa |
 | `θ_up`, `θ_down` | pattern §11 | regra qualitativa — cobrir custos — sem valor |
