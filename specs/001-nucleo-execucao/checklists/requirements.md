@@ -3,7 +3,7 @@
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-20
 **Feature**: [spec.md](../spec.md)
-**Constitution**: v1.1.0
+**Constitution**: v1.2.0
 
 ## Content Quality
 

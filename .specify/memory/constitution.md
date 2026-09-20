@@ -140,9 +140,11 @@ Princípio V. Testnet da Bybit é o ambiente da porta de paper trading.
 
 **Ativo:** Bitcoin. Qualquer outro ativo está fora de escopo até emenda MINOR.
 
-**Portas de Promoção** — cumulativas e em ordem. Os limiares abaixo são valores
-iniciais e MUST ser confirmados ou ajustados pelo mantenedor antes da primeira
-execução em paper trading:
+**Portas de Promoção** — cumulativas e em ordem. Os limiares abaixo foram propostos
+pelo assistente e **aceitos pelo mantenedor em 2026-09-20 como valores de partida
+provisórios**, não como medição. Permanecem ajustáveis: toda implementação MUST
+tratá-los como configuração externa, nunca como constante embutida em código, e
+alterá-los MUST ser troca de configuração, não alteração de programa.
 
 | Porta | Critério mínimo |
 |---|---|
@@ -150,14 +152,20 @@ execução em paper trading:
 | 2. Paper trading | ≥ 30 dias corridos ininterruptos em testnet, com o mesmo código que iria para `live` |
 | 3. Liberação | Ato humano registrado, após revisão dos resultados das portas 1 e 2 |
 
-**Métricas mínimas** exigidas nas portas 1 e 2 (valores iniciais, sujeitos a
-confirmação): profit factor ≥ 1.3; drawdown máximo ≤ 15% do capital; a divergência
+**Métricas mínimas** exigidas nas portas 1 e 2 (valores de partida provisórios):
+profit factor ≥ 1.3; drawdown máximo ≤ 15% do capital; a divergência
 entre o resultado do paper trading e o do backtest no mesmo período MUST ser
 investigada e explicada antes da porta 3, não apenas tolerada.
 
-**Limites de risco iniciais** (Princípio II; valores sujeitos a confirmação):
+**Limites de risco iniciais** (Princípio II; valores de partida provisórios):
 perda máxima diária 2% do capital; tamanho máximo por posição 10% do capital;
 exposição máxima total 20% do capital.
+
+**Revisão obrigatória dos limiares.** Aceitar valores de partida não dispensa
+calibrá-los. Os limiares MUST ser revistos pelo mantenedor contra o capital real e os
+resultados observados **antes da Porta 3** — a liberação para capital real. Até lá
+servem para que o sistema seja construído e exercitado; a partir dali passam a
+governar dinheiro, e um número que ninguém mediu não deve governar dinheiro.
 
 **Segredos:** nenhum segredo no repositório. `.gitignore` MUST cobrir arquivos de
 credencial antes de qualquer código de integração ser escrito.
@@ -209,4 +217,4 @@ emenda formal desta constitution.
 **Orientação de runtime.** Enquanto o projeto não tiver um `CLAUDE.md`, este
 documento é a única fonte de orientação de desenvolvimento em tempo de execução.
 
-**Version**: 1.1.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+**Version**: 1.2.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
