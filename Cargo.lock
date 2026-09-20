@@ -1388,6 +1388,7 @@ dependencies = [
  "trade-backtest",
  "trade-bybit",
  "trade-domain",
+ "trade-paper",
  "trade-ports",
  "trade-risk",
  "trade-storage",

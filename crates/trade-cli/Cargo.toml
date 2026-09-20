@@ -13,6 +13,7 @@ trade-strategy.workspace = true
 trade-backtest.workspace = true
 trade-storage.workspace = true
 trade-bybit.workspace = true
+trade-paper.workspace = true
 chrono.workspace = true
 clap.workspace = true
 rust_decimal.workspace = true

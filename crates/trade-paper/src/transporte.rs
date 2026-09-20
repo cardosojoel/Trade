@@ -76,3 +76,25 @@ pub mod testing {
         }
     }
 }
+
+/// O cliente autenticado real satisfaz o transporte.
+///
+/// A tradução de erro mantém a distinção que importa: `Desconhecido` continua
+/// desconhecido, porque é ela que impede a retentativa automática.
+impl Transporte for trade_bybit::cliente_autenticado::ClienteAutenticado {
+    fn get(&self, caminho: &str, query: &str) -> Result<String, TransporteError> {
+        self.get(caminho, query).map_err(de_http)
+    }
+    fn post(&self, caminho: &str, corpo: &str) -> Result<String, TransporteError> {
+        self.post(caminho, corpo).map_err(de_http)
+    }
+}
+
+fn de_http(e: trade_bybit::cliente_autenticado::HttpError) -> TransporteError {
+    use trade_bybit::cliente_autenticado::HttpError as H;
+    match e {
+        H::Transitoria(m) => TransporteError::Transitoria(m),
+        H::Permanente(m) => TransporteError::Permanente(m),
+        H::Desconhecido(m) => TransporteError::Desconhecido(m),
+    }
+}

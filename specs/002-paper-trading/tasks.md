@@ -69,11 +69,12 @@ Verificável sem rede e sem credencial.
 
 ---
 
-**Situação em 2026-09-20**: 15 de 31 tarefas das fatias 1 a 5 concluídas.
+**Situação em 2026-09-20**: 17 de 31 tarefas das fatias 1 a 5 concluídas.
 Feito: modo `paper`, credenciais redigidas, assinatura conferida contra a
 documentação, verificação de permissão da chave, montagem de ordem com stop a
-mercado no gatilho, identificador de cliente e tradução de erro. Falta o
-executor ligando as peças, a reconciliação e o laço contínuo.
+mercado no gatilho, identificador de cliente, tradução de erro, cliente HTTP
+autenticado e o comando `trade paper verificar`. Falta o executor ligando as
+peças, a reconciliação e o laço contínuo.
 
 **Fatias 1 a 5**: 31 tarefas, nenhuma precisa de credencial.
 **Fatias 6 e 7**: 8 tarefas, todas dependem do mantenedor criar a chave de

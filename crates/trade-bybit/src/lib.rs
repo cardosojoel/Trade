@@ -11,6 +11,7 @@
 pub mod auth;
 pub mod backoff;
 pub mod client;
+pub mod cliente_autenticado;
 pub mod collector;
 pub mod credencial;
 pub mod errors;

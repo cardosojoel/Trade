@@ -35,6 +35,20 @@ pub enum Command {
     Kill(KillArgs),
     /// Deriva o perfil de operação a partir do depósito.
     Perfil(PerfilArgs),
+    /// Confere se a conta está pronta para paper trading. Não emite ordem.
+    Paper(PaperArgs),
+}
+
+#[derive(clap::Args, Debug)]
+pub struct PaperArgs {
+    #[command(subcommand)]
+    pub acao: PaperAcao,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum PaperAcao {
+    /// Credencial, relógio e permissão da chave. Não emite ordem.
+    Verificar,
 }
 
 #[derive(clap::Args, Debug)]
