@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"${CLAUDE_PROJECT_DIR:-.}/CURRENT_STATE.md\"; if [ -f \"$f\" ]; then jq -n --rawfile s \"$f\" '{hookSpecificOutput:{hookEventName:\"SessionStart\",additionalContext:(\"Estado atual do projeto Trade, lido automaticamente de CURRENT_STATE.md no início da sessão.\\n\\nComece por aqui: situe em que ponto o projeto está e proponha o próximo passo antes de agir.\\n\\n---\\n\\n\" + $s)}}'; else jq -n --arg p \"$f\" '{systemMessage:(\"CURRENT_STATE.md não encontrado em \" + $p + \" — o estado do projeto não foi carregado.\")}'; fi",
+            "timeout": 10,
+            "statusMessage": "Lendo o estado do projeto"
+          }
+        ]
+      }
+    ]
+  }
+}

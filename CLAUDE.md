@@ -72,6 +72,22 @@ exigem esclarecimento constante.
 
 # Específico deste projeto
 
+## Início de sessão: comece pelo CURRENT_STATE.md
+
+**Toda sessão nova neste projeto começa lendo `CURRENT_STATE.md`**, e é a partir
+dele que se decide por onde continuar. O arquivo traz o que funciona, o que
+falta por fase, as pendências e as decisões em aberto.
+
+Um hook `SessionStart` em `.claude/settings.json` injeta o conteúdo
+automaticamente. Se por algum motivo ele não rodar, leia o arquivo antes de
+propor qualquer trabalho — decidir o próximo passo sem saber o estado atual é
+como escolher rota sem saber onde se está.
+
+Ao concluir um bloco de trabalho relevante — uma fase, uma correção de defeito,
+uma decisão de arquitetura — **atualize o `CURRENT_STATE.md`**. Um arquivo de
+estado desatualizado é pior que nenhum: ele faz a sessão seguinte decidir com
+base em algo que já não é verdade.
+
 Robô de day trade automatizado de Bitcoin. **Mercado spot, apenas comprado** —
 sem alavancagem e sem venda a descoberto.
 
