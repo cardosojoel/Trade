@@ -1,0 +1,80 @@
+# Workspace do projeto Trade — robô de day trade automatizado de Bitcoin.
+#
+# O grafo de dependências entre as crates não é organização: é a forma pela qual
+# os Princípios II e V da constitution deixam de ser convenção e passam a ser
+# verificados pelo compilador. Ver specs/001-nucleo-execucao/plan.md.
+#
+# A raiz também é um pacote, e só existe para hospedar os testes de arquitetura
+# em tests/ — os guardas que falham quando uma fronteira é violada.
+
+[package]
+name = "trade"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[workspace]
+members = [
+    "crates/trade-domain",
+    "crates/trade-ports",
+    "crates/trade-risk",
+    "crates/trade-strategy",
+    "crates/trade-backtest",
+    "crates/trade-storage",
+    "crates/trade-bybit",
+    "crates/trade-cli",
+]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[workspace.dependencies]
+# Externas — versão única para todo o workspace
+chrono        = "0.4.45"
+rust_decimal  = "1.43.0"
+serde         = { version = "1.0.229", features = ["derive"] }
+serde_json    = "1.0.151"
+thiserror     = "2.0.20"
+rusqlite      = { version = "0.40.2", features = ["bundled"] }
+ureq          = "3.4.2"
+clap          = { version = "4.6.7", features = ["derive"] }
+toml          = "1.1.6"
+ulid          = "3.0.0"
+proptest      = "1.11.0"
+rstest        = "0.27.0"
+trybuild      = "1.0.121"
+tempfile      = "3.27.0"
+assert_cmd    = "2.2.2"
+predicates    = "3.1.4"
+
+# Internas — este é o grafo que a constitution cobra. Quem depende de quem
+# aqui determina o que cada crate consegue sequer nomear.
+trade-domain   = { path = "crates/trade-domain" }
+trade-ports    = { path = "crates/trade-ports" }
+trade-risk     = { path = "crates/trade-risk" }
+trade-strategy = { path = "crates/trade-strategy" }
+trade-backtest = { path = "crates/trade-backtest" }
+trade-storage  = { path = "crates/trade-storage" }
+trade-bybit    = { path = "crates/trade-bybit" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+# Ponto flutuante em caminho monetário é o defeito que rust_decimal existe para
+# impedir. Negar aqui vale para todo o workspace; as crates sem cálculo
+# financeiro não perdem nada com isso.
+float_arithmetic = "deny"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+toml.workspace = true

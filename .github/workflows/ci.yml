@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # As travas de fronteira rodam primeiro e sozinhas: se uma delas falhar, o
+  # problema é arquitetural e não adianta saber se os outros testes passam.
+  fronteiras:
+    name: Travas de arquitetura
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fronteira entre crates (Princípio V)
+        run: cargo test --package trade --test architecture
+      - name: Ponto flutuante em caminho monetário (R-002)
+        run: cargo test --package trade --test no_float
+
+  qualidade:
+    name: Formato e lints
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+
+  testes:
+    name: Testes
+    runs-on: ubuntu-latest
+    needs: fronteiras
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --workspace

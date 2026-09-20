@@ -1,0 +1,18 @@
+[package]
+name = "trade-ports"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+trade-domain.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+thiserror.workspace = true
+
+[features]
+# Duplos de teste. Feature separada para que não entrem em build de produção.
+testing = []
+
+[lints]
+workspace = true

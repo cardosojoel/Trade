@@ -1,0 +1,33 @@
+[package]
+name = "trade-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# Ponto de composição: a única crate que conhece as duas pontas.
+[dependencies]
+trade-domain.workspace = true
+trade-ports.workspace = true
+trade-risk.workspace = true
+trade-strategy.workspace = true
+trade-backtest.workspace = true
+trade-storage.workspace = true
+trade-bybit.workspace = true
+chrono.workspace = true
+clap.workspace = true
+rust_decimal.workspace = true
+serde.workspace = true
+toml.workspace = true
+ulid.workspace = true
+
+[[bin]]
+name = "trade"
+path = "src/main.rs"
+
+[dev-dependencies]
+assert_cmd.workspace = true
+predicates.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

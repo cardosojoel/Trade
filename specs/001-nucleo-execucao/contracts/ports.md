@@ -115,6 +115,13 @@ existe, e é sobre ela que a retomada de FR-014 decide por onde continuar.
 
 ## `Strategy` — a fronteira que mais importa
 
+> **Onde mora**: `trade-domain`, não `trade-ports`. A diferença é o ponto inteiro.
+> Se `Strategy` vivesse aqui, `trade-strategy` precisaria declarar `trade-ports`
+> como dependência e passaria a **conseguir nomear** `OrderExecutor`. Vivendo em
+> `trade-domain`, a crate de estratégias depende só do domínio e o executor é,
+> literalmente, um nome que ela não alcança. Verificado por
+> `tests/architecture.rs::estrategia_nao_consegue_nomear_o_executor_de_ordens`.
+
 ```rust
 pub trait Strategy {
     fn on_candle(&mut self, ctx: &MarketContext) -> Option<Signal>;

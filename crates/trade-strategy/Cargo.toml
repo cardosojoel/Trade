@@ -1,0 +1,18 @@
+[package]
+name = "trade-strategy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# NÃO depende de trade-ports, e portanto não consegue nomear OrderExecutor.
+# A estratégia devolve Signal; quem executa é o motor, atravessando o RiskGuard.
+# Esta ausência é FR-018 e FR-021 na forma de grafo de dependências.
+[dependencies]
+trade-domain.workspace = true
+rust_decimal.workspace = true
+
+[features]
+testing = []
+
+[lints]
+workspace = true

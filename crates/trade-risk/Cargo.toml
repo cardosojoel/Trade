@@ -1,0 +1,19 @@
+[package]
+name = "trade-risk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+trade-domain.workspace = true
+trade-ports.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+
+[dev-dependencies]
+trade-ports = { workspace = true, features = ["testing"] }
+rstest.workspace = true
+trybuild.workspace = true
+
+[lints]
+workspace = true

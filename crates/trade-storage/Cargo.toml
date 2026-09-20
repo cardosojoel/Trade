@@ -1,0 +1,19 @@
+[package]
+name = "trade-storage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+trade-domain.workspace = true
+trade-ports.workspace = true
+chrono.workspace = true
+rusqlite.workspace = true
+rust_decimal.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

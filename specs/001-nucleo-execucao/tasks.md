@@ -29,14 +29,14 @@ Workspace Rust conforme plan.md: `crates/<nome>/src/`, testes de integração em
 **Purpose**: erguer o workspace e, antes de qualquer lógica, instalar as travas que
 tornam os Princípios II e V verificáveis por máquina.
 
-- [ ] T001 Criar `Cargo.toml` do workspace na raiz declarando os 8 membros (`crates/trade-domain`, `trade-ports`, `trade-risk`, `trade-strategy`, `trade-backtest`, `trade-storage`, `trade-bybit`, `trade-cli`) e a seção `[workspace.dependencies]` com as crates do plan.md
-- [ ] T002 Criar `rust-toolchain.toml` na raiz fixando `channel = "1.98.1"` e componentes `rustfmt`, `clippy` — toolchain flutuante quebraria o determinismo exigido por FR-029
-- [ ] T003 [P] Criar `.gitignore` na raiz com `/target` e `/data` — os bancos não vão para o repositório
-- [ ] T004 [P] Criar `rustfmt.toml` na raiz e a seção `[workspace.lints]` no `Cargo.toml` com `unsafe_code = "forbid"` e `clippy::float_arithmetic = "deny"`
-- [ ] T005 Criar os 8 crates com `cargo new --lib` (e `--bin` para `trade-cli`) e declarar em cada `Cargo.toml` **exatamente** as dependências do grafo do plan.md — `trade-strategy`, `trade-risk` e `trade-backtest` NÃO declaram `trade-bybit` nem `ureq`
-- [ ] T006 Escrever teste de arquitetura em `tests/architecture.rs` que lê os `Cargo.toml` de `trade-strategy`, `trade-risk` e `trade-backtest` e **falha** se qualquer um declarar `trade-bybit`, `ureq` ou outra dependência de rede
-- [ ] T007 [P] Escrever teste em `tests/no_float.rs` que varre `crates/trade-domain/src`, `crates/trade-risk/src` e `crates/trade-backtest/src` e **falha** ao encontrar `f32` ou `f64` — ponto flutuante em caminho monetário é o defeito que R-002 existe para impedir
-- [ ] T008 [P] Criar `.github/workflows/ci.yml` rodando `cargo fmt --check`, `cargo clippy -- -D warnings` e `cargo test --workspace`
+- [X] T001 Criar `Cargo.toml` do workspace na raiz declarando os 8 membros (`crates/trade-domain`, `trade-ports`, `trade-risk`, `trade-strategy`, `trade-backtest`, `trade-storage`, `trade-bybit`, `trade-cli`) e a seção `[workspace.dependencies]` com as crates do plan.md
+- [X] T002 Criar `rust-toolchain.toml` na raiz fixando `channel = "1.98.1"` e componentes `rustfmt`, `clippy` — toolchain flutuante quebraria o determinismo exigido por FR-029
+- [X] T003 [P] Criar `.gitignore` na raiz com `/target` e `/data` — os bancos não vão para o repositório
+- [X] T004 [P] Criar `rustfmt.toml` na raiz e a seção `[workspace.lints]` no `Cargo.toml` com `unsafe_code = "forbid"` e `clippy::float_arithmetic = "deny"`
+- [X] T005 Criar os 8 crates com `cargo new --lib` (e `--bin` para `trade-cli`) e declarar em cada `Cargo.toml` **exatamente** as dependências do grafo do plan.md — `trade-strategy`, `trade-risk` e `trade-backtest` NÃO declaram `trade-bybit` nem `ureq`
+- [X] T006 Escrever teste de arquitetura em `tests/architecture.rs` que lê os `Cargo.toml` de `trade-strategy`, `trade-risk` e `trade-backtest` e **falha** se qualquer um declarar `trade-bybit`, `ureq` ou outra dependência de rede
+- [X] T007 [P] Escrever teste em `tests/no_float.rs` que varre `crates/trade-domain/src`, `crates/trade-risk/src` e `crates/trade-backtest/src` e **falha** ao encontrar `f32` ou `f64` — ponto flutuante em caminho monetário é o defeito que R-002 existe para impedir
+- [X] T008 [P] Criar `.github/workflows/ci.yml` rodando `cargo fmt --check`, `cargo clippy -- -D warnings` e `cargo test --workspace`
 
 **Checkpoint**: o workspace compila vazio, e as travas de arquitetura já falham se alguém violar as fronteiras.
 

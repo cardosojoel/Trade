@@ -1,0 +1,25 @@
+# Artefatos de compilação
+/target
+debug/
+release/
+*.rs.bk
+*.rlib
+
+# Bancos locais: market.db é cache reconstruível da fonte, runs.db é resultado
+# de execução. Nenhum dos dois pertence ao repositório.
+/data
+
+# Credenciais — nenhuma existe nesta feature, mas o padrão entra antes de
+# qualquer código de integração, conforme a constitution
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Editores e sistema
+.idea/
+.vscode/
+*.swp
+*.tmp
+.DS_Store
