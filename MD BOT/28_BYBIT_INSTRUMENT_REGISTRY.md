@@ -74,6 +74,11 @@ Ignorar estes dois requisitos multiplica o custo real por até 3,8.
 **REQ-BYBIT-002** O adapter MUST obter, atualizar e versionar as especificações
 do instrumento; alteração MUST gerar evento de configuração.
 
+**Implementado em 2026-09-20** — `instrumento.toml`, lido a cada execução por
+`load_instrumento`, e `validar_perfil` abortando antes de a primeira vela ser
+lida. O motor trunca toda ordem em `truncar_no_passo` e recusa emitir o que não
+for `negociavel`.
+
 **REQ-BYBIT-006** A especificação MUST ser relida no início de toda sessão e
 MUST NOT ser embutida em código nem herdada de sessão anterior. A Bybit revisa
 estes valores **nos dias 3 e 17 de cada mês, às 08h00 UTC+8**, e a própria

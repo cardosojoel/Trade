@@ -105,6 +105,13 @@ pub struct BacktestArgs {
     #[arg(long, default_value = "fees.toml")]
     pub fees: PathBuf,
 
+    /// Regras de quantidade do instrumento, relidas a cada execução.
+    ///
+    /// A Bybit revisa passo e valor mínimo nos dias 3 e 17 de cada mês. Herdar
+    /// de uma execução anterior é operar com regra que já não vale.
+    #[arg(long, default_value = "instrumento.toml")]
+    pub instrumento: PathBuf,
+
     #[arg(long, default_value = "data/market.db")]
     pub market_db: PathBuf,
 

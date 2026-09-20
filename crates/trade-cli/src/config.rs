@@ -14,7 +14,7 @@ use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::path::Path;
 use std::str::FromStr;
-use trade_domain::{Money, RiskLimits};
+use trade_domain::{Instrumento, Money, RiskLimits};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
@@ -39,6 +39,8 @@ pub enum ConfigError {
         campo: &'static str,
         valor: String,
     },
+    #[error("configuração inválida em {path}: {cause}")]
+    Invalido { path: String, cause: String },
 }
 
 #[derive(Debug, Deserialize)]
@@ -114,6 +116,65 @@ pub fn load_limits(path: impl AsRef<Path>) -> Result<RiskLimits, ConfigError> {
     })
 }
 
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct InstrumentoFile {
+    passo_qty: String,
+    valor_minimo_ordem: String,
+}
+
+/// Carrega as regras de quantidade do instrumento.
+///
+/// A Bybit revisa `passo_qty` e `valor_minimo_ordem` nos dias 3 e 17 de cada
+/// mês, e a documentação dela adverte que não se deve assumir constância. Por
+/// isso são lidos a cada execução e nunca embutidos no código
+/// (REQ-BYBIT-006).
+pub fn load_instrumento(path: impl AsRef<Path>) -> Result<Instrumento, ConfigError> {
+    let path = path.as_ref();
+    let raw = read(path)?;
+    let f: InstrumentoFile = toml::from_str(&raw).map_err(|e| ConfigError::Parse {
+        path: path.display().to_string(),
+        cause: e.message().to_string(),
+    })?;
+
+    Instrumento::novo(
+        decimal(path, "passo_qty", &f.passo_qty)?,
+        decimal(path, "valor_minimo_ordem", &f.valor_minimo_ordem)?,
+    )
+    .map_err(|e| ConfigError::Invalido {
+        path: path.display().to_string(),
+        cause: e.to_string(),
+    })
+}
+
+/// Confere se o perfil ainda é executável com as regras lidas agora.
+///
+/// REQ-BYBIT-007: se a releitura invalidar o perfil, a sessão não começa.
+/// Reduzir em silêncio para caber nos novos limites seria derivação não
+/// confirmada — o perfil vem do capital e das regras, e regras novas exigem
+/// derivação nova.
+pub fn validar_perfil(
+    instrumento: &Instrumento,
+    teto_de_posicao: Money,
+    capital: Money,
+) -> Result<(), String> {
+    let minimo = instrumento.valor_minimo_ordem();
+    if teto_de_posicao < minimo {
+        return Err(format!(
+            "o teto de posição ({teto_de_posicao}) é menor que a ordem mínima da \
+             corretora ({minimo}): nenhuma ordem seria negociável. Ou o teto sobe, \
+             ou esta configuração não opera."
+        ));
+    }
+    if capital < minimo {
+        return Err(format!(
+            "o capital ({capital}) não paga a ordem mínima da corretora ({minimo}): \
+             não há primeira compra possível."
+        ));
+    }
+    Ok(())
+}
+
 /// Carrega o custo de transação.
 pub fn load_fees(path: impl AsRef<Path>) -> Result<Fees, ConfigError> {
     let path = path.as_ref();
@@ -135,6 +196,45 @@ mod tests {
     use rust_decimal::dec;
     use std::io::Write;
     use tempfile::NamedTempFile;
+
+    #[test]
+    fn instrumento_e_lido_do_arquivo() {
+        let f = arquivo("passo_qty = \"0.000001\"\nvalor_minimo_ordem = \"5\"\n");
+        let i = load_instrumento(f.path()).unwrap();
+        assert_eq!(i.passo_qty(), dec!(0.000001));
+        assert_eq!(i.valor_minimo_ordem(), dec!(5));
+    }
+
+    #[test]
+    fn passo_zero_no_arquivo_e_erro() {
+        // A Bybit revisa estes valores duas vezes por mês. Um passo zero
+        // aceito viraria divisão por zero no dimensionamento.
+        let f = arquivo("passo_qty = \"0\"\nvalor_minimo_ordem = \"5\"\n");
+        assert!(load_instrumento(f.path()).is_err());
+    }
+
+    #[test]
+    fn perfil_cujo_teto_de_posicao_nao_paga_a_ordem_minima_nao_inicia() {
+        // REQ-BYBIT-007: se a releitura invalidar o perfil, a sessão não
+        // começa. Reduzir em silêncio para caber seria derivação não
+        // confirmada.
+        let i = trade_domain::Instrumento::novo(dec!(0.000001), dec!(50)).unwrap();
+        let erro = validar_perfil(&i, dec!(10), dec!(1000)).unwrap_err();
+        assert!(erro.contains("teto de posição"), "erro foi: {erro}");
+    }
+
+    #[test]
+    fn capital_abaixo_da_ordem_minima_nao_inicia() {
+        let i = trade_domain::Instrumento::novo(dec!(0.000001), dec!(5)).unwrap();
+        let erro = validar_perfil(&i, dec!(1000), dec!(4)).unwrap_err();
+        assert!(erro.contains("capital"), "erro foi: {erro}");
+    }
+
+    #[test]
+    fn perfil_viavel_passa() {
+        let i = trade_domain::Instrumento::novo(dec!(0.000001), dec!(5)).unwrap();
+        assert!(validar_perfil(&i, dec!(1000), dec!(200)).is_ok());
+    }
 
     fn arquivo(conteudo: &str) -> NamedTempFile {
         let mut f = NamedTempFile::new().unwrap();

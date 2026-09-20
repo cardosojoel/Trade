@@ -1,0 +1,23 @@
+# Regras de quantidade do instrumento, lidas da corretora.
+#
+# Estes valores NÃO são constantes do projeto. A Bybit os revisa nos dias 3 e
+# 17 de cada mês, às 08h00 UTC+8, e a documentação dela adverte explicitamente
+# que não se deve assumir que permaneçam constantes. Por isso vivem aqui e são
+# relidos a cada execução (REQ-BYBIT-006), nunca embutidos no código.
+#
+# Se a releitura invalidar o perfil — teto de posição abaixo da ordem mínima,
+# ou capital que não paga a primeira compra — a execução não inicia
+# (REQ-BYBIT-007). Reduzir em silêncio para caber seria derivação que ninguém
+# confirmou.
+#
+# Lidos da API pública em 2026-09-20, spot BTCUSDT:
+#   GET /v5/market/instruments-info?category=spot&symbol=BTCUSDT
+#
+# `min_order_qty` está deprecado na API e não serve para validar tamanho:
+# o que vale é `minOrderAmt` (REQ-BYBIT-008).
+
+# basePrecision / qty_step — vale cerca de US$ 0,08 ao preço de 2026-09-20.
+passo_qty = "0.000001"
+
+# minOrderAmt — valor mínimo da ordem, em moeda de cotação.
+valor_minimo_ordem = "5"

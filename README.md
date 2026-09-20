@@ -19,7 +19,8 @@ trade collect --symbol BTCUSDT --interval 1m --from 2026-09-01 --to 2026-09-19
 trade backtest --mode backtest --symbol BTCUSDT --interval 1m \
   --from 2026-09-01 --to 2026-09-19 --capital 10000 \
   --strategy sma-cross --strategy-params fast=9,slow=21 \
-  --limits examples/limits.toml --fees examples/fees.toml
+  --limits examples/limits.toml --fees examples/fees.toml \
+  --instrumento examples/instrumento.toml
 ```
 
 ```

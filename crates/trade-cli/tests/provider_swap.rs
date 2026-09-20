@@ -51,6 +51,7 @@ fn config(capital: Money) -> BacktestConfig {
             taker_fee_rate: dec!(0.001),
             slippage_rate: dec!(0.0005),
         },
+        instrumento: trade_domain::Instrumento::novo(dec!(0.000001), dec!(5)).unwrap(),
         limits: RiskLimits {
             max_daily_loss: dec!(1_000_000),
             max_position_size: dec!(1_000_000),

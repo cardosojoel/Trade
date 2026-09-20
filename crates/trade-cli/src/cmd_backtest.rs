@@ -7,7 +7,7 @@
 //! Bybit existe.
 
 use crate::cli::BacktestArgs;
-use crate::config::{load_fees, load_limits};
+use crate::config::{load_fees, load_instrumento, load_limits, validar_perfil};
 use crate::report;
 use chrono::Utc;
 use rust_decimal::Decimal;
@@ -56,6 +56,15 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
     let symbol = Symbol::new(&args.symbol).map_err(|e| (ExitCode::Uso, e.to_string()))?;
     let limits = load_limits(&args.limits).map_err(|e| (ExitCode::Uso, e.to_string()))?;
     let fees_cfg = load_fees(&args.fees).map_err(|e| (ExitCode::Uso, e.to_string()))?;
+    let instrumento =
+        load_instrumento(&args.instrumento).map_err(|e| (ExitCode::Uso, e.to_string()))?;
+
+    // REQ-BYBIT-007 — a releitura pode invalidar o perfil, e aí a sessão não
+    // começa. É deliberado que isto venha antes de qualquer vela ser lida:
+    // descobrir no meio da execução que nenhuma ordem era negociável custa o
+    // tempo inteiro da execução para produzir um resultado vazio.
+    validar_perfil(&instrumento, limits.max_position_size, args.capital)
+        .map_err(|e| (ExitCode::Uso, e))?;
 
     if args.to <= args.from {
         return Err((
@@ -85,6 +94,7 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
             slippage_rate: fees_cfg.slippage_rate,
         },
         limits: limits.clone(),
+        instrumento,
         // Piso de 1% do capital. Em spot comprado o patrimônio nunca chega a
         // zero, então "capital esgotado" precisa de um piso para significar
         // alguma coisa.

@@ -39,6 +39,9 @@ sobrevive à regeneração das tabelas abaixo.
 | `REQ-BYBIT-004` | `trade-domain/src/types.rs` — `Fill::fee_base` | `position::tests::compra_credita_a_quantidade_liquida_da_taxa_em_moeda_base` | **TESTED** |
 | `REQ-BYBIT-005` | `trade-domain/src/instrumento.rs` | `position::tests::residuo_acumulado_volta_a_ser_vendavel` | **TESTED** |
 | `REQ-SIZING-004` | `trade-domain/src/position.rs` — `apply_fill` | `position::tests::residuo_abaixo_do_passo_permanece_na_posicao` | **TESTED** |
+| `REQ-BYBIT-006` | `trade-cli/src/config.rs` — `load_instrumento` | `config::tests::instrumento_e_lido_do_arquivo` | **TESTED** |
+| `REQ-BYBIT-007` | `trade-cli/src/config.rs` — `validar_perfil` | `config::tests::perfil_cujo_teto_de_posicao_nao_paga_a_ordem_minima_nao_inicia` | **TESTED** |
+| `REQ-BYBIT-008` | `examples/instrumento.toml` — só `minOrderAmt` é lido | — | **IMPLEMENTED** |
 
 Nenhum chegou a `VERIFIED`: falta benchmark e métrica de produção, e a regra
 deste documento é explícita em que revisão documental não promove requisito

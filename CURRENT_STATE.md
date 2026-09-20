@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**211 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**227 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
 
 ---
 
@@ -385,7 +385,8 @@ tem precedência sobre qualquer outra prática.
 ```bash
 trade collect  --symbol BTCUSDT --interval 1m --from 2025-09-20 --to 2026-09-20
 trade backtest --mode backtest --from 2025-09-20 --to 2026-09-20 --capital 10000 \
-               --limits limits.toml --fees fees.toml
+               --limits limits.toml --fees fees.toml \
+               --instrumento instrumento.toml
 trade kill                  # aciona o freio; --release libera
 ```
 

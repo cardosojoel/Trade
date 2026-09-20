@@ -65,6 +65,9 @@ pub fn config(
             slippage_rate: slippage,
         },
         limits,
+        // BTCUSDT na Bybit, lido em 2026-09-20. Um teste que precise de outro
+        // passo sobrescreve o campo.
+        instrumento: trade_domain::Instrumento::novo(dec!(0.000001), dec!(5)).unwrap(),
         // Piso de 1% do capital: abaixo disso não há mais o que operar.
         min_equity: capital / dec!(100),
     }

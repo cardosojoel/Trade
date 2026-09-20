@@ -6,8 +6,8 @@ use crate::run::{BacktestOutcome, RunOutcome};
 use chrono::{DateTime, Duration, Utc};
 use rust_decimal::Decimal;
 use trade_domain::{
-    AuditKind, FeeModel, Gap, Intent, Interval, LimitBreach, MarketContext, Money, Order, OrderId,
-    Position, RiskLimits, RunMetrics, Side, Strategy, Symbol, Verdict,
+    AuditKind, FeeModel, Gap, Instrumento, Intent, Interval, LimitBreach, MarketContext, Money,
+    Order, OrderId, Position, RiskLimits, RunMetrics, Side, Strategy, Symbol, Verdict,
 };
 use trade_ports::{Clock, MarketDataSource, MarketError, Recorder};
 use trade_risk::{KillSwitch, RiskContext, RiskGuard};
@@ -22,6 +22,8 @@ pub struct BacktestConfig {
     pub initial_capital: Money,
     pub fees: FeeModel,
     pub limits: RiskLimits,
+    /// Regras de quantidade lidas da corretora nesta execução (REQ-BYBIT-006).
+    pub instrumento: Instrumento,
     /// Patrimônio abaixo do qual a execução encerra como capital esgotado.
     ///
     /// Existe porque, em spot comprado e sem alavancagem, **o capital nunca
@@ -148,12 +150,18 @@ impl BacktestEngine {
                         Side::Buy => qty,
                     };
 
-                    // Quantidade quantizada à escala do ativo: uma ordem de
-                    // 0,0170935254328020703426968481 BTC não existe em lugar
-                    // nenhum, e simulá-la é simular outro mercado.
-                    let qty = trade_domain::quantizar(qty);
+                    // Quantidade truncada no passo do instrumento, e não numa
+                    // escala qualquer: uma ordem de 0,01709352 BTC não existe
+                    // em lugar nenhum se o passo é 0,000001, e simulá-la é
+                    // simular outro mercado. O que sobra abaixo do passo é o
+                    // resíduo — fica na posição e se soma à ordem seguinte.
+                    let qty = cfg.instrumento.truncar_no_passo(qty);
 
-                    if qty > Decimal::ZERO {
+                    // Ordem abaixo do valor mínimo da corretora não é emitida.
+                    // É o caso do resíduo pequeno demais para ser vendido: ele
+                    // espera acumular, em vez de virar ordem recusada a cada
+                    // vela.
+                    if cfg.instrumento.negociavel(qty, referencia) {
                         proxima_ordem += 1;
                         let ordem = Order {
                             id: OrderId(proxima_ordem),
