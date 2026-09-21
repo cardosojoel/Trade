@@ -17,6 +17,15 @@ recusados explicitamente.
 **305 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
+**Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
+no commit `87d3293` (decisão 031, `conferir_o_que_os_documentos_afirmam`,
+`noul` 0,73). Conferem: 105 de 105 tarefas da feature 001; nove execuções,
+1.146.977 eventos e 114.653 linhas de extrato no `runs.db`; 525.600 velas e
+zero lacunas no `market.db`; 229.443 ordens para 229.443 decisões de risco;
+constitution 2.0.0, ratificada em 2026-09-20; e nenhuma linha com
+`mode = 'paper'`, porque a sessão ainda não existe. **A única afirmação que
+estava errada era a da feature 002**, corrigida abaixo.
+
 ---
 
 ## Decisões esperando por você
