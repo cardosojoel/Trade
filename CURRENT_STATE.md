@@ -1,7 +1,7 @@
 # Estado atual do projeto
 
 **Projeto:** Trade — robô de day trade automatizado de Bitcoin
-**Atualizado em:** 2026-09-20
+**Atualizado em:** 2026-09-21
 **Repositório:** https://github.com/cardosojoel/Trade (privado)
 
 ---
@@ -14,7 +14,8 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**290 testes verdes · clippy limpo · CI verde · tudo sincronizado com o remoto**
+**305 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+`cargo test --workspace --all-features`
 
 ---
 
@@ -96,7 +97,15 @@ não chega a precisar de ADR.
 ## Em andamento: feature 002, paper trading
 
 Spec, plano e tarefas escritos. **25 das 31 tarefas que não precisam de
-credencial estão concluídas.**
+credencial estão concluídas** — fatias 1 a 4 fechadas, fatia 5 inteira em
+aberto. São 39 tarefas no total; as catorze restantes são a fatia 5 (T026 a
+T031) e as fatias 6 e 7, que exigem credencial de testnet e tempo. Contado em
+`specs/002-paper-trading/tasks.md`, 2026-09-21.
+
+> Até 2026-09-21 este parágrafo dizia 25 de 31 quando eram 23, e a folha de
+> passagem do DsTrade dizia "fatias 1 a 4 fechadas" com T024 e T025 ainda
+> abertas. As duas T foram feitas hoje e o número passou a ser verdade; fica o
+> registro de que era conferível e não estava conferido.
 
 O que existe: modo `paper` no domínio e recusado no comando `backtest`;
 credenciais lidas do ambiente com o segredo redigido em `Debug` e `Display`;
@@ -112,9 +121,26 @@ Retentar pode duplicar, desistir pode deixar posição órfã. Ele é classifica
 como falha de integridade de propósito — é o que impede a retentativa
 automática e força a reconciliação.
 
-O que falta sem credencial: o executor ligando as peças, a reconciliação de
-posição e o laço contínuo. **O que só o mantenedor destrava**: criar a chave de
-testnet sem permissão de saque, e os 30 dias correrem.
+**O reinício deixou de perder estado (T024 e T025, FR-112).** O `runs.db`
+passou a ser fonte de recuperação, e não só de auditoria: a posição se
+reconstitui replicando os eventos `order` e `fill` pelo mesmo `apply_fill` que
+os produziu — com taxas de abertura, resultado realizado e o instante de
+abertura que o prazo de 72 h vai consultar —, e os contadores de risco voltam
+do último retrato `risk_decision`.
+
+A parte que não era óbvia: o retrato grava o resultado do dia **já somado**, e
+o contador precisa das três parcelas, porque o aberto conta por variação desde
+a virada. A linha de base do dia nunca foi gravada e sai por diferença — a
+exposição do retrato dividida pela quantidade de então devolve o preço daquele
+instante, e dele o aberto. Sem isso, a perda ocorrida **enquanto o processo
+esteve parado** não contaria contra o limite do dia, e o freio seria contornado
+por acidente. Decisão 030 do Jev (`deduzir_a_linha_de_base`, 0,59 · confiança
+0,45 — margem fina, contra 0,23 de retomar sem deduzir).
+
+O que falta sem credencial: o laço contínuo — relógio real, prazo de 72 h,
+retentativa, virada de dia e encerramento limpo (T026 a T031). **O que só o
+mantenedor destrava**: criar a chave de testnet sem permissão de saque, e os 30
+dias correrem.
 
 ---
 

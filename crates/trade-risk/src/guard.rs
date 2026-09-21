@@ -7,7 +7,8 @@ use crate::state::GuardState;
 use chrono::{DateTime, Utc};
 use trade_domain::AuditKind;
 use trade_domain::{
-    Anomaly, FeeModel, Fill, Money, Order, Position, RiskDecision, RiskLimits, Verdict,
+    Anomaly, EstadoRetomado, FeeModel, Fill, Money, Order, Position, RiskDecision, RiskLimits,
+    Verdict,
 };
 use trade_ports::{ExecError, OrderExecutor, Recorder};
 
@@ -70,6 +71,26 @@ impl<E: OrderExecutor> RiskGuard<E> {
             inner,
             limits,
             state: GuardState::default(),
+            kill_switch,
+        }
+    }
+
+    /// O mesmo que [`RiskGuard::new`], partindo do estado que o registro
+    /// devolveu depois de um reinício (FR-112).
+    ///
+    /// A cerca **não** vem do registro: limites são configuração corrente, e
+    /// retomá-los de uma sessão antiga deixaria um limite revogado continuar
+    /// valendo. Do registro vem só o que é contador.
+    pub fn retomar(
+        inner: E,
+        limits: RiskLimits,
+        kill_switch: KillSwitch,
+        estado: &EstadoRetomado,
+    ) -> Self {
+        RiskGuard {
+            inner,
+            limits,
+            state: GuardState::retomado(estado),
             kill_switch,
         }
     }

@@ -47,6 +47,14 @@ impl Position {
         self.realized_pnl
     }
 
+    /// Instante da primeira compra que abriu a posição corrente.
+    ///
+    /// É o que o prazo máximo de posição consulta: a idade conta da abertura,
+    /// não da última compra que aumentou a posição.
+    pub fn opened_at(&self) -> Option<DateTime<Utc>> {
+        self.opened_at
+    }
+
     pub fn is_flat(&self) -> bool {
         self.qty.is_zero()
     }

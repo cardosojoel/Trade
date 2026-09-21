@@ -15,6 +15,7 @@ pub mod metrics;
 pub mod mode;
 pub mod perfil;
 pub mod position;
+pub mod retomada;
 pub mod risk_types;
 pub mod strategy;
 pub mod types;
@@ -26,6 +27,7 @@ pub use metrics::RunMetrics;
 pub use mode::{ExecutionMode, ModeError};
 pub use perfil::{ParametrosDerivacao, Perfil, PerfilError};
 pub use position::{Position, PositionError};
+pub use retomada::EstadoRetomado;
 pub use risk_types::{
     Anomaly, FeeModel, IntegrityCause, LimitBreach, RiskDecision, RiskLimits, RiskState, Verdict,
 };

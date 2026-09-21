@@ -41,8 +41,8 @@ Verificável sem rede e sem credencial.
 - [X] T021 **(TF)** Comparação de posição local × reportada, com veredito
 - [X] T022 **(TF)** Divergência classifica como falha de integridade e exige revisão humana
 - [X] T023 **(TF)** `DESCONHECIDO` bloqueia nova entrada até resolver (FR-108)
-- [ ] T024 **(TF)** Estado recuperado do `runs.db` no início da sessão (FR-112)
-- [ ] T025 **(TF)** Contadores de risco — perda diária, ordens na janela — sobrevivem ao reinício
+- [X] T024 **(TF)** Estado recuperado do `runs.db` no início da sessão (FR-112)
+- [X] T025 **(TF)** Contadores de risco — perda diária, ordens na janela — sobrevivem ao reinício
 
 ## Fatia 5 — o laço contínuo
 

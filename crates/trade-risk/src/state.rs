@@ -2,7 +2,7 @@
 
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use rust_decimal::Decimal;
-use trade_domain::{Money, RiskState};
+use trade_domain::{EstadoRetomado, Money, RiskState};
 
 /// Estado mutável do guard.
 #[derive(Debug, Clone, Default)]
@@ -24,6 +24,24 @@ pub struct GuardState {
 }
 
 impl GuardState {
+    /// Estado recomposto a partir do registro, depois de um reinício
+    /// (FR-112).
+    ///
+    /// As três parcelas do resultado do dia entram separadas porque é assim
+    /// que o contador as mantém — o aberto conta por **variação** desde a
+    /// virada. Entrar só com o total obrigaria a inventar uma linha de base, e
+    /// uma linha de base errada é um limite que não morde.
+    pub fn retomado(e: &EstadoRetomado) -> Self {
+        GuardState {
+            realized_today: e.realized_today,
+            unrealized: e.unrealized,
+            unrealized_at_day_start: e.unrealized_at_day_start,
+            daily_loss_blocked: e.daily_loss_blocked,
+            day: e.day,
+            aceitas: e.aceitas.clone(),
+        }
+    }
+
     /// Remove da janela o que já saiu dela e devolve quantas restam.
     ///
     /// Conta ordens **aceitas**, não submetidas: o limite existe para
