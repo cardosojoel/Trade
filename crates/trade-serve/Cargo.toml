@@ -1,0 +1,30 @@
+# O servidor HTTP local de leitura do registro.
+#
+# Na lista ISOLATED de `tests/architecture.rs`: não declara corretora, rede,
+# camada de risco, motor de backtest nem a própria CLI. Iniciar execução entra
+# por uma trait de `trade-ports` que o ponto de composição implementa — é o que
+# faz FR-001 e SC-008 valerem juntos sem que esta crate herde, pelo grafo, tudo
+# que a CLI alcança.
+#
+# `tiny_http` é servidor HTTP síncrono, sem runtime assíncrono e sem TLS. O
+# teste de arquitetura permite: o que ele proíbe é cliente que **alcança** a
+# corretora. Este escuta em 127.0.0.1 e não disca para lugar nenhum.
+
+[package]
+name = "trade-serve"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+trade-domain.workspace = true
+trade-ports.workspace = true
+trade-storage.workspace = true
+tiny_http.workspace = true
+serde_json.workspace = true
+rust_decimal.workspace = true
+chrono.workspace = true
+
+[lints]
+workspace = true

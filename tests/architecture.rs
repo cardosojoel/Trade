@@ -15,18 +15,18 @@ const ISOLATED: &[&str] = &[
     "trade-risk",
     "trade-backtest",
     "trade-session",
+    "trade-serve",
 ];
 
-/// Adaptador de corretora, clientes de rede — e o motor de backtest.
+/// O que **nenhuma** crate isolada declara: alcança a corretora, alcança a
+/// rede, ou devolve tempo simulado.
 ///
-/// `trade-backtest` entra na lista por causa de FR-115: o `BacktestClock`
-/// devolve instante simulado, e uma sessão ao vivo que o alcançasse poderia
-/// datar evento com hora que não é a do mundo. Não declarar a crate é o que
-/// torna isso impossível em vez de desaconselhado.
-const FORBIDDEN: &[&str] = &[
+/// `trade-backtest` está aqui por causa de FR-115: o `BacktestClock` devolve
+/// instante simulado, e uma sessão ao vivo que o alcançasse poderia datar
+/// evento com hora que não é a do mundo.
+const SEM_CORRETORA_NEM_REDE: &[&str] = &[
     "trade-bybit",
     "trade-paper",
-    "trade-storage",
     "trade-backtest",
     "ureq",
     "reqwest",
@@ -35,6 +35,27 @@ const FORBIDDEN: &[&str] = &[
     "tokio",
     "async-std",
 ];
+
+/// Persistência.
+///
+/// **Proibição diferente da de cima, e por isso lista separada.** Até
+/// 2026-09-21 as duas viviam juntas, e o servidor de leitura do registro não
+/// cabia em lugar nenhum: ele não pode alcançar a corretora, e ler o registro
+/// **é** o trabalho dele. A regra proibia o que o Princípio V nunca proibiu.
+///
+/// Decisão 038 do Jev (`separar_as_duas_proibicoes`, **1,00 · confiança
+/// 1,00** — unânime; `isso_exige_emenda_na_constitution`, `noul` 0,24: ajuste
+/// de expressão, não emenda).
+const SEM_PERSISTENCIA: &[&str] = &["trade-storage"];
+
+/// Quem não conhece persistência.
+///
+/// O motor recebe as velas por uma porta e não deve saber que há SQLite do
+/// outro lado — é o que permite trocar o provedor sem tocar no motor. Vale
+/// para estratégia, risco e backtest; **não** vale para o servidor, cujo
+/// trabalho é justamente ler o registro (`SC-008` da feature 003 fala de
+/// corretora, não de persistência).
+const NAO_CONHECEM_PERSISTENCIA: &[&str] = &["trade-strategy", "trade-risk", "trade-backtest"];
 
 /// Clientes de rede também são proibidos em dev-dependencies: um teste que
 /// alcance a rede corrompe a garantia tanto quanto o código de produção.
@@ -58,8 +79,13 @@ fn crates_isoladas_nao_dependem_da_corretora_nem_da_rede() {
 
     for &c in ISOLATED {
         for dep in deps_of(c, "dependencies") {
-            if FORBIDDEN.contains(&dep.as_str()) {
+            if SEM_CORRETORA_NEM_REDE.contains(&dep.as_str()) {
                 violacoes.push(format!("{c} declara `{dep}` em [dependencies]"));
+            }
+            if NAO_CONHECEM_PERSISTENCIA.contains(&c) && SEM_PERSISTENCIA.contains(&dep.as_str()) {
+                violacoes.push(format!(
+                    "{c} declara `{dep}` em [dependencies] — o motor recebe as velas por uma porta"
+                ));
             }
         }
         for dep in deps_of(c, "dev-dependencies") {

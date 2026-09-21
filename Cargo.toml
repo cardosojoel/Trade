@@ -25,6 +25,7 @@ members = [
     "crates/trade-strategy",
     "crates/trade-backtest",
     "crates/trade-session",
+    "crates/trade-serve",
     "crates/trade-storage",
     "crates/trade-bybit",
     "crates/trade-paper",
@@ -50,6 +51,7 @@ rusqlite      = { version = "0.40.2", features = ["bundled"] }
 ureq          = "3.4.2"
 clap          = { version = "4.6.7", features = ["derive"] }
 ctrlc         = "3.5.2"
+tiny_http     = "0.12.0"
 toml          = "1.1.6"
 ulid          = "3.0.0"
 proptest      = "1.11.0"
@@ -67,6 +69,7 @@ trade-risk     = { path = "crates/trade-risk" }
 trade-strategy = { path = "crates/trade-strategy" }
 trade-backtest = { path = "crates/trade-backtest" }
 trade-session  = { path = "crates/trade-session" }
+trade-serve    = { path = "crates/trade-serve" }
 trade-storage  = { path = "crates/trade-storage" }
 trade-bybit    = { path = "crates/trade-bybit" }
 trade-paper    = { path = "crates/trade-paper" }
