@@ -53,6 +53,9 @@ struct LimitsFile {
     window_minutes: i64,
     max_transient_retries: u32,
     max_price_deviation_ratio: String,
+    /// Prazo máximo de posição, em horas. Inteiro e não string: horas não são
+    /// dinheiro, e não passam por aritmética decimal.
+    max_position_hours: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -113,6 +116,7 @@ pub fn load_limits(path: impl AsRef<Path>) -> Result<RiskLimits, ConfigError> {
             "max_price_deviation_ratio",
             &f.max_price_deviation_ratio,
         )?,
+        max_position_hours: f.max_position_hours,
     })
 }
 
@@ -279,7 +283,23 @@ max_orders_per_window = 10
 window_minutes        = 60
 max_transient_retries = 5
 max_price_deviation_ratio = "0.20"
+max_position_hours = 72
 "#;
+
+    #[test]
+    fn cerca_sem_o_prazo_declarado_e_recusada() {
+        // Limite ausente precisa significar "nada passa", nunca "tudo passa"
+        // — e prazo ausente significaria posição sem prazo nenhum, que é
+        // justamente o que a emenda 2.0.0 veio proibir. O arquivo tem de
+        // dizer, mesmo que diga zero (decisão 040 do Jev, 1,00 · 1,00).
+        let sem_prazo = LIMITES_VALIDOS.replace("max_position_hours = 72\n", "");
+        let f = arquivo(&sem_prazo);
+        let e = load_limits(f.path()).unwrap_err();
+        assert!(
+            e.to_string().contains("max_position_hours"),
+            "o erro aponta o campo que falta: {e}"
+        );
+    }
 
     #[test]
     fn carrega_limites_com_valores_exatos() {
@@ -292,6 +312,7 @@ max_price_deviation_ratio = "0.20"
         assert_eq!(l.window_minutes, 60);
         assert_eq!(l.max_transient_retries, 5);
         assert_eq!(l.max_price_deviation_ratio, dec!(0.20));
+        assert_eq!(l.max_position_hours, 72, "o prazo da emenda 2.0.0");
     }
 
     #[test]

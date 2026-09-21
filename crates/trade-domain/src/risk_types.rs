@@ -25,6 +25,18 @@ pub struct RiskLimits {
     /// implausível depende da granularidade e do ativo, e fixar no código
     /// seria decidir isso por quem opera.
     pub max_price_deviation_ratio: Money,
+    /// Prazo máximo de posição, em horas (emenda 2.0.0, FR-114).
+    ///
+    /// Vive na cerca, e não num argumento de linha de comando, por duas
+    /// razões. A convenção do projeto manda limiar de risco viver no
+    /// `limits.toml`. E a cerca é **gravada com cada execução** (FR-025):
+    /// duas execuções sob prazos diferentes precisam ser distinguíveis no
+    /// registro, e o prazo muda resultado — numa das execuções gravadas, 39
+    /// dos 146 episódios passam de 72 horas.
+    ///
+    /// Zero significa **sem prazo**, como o backtest da feature 001, que é
+    /// anterior à emenda.
+    pub max_position_hours: i64,
 }
 
 /// Estado corrente avaliado contra a cerca.
@@ -161,6 +173,10 @@ impl Default for RiskLimits {
             window_minutes: 60,
             max_transient_retries: 0,
             max_price_deviation_ratio: Decimal::ZERO,
+            // Zero é "sem prazo", e não "prazo zero": um prazo de zero horas
+            // encerraria toda posição na vela seguinte. A cerca fechada
+            // recusa ordem antes disso.
+            max_position_hours: 0,
         }
     }
 }

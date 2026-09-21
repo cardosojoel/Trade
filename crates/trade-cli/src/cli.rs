@@ -146,10 +146,6 @@ pub struct RodarArgs {
     #[arg(long, default_value = "data/KILL")]
     pub kill_file: PathBuf,
 
-    /// Prazo máximo de posição, em horas (FR-114, emenda 2.0.0).
-    #[arg(long, default_value_t = 72)]
-    pub prazo_horas: i64,
-
     /// Fração abaixo do preço de entrada onde o stop é colocado.
     #[arg(long, default_value = "0.02", value_parser = parse_decimal)]
     pub stop_fracao: Decimal,

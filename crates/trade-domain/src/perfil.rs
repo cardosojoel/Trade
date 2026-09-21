@@ -210,6 +210,7 @@ mod tests {
             window_minutes: 60,
             max_transient_retries: 5,
             max_price_deviation_ratio: dec!(0.1),
+            max_position_hours: 72,
         };
         let l = p.limites(dec!(200), &base);
         assert_eq!(l.max_position_size, dec!(100), "50% de 200");

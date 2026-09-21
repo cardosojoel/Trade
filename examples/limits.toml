@@ -22,3 +22,12 @@ max_transient_retries = 5
 # operação para para revisão humana. 20% entre velas de um minuto em BTC não
 # é movimento, é dado ruim.
 max_price_deviation_ratio = "0.20"
+
+# Prazo máximo de posição, em horas. Criado pela emenda 2.0.0 da constitution,
+# que redefiniu um princípio marcado NÃO-NEGOCIÁVEL — o domínio deixou de ser
+# day trade estrito.
+#
+# Vive aqui, e não num argumento de linha de comando, porque é limiar de risco
+# e porque a cerca é gravada com cada execução: duas execuções sob prazos
+# diferentes precisam ser distinguíveis no registro. Zero significa sem prazo.
+max_position_hours = 72

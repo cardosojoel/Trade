@@ -60,6 +60,8 @@ fn config(capital: Money) -> BacktestConfig {
             window_minutes: 60,
             max_transient_retries: 3,
             max_price_deviation_ratio: dec!(0.50),
+            // Backtest não tem prazo: a feature 001 é anterior à emenda 2.0.0.
+            max_position_hours: 0,
         },
         min_equity: capital / Decimal::from(100),
     }

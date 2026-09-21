@@ -27,6 +27,7 @@ pub fn limits() -> RiskLimits {
         window_minutes: 60,
         max_transient_retries: 3,
         max_price_deviation_ratio: dec!(0.20),
+        max_position_hours: 72,
     }
 }
 

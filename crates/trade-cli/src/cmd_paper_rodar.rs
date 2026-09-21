@@ -217,7 +217,9 @@ fn executar(args: &RodarArgs) -> Saida {
             slippage_rate: fees_cfg.slippage_rate,
         },
         instrumento,
-        prazo_maximo: Duration::hours(args.prazo_horas),
+        // Da cerca, não do argumento: é limiar de risco, e vai gravado com
+        // a execução (decisão 040 do Jev, 1,00 · confiança 1,00).
+        prazo_maximo: Duration::hours(limits.max_position_hours),
     });
 
     let resultado = sessao

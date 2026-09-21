@@ -140,6 +140,10 @@ fn limites_json(l: &RiskLimits) -> String {
         "max_price_deviation_ratio".into(),
         to_sql(l.max_price_deviation_ratio),
     );
+    m.insert(
+        "max_position_hours".into(),
+        l.max_position_hours.to_string(),
+    );
     json_map(&m)
 }
 
