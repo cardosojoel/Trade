@@ -1545,6 +1545,7 @@ dependencies = [
  "chrono",
  "rust_decimal",
  "serde_json",
+ "tempfile",
  "tiny_http",
  "trade-domain",
  "trade-ports",

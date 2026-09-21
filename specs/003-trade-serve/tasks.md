@@ -26,16 +26,16 @@ errar, e são o que o `SC-003` ao `SC-007` cobram.
 Cada tarefa traz consulta nova em `trade-storage`: o lado de leitura do
 registro não existe hoje (pesquisa, item 1).
 
-- [ ] T008 **(TF)** `trade-storage` lê execuções: cabeçalho, cerca e taxas, a partir do `runs_json`
-- [ ] T009 **(TF)** `trade-storage` lê métricas e extrato de uma execução
-- [ ] T010 **(TF)** Todo valor monetário sai como **string** JSON; nenhum como número (FR-002, SC-002)
-- [ ] T011 **(TF)** A versão do código vem **presente e nula** em toda resposta que descreva execução (FR-006, SC-009)
-- [ ] T012 `GET /runs` — grupos de execuções, com cerca e comparabilidade
-- [ ] T013 `GET /runs/{id}` — métricas, decomposição do custo, estado da Porta 1
-- [ ] T014 **(TF)** As cinco exigências da Porta 1 vêm de configuração, nunca de constante embutida (FR-024)
-- [ ] T015 **(TF)** `profit_factor` indefinido vem `null` com o motivo, nunca zero, infinito ou texto (FR-021)
-- [ ] T016 **(TF)** `GET /runs/{id}/daily` — P&L por dia, pior dia, dias que romperam o limite, curva acumulada
-- [ ] T017 **(TF)** Todo agregado é calculado em decimal exato no servidor (FR-008)
+- [X] T008 **(TF)** `trade-storage` lê execuções: cabeçalho, cerca e taxas, a partir do `runs_json`
+- [X] T009 **(TF)** `trade-storage` lê métricas e extrato de uma execução
+- [X] T010 **(TF)** Todo valor monetário sai como **string** JSON; nenhum como número (FR-002, SC-002)
+- [X] T011 **(TF)** A versão do código vem **presente e nula** em toda resposta que descreva execução (FR-006, SC-009)
+- [X] T012 `GET /runs` — grupos de execuções, com cerca e comparabilidade
+- [X] T013 `GET /runs/{id}` — métricas, decomposição do custo, estado da Porta 1
+- [X] T014 **(TF)** As cinco exigências da Porta 1 vêm de configuração, nunca de constante embutida (FR-024)
+- [X] T015 **(TF)** `profit_factor` indefinido vem `null` com o motivo, nunca zero, infinito ou texto (FR-021)
+- [X] T016 **(TF)** `GET /runs/{id}/daily` — P&L por dia, pior dia, dias que romperam o limite, curva acumulada
+- [X] T017 **(TF)** Todo agregado é calculado em decimal exato no servidor (FR-008)
 
 ## Fatia 3 — reconstituição
 

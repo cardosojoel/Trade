@@ -35,6 +35,48 @@ pub struct ExecucaoEmAberto {
     pub started_at: DateTime<Utc>,
 }
 
+/// Uma execução, como o registro a guarda.
+///
+/// Os JSON da cerca e das taxas vêm **crus**. Quem lê decide se os interpreta:
+/// interpretá-los aqui obrigaria esta crate a conhecer a forma de `RiskLimits`
+/// em toda versão que já foi gravada, e o registro é insubstituível — tem
+/// linha de ontem e vai ter de amanhã.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExecucaoLida {
+    pub run_id: String,
+    pub mode: String,
+    pub symbol: String,
+    pub interval: String,
+    pub from: DateTime<Utc>,
+    pub to: DateTime<Utc>,
+    pub initial_capital: Money,
+    pub limits_json: String,
+    pub fees_json: String,
+    pub strategy: String,
+    pub strategy_params_json: String,
+    pub started_at: DateTime<Utc>,
+    pub ended_at: Option<DateTime<Utc>>,
+    pub outcome: Option<String>,
+    pub halt_reason: Option<String>,
+}
+
+/// As métricas de uma execução.
+///
+/// `profit_factor` é `Option` porque **é** indefinido sem operação perdedora.
+/// Convertê-lo em zero ou infinito produziria um número que induz erro na
+/// Porta 1 de promoção (FR-021).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MetricasLidas {
+    pub profit_factor: Option<Money>,
+    pub max_drawdown: Money,
+    pub trade_count: u64,
+    pub net_result: Money,
+    pub gross_profit: Money,
+    pub gross_loss: Money,
+    pub total_fees: Money,
+    pub total_slippage: Money,
+}
+
 pub struct RunsRepository {
     conn: Connection,
 }
@@ -203,6 +245,123 @@ impl RunsRepository {
             )
             .map_err(escrita)?;
         Ok(())
+    }
+
+    /// Uma execução pelo identificador.
+    ///
+    /// `None` é "não existe", e não "não deu para ler" — as duas decidem
+    /// coisas diferentes, e o contrato de erro do servidor as separa em 404 e
+    /// 503.
+    pub fn execucao(&self, run_id: &str) -> Result<Option<ExecucaoLida>, StorageError> {
+        let mut stmt = self
+            .conn
+            .prepare(&format!("{SELECT_EXECUCAO} WHERE run_id = ?1"))
+            .map_err(consulta)?;
+        let mut linhas = stmt.query_map([run_id], le_execucao).map_err(consulta)?;
+        match linhas.next() {
+            None => Ok(None),
+            Some(l) => Ok(Some(l.map_err(consulta)??)),
+        }
+    }
+
+    /// Todas as execuções, da mais recente para a mais antiga.
+    ///
+    /// Ordenadas por `run_id`, que é ULID e portanto ordenável por tempo. Não
+    /// depende de o relógio da máquina ter andado para a frente entre duas
+    /// execuções.
+    pub fn listar_execucoes(&self) -> Result<Vec<ExecucaoLida>, StorageError> {
+        let mut stmt = self
+            .conn
+            .prepare(&format!("{SELECT_EXECUCAO} ORDER BY run_id DESC"))
+            .map_err(consulta)?;
+        let linhas = stmt.query_map([], le_execucao).map_err(consulta)?;
+        let mut out = Vec::new();
+        for l in linhas {
+            out.push(l.map_err(consulta)??);
+        }
+        Ok(out)
+    }
+
+    /// As métricas de uma execução, se já foram gravadas.
+    pub fn metricas(&self, run_id: &str) -> Result<Option<MetricasLidas>, StorageError> {
+        let mut stmt = self
+            .conn
+            .prepare(
+                "SELECT profit_factor, max_drawdown, trade_count, net_result, \
+                 gross_profit, gross_loss, total_fees, total_slippage \
+                 FROM metrics WHERE run_id = ?1",
+            )
+            .map_err(consulta)?;
+        let mut linhas = stmt
+            .query_map([run_id], |r| {
+                Ok((
+                    r.get::<_, Option<String>>(0)?,
+                    r.get::<_, String>(1)?,
+                    r.get::<_, i64>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, String>(4)?,
+                    r.get::<_, String>(5)?,
+                    r.get::<_, String>(6)?,
+                    r.get::<_, String>(7)?,
+                ))
+            })
+            .map_err(consulta)?;
+
+        let Some(l) = linhas.next() else {
+            return Ok(None);
+        };
+        let (pf, dd, n, net, gp, gl, fees, slip) = l.map_err(consulta)?;
+        Ok(Some(MetricasLidas {
+            profit_factor: pf.map(|s| decimal(&s, "profit_factor")).transpose()?,
+            max_drawdown: decimal(&dd, "max_drawdown")?,
+            trade_count: u64::try_from(n).unwrap_or(0),
+            net_result: decimal(&net, "net_result")?,
+            gross_profit: decimal(&gp, "gross_profit")?,
+            gross_loss: decimal(&gl, "gross_loss")?,
+            total_fees: decimal(&fees, "total_fees")?,
+            total_slippage: decimal(&slip, "total_slippage")?,
+        }))
+    }
+
+    /// O extrato de uma execução, em ordem.
+    pub fn extrato(&self, run_id: &str) -> Result<Vec<Trade>, StorageError> {
+        let mut stmt = self
+            .conn
+            .prepare(
+                "SELECT trade_seq, entry_ms, entry_price, exit_ms, exit_price, \
+                 qty, fees, pnl FROM trade WHERE run_id = ?1 ORDER BY trade_seq",
+            )
+            .map_err(consulta)?;
+        let linhas = stmt
+            .query_map([run_id], |r| {
+                Ok((
+                    r.get::<_, i64>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, i64>(3)?,
+                    r.get::<_, String>(4)?,
+                    r.get::<_, String>(5)?,
+                    r.get::<_, String>(6)?,
+                    r.get::<_, String>(7)?,
+                ))
+            })
+            .map_err(consulta)?;
+
+        let mut out = Vec::new();
+        for l in linhas {
+            let (seq, e_ms, e_px, x_ms, x_px, qty, fees, pnl) = l.map_err(consulta)?;
+            out.push(Trade {
+                seq: u64::try_from(seq).unwrap_or(0),
+                entry_at: instante(e_ms)?,
+                entry_price: decimal(&e_px, "entry_price")?,
+                exit_at: instante(x_ms)?,
+                exit_price: decimal(&x_px, "exit_price")?,
+                qty: decimal(&qty, "qty")?,
+                fees: decimal(&fees, "fees")?,
+                pnl: decimal(&pnl, "pnl")?,
+            });
+        }
+        Ok(out)
     }
 
     /// A última execução em modo `paper` que não foi encerrada.
@@ -443,4 +602,71 @@ mod testes_retomada {
         let a = r.ultima_paper_em_aberto().unwrap().unwrap();
         assert_eq!(a.run_id, "P1", "o modo separa, e o ULID maior não engana");
     }
+}
+
+const SELECT_EXECUCAO: &str = "SELECT run_id, mode, symbol, interval, from_ms, to_ms, \
+     initial_capital, limits_json, fees_json, strategy, strategy_params_json, \
+     started_at, ended_at, outcome, halt_reason FROM run";
+
+fn consulta(e: rusqlite::Error) -> StorageError {
+    StorageError::Query(e.to_string())
+}
+
+/// Lê um valor monetário gravado como texto.
+///
+/// Gravado como TEXT justamente para isto: um `REAL` no caminho perderia
+/// dígito entre a escrita e a leitura, e o extrato deixaria de fechar contra a
+/// soma feita por fora, em SQL (SC-009 da feature 001).
+fn decimal(s: &str, campo: &str) -> Result<Money, StorageError> {
+    use std::str::FromStr;
+    Money::from_str(s).map_err(|e| StorageError::Query(format!("`{campo}` = {s:?}: {e}")))
+}
+
+fn instante(ms: i64) -> Result<DateTime<Utc>, StorageError> {
+    DateTime::from_timestamp_millis(ms)
+        .ok_or_else(|| StorageError::Query(format!("instante inválido: {ms}")))
+}
+
+/// Monta uma execução a partir da linha, adiando a conversão de decimal.
+///
+/// O `Result` de dentro existe porque `rusqlite` não sabe converter para
+/// `Decimal`: o erro de conversão é nosso, não dele, e sai por fora do erro
+/// dele.
+#[allow(clippy::type_complexity)]
+fn le_execucao(r: &rusqlite::Row<'_>) -> rusqlite::Result<Result<ExecucaoLida, StorageError>> {
+    let run_id: String = r.get(0)?;
+    let mode: String = r.get(1)?;
+    let symbol: String = r.get(2)?;
+    let interval: String = r.get(3)?;
+    let from_ms: i64 = r.get(4)?;
+    let to_ms: i64 = r.get(5)?;
+    let capital: String = r.get(6)?;
+    let limits_json: String = r.get(7)?;
+    let fees_json: String = r.get(8)?;
+    let strategy: String = r.get(9)?;
+    let strategy_params_json: String = r.get(10)?;
+    let started: i64 = r.get(11)?;
+    let ended: Option<i64> = r.get(12)?;
+    let outcome: Option<String> = r.get(13)?;
+    let halt_reason: Option<String> = r.get(14)?;
+
+    Ok((|| {
+        Ok(ExecucaoLida {
+            run_id,
+            mode,
+            symbol,
+            interval,
+            from: instante(from_ms)?,
+            to: instante(to_ms)?,
+            initial_capital: decimal(&capital, "initial_capital")?,
+            limits_json,
+            fees_json,
+            strategy,
+            strategy_params_json,
+            started_at: instante(started)?,
+            ended_at: ended.map(instante).transpose()?,
+            outcome,
+            halt_reason,
+        })
+    })())
 }
