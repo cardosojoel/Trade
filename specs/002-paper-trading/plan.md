@@ -106,11 +106,21 @@ Em fatias que fecham sozinhas, cada uma verificável sem a seguinte:
 4. **Reconciliação.** Comparação e classificação. Verificável sem rede.
 5. **Laço contínuo.** Relógio real, prazo de 72h, reinício. Verificável com
    duplo.
+5b. **A composição.** Fonte de velas ao vivo, reconciliação na abertura e o
+   comando que liga tudo. Verificável com duplo.
 6. **Primeira ordem real na testnet.** Exige credencial.
 7. **Os 30 dias.** Exige credencial e tempo.
 
-As fatias 1 a 5 não precisam de credencial e podem ser feitas agora. As 6 e 7
+As fatias 1 a 5b não precisam de credencial e podem ser feitas agora. As 6 e 7
 são o que só o mantenedor destrava.
+
+> **Emenda de 2026-09-21 — decisão 034 do Jev** (`fatia_nova_antes_da_6`,
+> 0,99 · confiança 0,98). A fatia 5b não estava aqui, e as peças das fatias 3,
+> 4 e 5 terminaram sem chamador nenhum. As tarefas da fatia 6 são atos —
+> criar a chave, emitir a primeira ordem, medir a divergência —, e nenhuma
+> delas é escrever o código que liga as peças. A sessão passa também a
+> **reconciliar ao abrir**, e o veredito ganha destino no registro
+> (`reconciliar_e_dar_destino_ao_veredito`, 0,89 · confiança 0,84).
 
 ## Post-Design Constitution Re-Check
 

@@ -105,10 +105,11 @@ não chega a precisar de ADR.
 
 ## Em andamento: feature 002, paper trading
 
-Spec, plano e tarefas escritos. **As 31 tarefas que não precisam de credencial
-estão concluídas** — fatias 1 a 5 fechadas. São 39 no total; as oito restantes
-são as fatias 6 e 7, que exigem chave de testnet e trinta dias corridos.
-Contado em `specs/002-paper-trading/tasks.md`, 2026-09-21.
+Spec, plano e tarefas escritos. **31 de 45 tarefas concluídas** — fatias 1 a 5
+fechadas. Das catorze abertas, **seis são a fatia 5b, que não exige
+credencial** e foi acrescentada em 2026-09-21; as oito restantes são as fatias
+6 e 7, que exigem chave de testnet e trinta dias corridos. Contado em
+`specs/002-paper-trading/tasks.md`, 2026-09-21.
 
 > Até 2026-09-21 este parágrafo dizia 25 de 31 quando eram 23, e a folha de
 > passagem do DsTrade dizia "fatias 1 a 4 fechadas" com T024 e T025 ainda
@@ -170,16 +171,36 @@ quem instala o tratador de SIGINT/SIGTERM é a CLI (`parada::instalar`). Sair de
 dentro do tratador não roda destrutor nenhum e perderia o lote de eventos ainda
 em memória — a bandeira deixa a volta corrente terminar e gravar antes de sair.
 
-### A lacuna que fica, e que tarefa nenhuma cobre
+### A fatia 5b, e por que ela existe
 
-O laço roda contra um duplo e **não roda contra a Bybit**: não existe
-implementação de `LiveCandleSource` contra a corretora, e não existe
-`trade paper rodar`. Isso é composição, e a fatia 5 foi definida como
-"verificável com duplo" — mas as tarefas da fatia 6 são *criar a chave*,
-*primeira ordem real* e *divergências medidas*, e **nenhuma delas é escrever a
-composição**. Do jeito que o `tasks.md` está, ninguém consegue rodar a T033 sem
-antes fazer um trabalho que não está listado. Levantado em 2026-09-21; não
-inventei tarefa nova para não decidir no lugar de quem decide.
+A fatia 5 terminou com **quatro peças prontas e nenhuma com chamador**. Busca
+por consumidor em todas as crates, 2026-09-21, commit `5558b51`: o
+`PaperExecutor` (fatia 3), a `comparar`/`Veredito` (fatia 4), a `recuperar`
+(T024 e T025) e a `Sessao` (fatia 5) não são construídos nem chamados fora das
+próprias crates. Não existe fonte de velas ao vivo contra a Bybit, e
+`trade paper` só tem a ação `verificar`.
+
+As tarefas da fatia 6 são **atos** — criar a chave, emitir a primeira ordem,
+medir a divergência —, e nenhuma delas é escrever o código que liga as peças.
+Quem fosse fazer a T033 descobriria no meio do caminho um trabalho que não
+estava na lista. Por isso a **fatia 5b** (decisão 034, `fatia_nova_antes_da_6`,
+0,99 · confiança 0,98): seis tarefas, nenhuma exigindo credencial, verificáveis
+com duplo como as fatias 3 e 4.
+
+Duas delas vieram de achados do levantamento:
+
+- **A sessão passa a reconciliar ao abrir, e o veredito ganha destino no
+  registro** (T041, T042). Resolve as pendências **P8** e **P13** e o
+  `REQ-UI-049`: hoje uma reconciliação que deu `SYNCED` não deixa prova de ter
+  acontecido. Decisão 034, `reconciliar_e_dar_destino_ao_veredito`, 0,89 ·
+  confiança 0,84.
+- **O `seq` tem de retomar de onde parou** (T043). O `AuditRecorder` sempre
+  começa em `seq = 0` e o `audit_sink` grava com `INSERT OR REPLACE` sobre a
+  chave `(run_id, seq)`. Uma sessão que reiniciasse com o mesmo `run_id`
+  **sobrescreveria em silêncio** os eventos da sessão anterior — auditoria
+  destruída sem erro, que é o que o Princípio IV menos admite. O plano promete
+  desde sempre que "o `seq` continua sem buraco entre reinícios", e não havia
+  como cumprir: `recuperar` devolve `proximo_seq` e nada sabe consumi-lo.
 
 **O que só o mantenedor destrava**: criar a chave de testnet sem permissão de
 saque, e os 30 dias correrem.

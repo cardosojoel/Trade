@@ -53,6 +53,25 @@ Verificável sem rede e sem credencial.
 - [X] T030 **(TF)** Virada de dia zera o freio com posição aberta atravessando (FR-019b)
 - [X] T031 Encerramento limpo: sinal do sistema fecha o registro sem perder evento
 
+## Fatia 5b — a composição *(não exige credencial)*
+
+> Acrescentada em 2026-09-21 pela **decisão 034** do Jev
+> (`fatia_nova_antes_da_6`, 0,99 · confiança 0,98). A fatia 5 terminou com
+> quatro peças prontas e **nenhuma com chamador**: o `PaperExecutor`, a
+> reconciliação, a recuperação de estado e o laço. Nenhuma tarefa cobria
+> ligá-las, e a T033 pressupunha que já estivessem ligadas.
+>
+> A numeração continua de T039 de propósito: T032 a T039 são citadas em
+> documento fora deste repositório, e renumerar as falsificaria. A ordem de
+> execução é a da posição, não a do número.
+
+- [ ] T040 **(TF)** `LiveCandleSource` contra a Bybit: última vela **fechada**, nunca a em formação
+- [ ] T041 **(TF)** A sessão abre reconciliando; `DIVERGENTE` e `DESCONHECIDO` impedem a primeira ordem (FR-108)
+- [ ] T042 **(TF)** O veredito da reconciliação ganha destino no registro (P8, P13, `REQ-UI-049`)
+- [ ] T043 **(TF)** O `seq` retoma de onde parou — hoje reiniciar **sobrescreve** a auditoria da sessão anterior
+- [ ] T044 `trade paper rodar`: compõe credencial, executor dentro do `RiskGuard`, estado recuperado, estratégia, fonte e registro
+- [ ] T045 **(TF)** A execução grava `run` com `mode = 'paper'`, mais extrato e métricas ao encerrar
+
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 
 - [ ] T032 Chave de testnet criada, sem permissão de saque, e verificada
