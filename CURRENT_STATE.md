@@ -103,7 +103,35 @@ da corretora e da aritmética, medidos do mercado e do capital, de autoridade, d
 promoção, e os limites da própria medição. Um desenho que não passa nessa folha
 não chega a precisar de ADR.
 
-## Em andamento: feature 002, paper trading
+## Aberta em 2026-09-21: feature 003, `trade serve`
+
+`specs/003-trade-serve/spec.md` existe — 5 user stories, **25 requisitos
+funcionais**, **15 critérios de sucesso**, as entidades e o contrato das onze
+rotas com exemplo de JSON. O texto veio pronto do DsTrade
+(`design/11_SPEC_TRADE_SERVE.md` v1.1, aceita), no formato que a decisão 020
+escolheu justamente para não haver retrabalho aqui.
+
+**Só a spec.** Não há plano, não há tarefas, não há código. O próximo passo do
+fluxo é `/speckit.plan`.
+
+Três coisas que quem for implementar precisa saber antes:
+
+- A feature foi **aceita com empate** — decisão 022, 0,48 × 0,48, confiança
+  0,22 — e emendada pela 023, cuja resposta se espalhou por cinco defeitos
+  reais. Abrir agora é a decisão 036, e também com margem fina: 0,63 ·
+  confiança 0,51, contra 0,24 de simplesmente parar e entregar o que está
+  pronto.
+- A **versão do código na tabela `run` não existe**, e a spec conta com isso:
+  `FR-006` exige o campo presente e nulo e `FR-007` obriga a comparação entre
+  execuções a se declarar não confiável. A decisão 036 confirmou que a
+  interface pode nascer assim (`noul` 0,31) — ausência declarada é resposta
+  honesta, não defeito. É a pendência **P6/P9**, ainda aberta.
+- **Nenhum limiar de desempenho dela foi medido**; os dois que existem nascem
+  como configuração de partida.
+
+---
+
+## Concluída até onde o código alcança: feature 002, paper trading
 
 Spec, plano e tarefas escritos. **37 de 45 tarefas concluídas** — fatias 1 a 5b
 fechadas. **Tudo que não exige credencial está feito.** As oito abertas são as
