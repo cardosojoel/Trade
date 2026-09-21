@@ -23,7 +23,10 @@ pub enum ExecutionMode {
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum ModeError {
-    #[error("modo '{0}' ainda não implementado — apenas 'backtest' está disponível nesta versão")]
+    #[error(
+        "modo '{0}' não liberado — disponíveis: 'backtest' e 'paper'. A promoção para capital \
+         real é ato humano registrado, e o Princípio I não admite que ela venha de um argumento."
+    )]
     NotImplemented(String),
     #[error("modo '{0}' desconhecido — modos disponíveis: backtest, paper")]
     Unknown(String),

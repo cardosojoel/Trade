@@ -40,10 +40,29 @@ pub struct AuditRecorder<S: AuditSink> {
 
 impl<S: AuditSink> AuditRecorder<S> {
     pub fn new(run_id: impl Into<String>, mode: ExecutionMode, sink: S) -> Self {
+        AuditRecorder::retomando(run_id, mode, sink, 0)
+    }
+
+    /// Retoma uma execução, continuando a numeração de onde ela parou.
+    ///
+    /// **Sem isto, reiniciar destrói auditoria em silêncio.** A chave da
+    /// tabela é `(run_id, seq)` e a gravação é `INSERT OR REPLACE`: um
+    /// processo que voltasse numerando do zero sobrescreveria, um a um, os
+    /// eventos da sessão anterior — sem erro, sem aviso, e sem deixar sinal de
+    /// que existiram. É o pior resultado que o Princípio IV admite imaginar.
+    ///
+    /// `ultimo_seq` é o último `seq` **usado**; o próximo evento recebe o
+    /// seguinte.
+    pub fn retomando(
+        run_id: impl Into<String>,
+        mode: ExecutionMode,
+        sink: S,
+        ultimo_seq: u64,
+    ) -> Self {
         AuditRecorder {
             run_id: run_id.into(),
             mode,
-            seq: 0,
+            seq: ultimo_seq,
             sink,
         }
     }
@@ -75,5 +94,45 @@ impl<S: AuditSink> Recorder for AuditRecorder<S> {
 
     fn flush(&mut self) -> Result<(), AuditError> {
         self.sink.flush()
+    }
+}
+
+#[cfg(all(test, feature = "testing"))]
+mod tests {
+    use super::*;
+    use crate::testing::InMemoryAuditSink;
+    use chrono::TimeZone;
+    use trade_domain::Position;
+
+    fn instante() -> DateTime<Utc> {
+        Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap()
+    }
+
+    fn transicao() -> AuditKind {
+        AuditKind::StateTransition {
+            from: "Flat".into(),
+            to: "Long".into(),
+            position: Position::default(),
+            fechado_por: None,
+        }
+    }
+
+    #[test]
+    fn uma_execucao_nova_comeca_no_um() {
+        let mut r = AuditRecorder::new("R1", ExecutionMode::Paper, InMemoryAuditSink::new());
+        r.record(instante(), transicao()).unwrap();
+        assert_eq!(r.seq(), 1);
+    }
+
+    #[test]
+    fn a_execucao_retomada_continua_de_onde_parou() {
+        // A chave da tabela é (run_id, seq) e a gravação é INSERT OR REPLACE:
+        // recomeçar do zero sobrescreveria a auditoria da sessão anterior sem
+        // erro nenhum.
+        let mut r =
+            AuditRecorder::retomando("R1", ExecutionMode::Paper, InMemoryAuditSink::new(), 417);
+        r.record(instante(), transicao()).unwrap();
+        assert_eq!(r.seq(), 418, "o próximo seq é o seguinte ao último usado");
+        assert_eq!(r.sink().events[0].seq, 418);
     }
 }

@@ -25,6 +25,16 @@ pub struct RunHeader<'a> {
     pub started_at: DateTime<Utc>,
 }
 
+/// Uma execução que começou e não foi encerrada.
+///
+/// Sem `ended_at` é o que fica quando o processo caiu — e é o que a sessão
+/// procura ao subir para retomar de onde parou (decisão 035).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExecucaoEmAberto {
+    pub run_id: String,
+    pub started_at: DateTime<Utc>,
+}
+
 pub struct RunsRepository {
     conn: Connection,
 }
@@ -195,6 +205,36 @@ impl RunsRepository {
         Ok(())
     }
 
+    /// A última execução em modo `paper` que não foi encerrada.
+    ///
+    /// Ordenada por `run_id` e não por `started_at`: o identificador é ULID,
+    /// ordenável por tempo por construção, e ordenar pelo que é chave não
+    /// depende de o relógio da máquina ter andado para a frente.
+    pub fn ultima_paper_em_aberto(&self) -> Result<Option<ExecucaoEmAberto>, StorageError> {
+        let mut stmt = self
+            .conn
+            .prepare(
+                "SELECT run_id, started_at FROM run \
+                 WHERE mode = 'paper' AND ended_at IS NULL \
+                 ORDER BY run_id DESC LIMIT 1",
+            )
+            .map_err(|e| StorageError::Query(e.to_string()))?;
+
+        let mut linhas = stmt
+            .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)?)))
+            .map_err(|e| StorageError::Query(e.to_string()))?;
+
+        match linhas.next() {
+            None => Ok(None),
+            Some(linha) => {
+                let (run_id, ms) = linha.map_err(|e| StorageError::Query(e.to_string()))?;
+                let started_at = DateTime::from_timestamp_millis(ms)
+                    .ok_or_else(|| StorageError::Query(format!("instante inválido: {ms}")))?;
+                Ok(Some(ExecucaoEmAberto { run_id, started_at }))
+            }
+        }
+    }
+
     pub fn connection(&self) -> &Connection {
         &self.conn
     }
@@ -327,5 +367,80 @@ mod tests {
             })
             .unwrap();
         assert_eq!(preco, "63420.12345678", "nenhum dígito perdido no disco");
+    }
+}
+
+#[cfg(test)]
+mod testes_retomada {
+    use super::*;
+    use crate::db::open_runs;
+    use chrono::TimeZone;
+    use rust_decimal::dec;
+    use tempfile::tempdir;
+
+    fn repo() -> (tempfile::TempDir, RunsRepository) {
+        let dir = tempdir().unwrap();
+        let conn = open_runs(dir.path().join("runs.db")).unwrap();
+        (dir, RunsRepository::new(conn))
+    }
+
+    fn abrir(r: &mut RunsRepository, run_id: &str, mode: ExecutionMode, hora: u32) {
+        let sym = Symbol::new("BTCUSDT").unwrap();
+        let lim = RiskLimits::default();
+        let fees = FeeModel::default();
+        let params = BTreeMap::new();
+        let t = Utc.with_ymd_and_hms(2026, 1, 1, hora, 0, 0).unwrap();
+        r.start_run(&RunHeader {
+            run_id,
+            mode,
+            symbol: &sym,
+            interval: Interval::M1,
+            from: t,
+            to: t + chrono::Duration::days(1),
+            initial_capital: dec!(10000),
+            limits: &lim,
+            fees: &fees,
+            strategy: "sma-cross",
+            strategy_params: &params,
+            started_at: t,
+        })
+        .unwrap();
+    }
+
+    #[test]
+    fn sem_execucao_paper_nao_ha_o_que_retomar() {
+        let (_d, mut r) = repo();
+        abrir(&mut r, "B1", ExecutionMode::Backtest, 1);
+        assert_eq!(r.ultima_paper_em_aberto().unwrap(), None);
+    }
+
+    #[test]
+    fn a_execucao_encerrada_nao_e_retomada() {
+        let (_d, mut r) = repo();
+        abrir(&mut r, "P1", ExecutionMode::Paper, 1);
+        r.finish_run("P1", Utc::now(), "completed", None).unwrap();
+        assert_eq!(
+            r.ultima_paper_em_aberto().unwrap(),
+            None,
+            "encerrada é encerrada: retomá-la duplicaria o registro dela"
+        );
+    }
+
+    #[test]
+    fn retoma_a_mais_recente_das_que_ficaram_abertas() {
+        let (_d, mut r) = repo();
+        abrir(&mut r, "P1", ExecutionMode::Paper, 1);
+        abrir(&mut r, "P2", ExecutionMode::Paper, 2);
+        let a = r.ultima_paper_em_aberto().unwrap().unwrap();
+        assert_eq!(a.run_id, "P2");
+    }
+
+    #[test]
+    fn um_backtest_em_aberto_nao_e_confundido_com_sessao() {
+        let (_d, mut r) = repo();
+        abrir(&mut r, "P1", ExecutionMode::Paper, 1);
+        abrir(&mut r, "Z9", ExecutionMode::Backtest, 9);
+        let a = r.ultima_paper_em_aberto().unwrap().unwrap();
+        assert_eq!(a.run_id, "P1", "o modo separa, e o ULID maior não engana");
     }
 }

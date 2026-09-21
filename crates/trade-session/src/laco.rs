@@ -7,7 +7,9 @@ use trade_domain::{
     AuditKind, CausaDoFechamento, FeeModel, Instrumento, Intent, MarketContext, Money, Order,
     OrderId, Position, Side, Signal, Strategy, Symbol, Trade, Verdict,
 };
-use trade_ports::{Clock, LiveCandleSource, MarketError, OrderExecutor, Recorder};
+use trade_ports::{
+    Clock, LiveCandleSource, MarketError, OrderExecutor, PrecoDeReferencia, Recorder,
+};
 use trade_risk::{RiskContext, RiskGuard};
 
 /// A cerca de operação de uma sessão.
@@ -22,6 +24,18 @@ pub struct SessaoConfig {
     /// Vem da configuração e não de constante: limiar de risco vive em
     /// `limits.toml`, nunca embutido no código.
     pub prazo_maximo: Duration,
+}
+
+/// O que está fora do laço e ele precisa consultar a cada volta.
+///
+/// Os três juntos num lugar só porque são a mesma coisa: o mundo de fora. O
+/// relógio diz que horas são, a bandeira diz se é para continuar, e o preço é
+/// o único fio até o executor — que está dentro do `RiskGuard` e, de resto,
+/// inalcançável.
+pub struct Ambiente<'a> {
+    pub clock: &'a dyn Clock,
+    pub parar: &'a AtomicBool,
+    pub preco: &'a dyn PrecoDeReferencia,
 }
 
 /// De onde a sessão parte.
@@ -81,15 +95,13 @@ impl Sessao {
     /// O relógio é consultado **uma vez por vela**, e o instante vale para
     /// todos os eventos daquela volta. É o que faz a cadeia sinal → ordem →
     /// decisão → preenchimento compartilhar um instante só, como no backtest.
-    #[allow(clippy::too_many_arguments)]
     pub fn executar<E: OrderExecutor>(
         &self,
         strategy: &mut dyn Strategy,
         fonte: &mut dyn LiveCandleSource,
         guard: &mut RiskGuard<E>,
-        clock: &dyn Clock,
+        ambiente: &Ambiente<'_>,
         inicio: SessaoInicio,
-        parar: &AtomicBool,
         audit: &mut dyn Recorder,
     ) -> Result<SessaoOutcome, MarketError> {
         let cfg = &self.config;
@@ -106,7 +118,7 @@ impl Sessao {
         loop {
             // Antes de pedir a próxima vela: pedir primeiro deixaria o laço
             // bloqueado na fonte esperando algo que já não vai ser usado.
-            if parar.load(Ordering::SeqCst) {
+            if ambiente.parar.load(Ordering::SeqCst) {
                 fim = FimDaSessao::Interrompida;
                 break;
             }
@@ -120,7 +132,10 @@ impl Sessao {
             })?;
             velas += 1;
 
-            let agora = clock.now();
+            let agora = ambiente.clock.now();
+            // O executor calcula o stop sobre este preço. É o único dado que
+            // atravessa a cerca em direção a ele.
+            ambiente.preco.definir(candle.close);
 
             // Retomada automática na virada do dia, sem ato humano (FR-022a).
             // A posição aberta atravessa: o dia mudou, o prazo dela não

@@ -203,7 +203,12 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
     Ok((code, saida))
 }
 
-fn montar_estrategia(nome: &str, params: &str) -> Result<Box<dyn Strategy>, String> {
+/// Escolhe a estratégia concreta pelo nome.
+///
+/// `pub(crate)` porque a sessão de paper compõe a mesma estratégia pelo mesmo
+/// nome: duas listas de nomes divergiriam no dia em que uma ganhasse entrada
+/// nova, e o backtest deixaria de validar o que o paper roda.
+pub(crate) fn montar_estrategia(nome: &str, params: &str) -> Result<Box<dyn Strategy>, String> {
     let mapa = parse_params(params)?;
     match nome {
         "sma-cross" => {

@@ -11,6 +11,7 @@ trade-ports.workspace = true
 trade-risk.workspace = true
 trade-strategy.workspace = true
 trade-backtest.workspace = true
+trade-session.workspace = true
 trade-storage.workspace = true
 trade-bybit.workspace = true
 trade-paper.workspace = true

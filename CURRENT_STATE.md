@@ -14,11 +14,11 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**320 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**345 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
-no commit `87d3293` (decisão 031, `conferir_o_que_os_documentos_afirmam`,
+no commit `5558b51` (decisão 031, `conferir_o_que_os_documentos_afirmam`,
 `noul` 0,73). Conferem: 105 de 105 tarefas da feature 001; nove execuções,
 1.146.977 eventos e 114.653 linhas de extrato no `runs.db`; 525.600 velas e
 zero lacunas no `market.db`; 229.443 ordens para 229.443 decisões de risco;
@@ -105,11 +105,10 @@ não chega a precisar de ADR.
 
 ## Em andamento: feature 002, paper trading
 
-Spec, plano e tarefas escritos. **31 de 45 tarefas concluídas** — fatias 1 a 5
-fechadas. Das catorze abertas, **seis são a fatia 5b, que não exige
-credencial** e foi acrescentada em 2026-09-21; as oito restantes são as fatias
-6 e 7, que exigem chave de testnet e trinta dias corridos. Contado em
-`specs/002-paper-trading/tasks.md`, 2026-09-21.
+Spec, plano e tarefas escritos. **37 de 45 tarefas concluídas** — fatias 1 a 5b
+fechadas. **Tudo que não exige credencial está feito.** As oito abertas são as
+fatias 6 e 7: criar a chave de testnet, a primeira ordem real, e os trinta dias
+corridos. Contado em `specs/002-paper-trading/tasks.md`, 2026-09-21.
 
 > Até 2026-09-21 este parágrafo dizia 25 de 31 quando eram 23, e a folha de
 > passagem do DsTrade dizia "fatias 1 a 4 fechadas" com T024 e T025 ainda
@@ -171,7 +170,32 @@ quem instala o tratador de SIGINT/SIGTERM é a CLI (`parada::instalar`). Sair de
 dentro do tratador não roda destrutor nenhum e perderia o lote de eventos ainda
 em memória — a bandeira deixa a volta corrente terminar e gravar antes de sair.
 
-### A fatia 5b, e por que ela existe
+### A fatia 5b — feita
+
+**`trade paper rodar` existe e as peças estão ligadas.** A ordem das
+verificações não é arbitrária; cada uma só faz sentido se a anterior passou, e
+todas vêm **antes** da primeira vela: o modo é `paper` e `live` é recusado no
+próprio argumento; a cerca e o instrumento saem do arquivo e o perfil é
+validado; a credencial existe, não convive com a de produção e não saca; a
+sessão retoma a execução anterior se houver uma em aberto; e a posição local é
+**reconciliada com a da corretora**.
+
+Divergente ou desconhecido, a sessão **não começa** — e o veredito fica no
+registro de qualquer forma, inclusive quando dá certo. É o nono `kind`,
+`reconciliation`, criado pela decisão 035 (0,99 · confiança 0,98). O
+`docs/auditoria.md` foi atualizado com a consulta dele.
+
+O que faltava para reconciliar e ninguém tinha notado: **nada buscava a posição
+reportada pela corretora.** `comparar` recebia a quantidade remota como
+parâmetro e nada a produzia. `trade_paper::saldo_de` é esse outro lado, e lê o
+saldo como string direto para `Decimal` — passar por ponto flutuante
+inventaria divergência, e divergência para o robô e chama um humano.
+
+A sessão **retoma sozinha** a última execução `paper` sem `ended_at` (decisão
+035): cai o processo, sobe de novo, continua a mesma execução. Começar uma nova
+com posição aberta partiria o registro dela em dois.
+
+### Por que a fatia 5b existiu
 
 A fatia 5 terminou com **quatro peças prontas e nenhuma com chamador**. Busca
 por consumidor em todas as crates, 2026-09-21, commit `5558b51`: o

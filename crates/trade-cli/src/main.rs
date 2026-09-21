@@ -3,7 +3,7 @@
 use clap::Parser;
 use std::process::ExitCode;
 use trade_cli::cli::{Cli, Command};
-use trade_cli::{cmd_backtest, cmd_collect, cmd_paper, cmd_perfil};
+use trade_cli::{cmd_backtest, cmd_collect, cmd_paper, cmd_paper_rodar, cmd_perfil};
 use trade_risk::KillSwitch;
 
 fn main() -> ExitCode {
@@ -36,11 +36,8 @@ fn main() -> ExitCode {
             ExitCode::from(code as u8)
         }
 
-        Command::Paper(args) => {
-            let r = match args.acao {
-                trade_cli::cli::PaperAcao::Verificar => cmd_paper::run(),
-            };
-            match r {
+        Command::Paper(args) => match &args.acao {
+            trade_cli::cli::PaperAcao::Verificar => match cmd_paper::run() {
                 Ok(saida) => {
                     println!("{saida}");
                     ExitCode::SUCCESS
@@ -49,8 +46,17 @@ fn main() -> ExitCode {
                     eprintln!("{msg}");
                     ExitCode::from(codigo)
                 }
+            },
+            trade_cli::cli::PaperAcao::Rodar(rodar) => {
+                let (codigo, saida) = cmd_paper_rodar::run(rodar);
+                if codigo == trade_cli::cmd_backtest::ExitCode::Ok {
+                    println!("{saida}");
+                } else {
+                    eprintln!("{saida}");
+                }
+                ExitCode::from(codigo as u8)
             }
-        }
+        },
 
         Command::Perfil(args) => match cmd_perfil::run(args) {
             Ok(saida) => {

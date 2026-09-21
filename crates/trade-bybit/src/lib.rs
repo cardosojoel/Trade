@@ -8,6 +8,7 @@
 //! ordens e não há credencial — o endpoint `/v5/market/kline` é público, o que
 //! mantém o Princípio VI intocado.
 
+pub mod ao_vivo;
 pub mod auth;
 pub mod backoff;
 pub mod client;
@@ -18,5 +19,6 @@ pub mod errors;
 pub mod gaps;
 pub mod parse;
 
+pub use ao_vivo::FonteAoVivo;
 pub use client::{BybitClient, KlinePage};
 pub use collector::{CollectOutcome, Collector};

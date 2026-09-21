@@ -14,10 +14,12 @@ use trade_domain::{
     Candle, ExecutionMode, FeeModel, Instrumento, Intent, MarketContext, Money, Position,
     RiskLimits, Signal, SignalId, SignalInputs, Strategy, Symbol,
 };
-use trade_ports::testing::{InMemoryAuditSink, StubOrderExecutor, VecLiveCandleSource};
+use trade_ports::testing::{
+    InMemoryAuditSink, PrecoIgnorado, StubOrderExecutor, VecLiveCandleSource,
+};
 use trade_ports::{AuditRecorder, Clock};
 use trade_risk::{KillSwitch, RiskGuard};
-use trade_session::{FimDaSessao, Sessao, SessaoConfig, SessaoInicio};
+use trade_session::{Ambiente, FimDaSessao, Sessao, SessaoConfig, SessaoInicio};
 
 fn t(h: i64) -> DateTime<Utc> {
     Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap() + Duration::hours(h)
@@ -192,9 +194,12 @@ fn o_laco_encaminha_a_ordem_pelo_guard() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(Position::default(), dec!(10000)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -235,9 +240,12 @@ fn nenhuma_ordem_alcanca_o_executor_sem_decisao_registrada() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(Position::default(), dec!(10000)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -271,9 +279,12 @@ fn posicao_que_atinge_o_prazo_e_encerrada() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(comprado_em(dec!(1), dec!(100), t(0)), dec!(0)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -303,9 +314,12 @@ fn abaixo_do_prazo_a_posicao_continua() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(comprado_em(dec!(1), dec!(100), t(0)), dec!(0)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -334,9 +348,12 @@ fn o_registro_diz_que_foi_o_prazo_que_fechou() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(comprado_em(dec!(1), dec!(100), t(0)), dec!(0)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -367,9 +384,12 @@ fn o_registro_diz_que_foi_o_sinal_que_fechou() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(comprado_em(dec!(1), dec!(100), t(0)), dec!(0)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -403,9 +423,12 @@ fn a_virada_de_dia_solta_o_freio_com_a_posicao_atravessando() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(comprado_em(dec!(1), dec!(100), t(20)), dec!(0)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -452,9 +475,12 @@ fn falha_transitoria_retenta_e_a_sessao_continua() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(Position::default(), dec!(10000)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -492,9 +518,12 @@ fn retentativas_esgotadas_param_a_sessao() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(Position::default(), dec!(10000)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -533,9 +562,12 @@ fn a_bandeira_de_parada_encerra_limpo_sem_perder_evento() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(Position::default(), dec!(10000)),
-            &parar,
             &mut rec,
         )
         .unwrap();
@@ -589,9 +621,12 @@ fn a_bandeira_no_meio_encerra_depois_da_volta_corrente() {
             &mut est,
             &mut fonte,
             &mut guard,
-            &relogio,
+            &Ambiente {
+                clock: &relogio,
+                parar: &parar,
+                preco: &PrecoIgnorado,
+            },
             inicio(Position::default(), dec!(10000)),
-            &parar,
             &mut rec,
         )
         .unwrap();

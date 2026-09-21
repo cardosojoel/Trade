@@ -146,7 +146,7 @@ ORDER BY seq;
 
 ### Transições de estado
 
-O oitavo tipo de evento. Não aparece na consulta acima porque a carga é outra:
+Não aparece na consulta acima porque a carga é outra:
 `halt`, `resume` e `anomaly` explicam **por que** a operação parou;
 `state_transition` registra **o que a posição era** em cada mudança de estado.
 
@@ -155,15 +155,53 @@ SELECT seq, datetime(at_ms/1000, 'unixepoch') AS quando,
        json_extract(payload_json, '$.from')      AS de,
        json_extract(payload_json, '$.to')        AS para,
        json_extract(payload_json, '$.qty')       AS quantidade,
-       json_extract(payload_json, '$.avg_price') AS preco_medio
+       json_extract(payload_json, '$.avg_price')  AS preco_medio,
+       json_extract(payload_json, '$.fechado_por') AS fechado_por
 FROM audit_event
 WHERE run_id = :run AND kind = 'state_transition'
 ORDER BY seq;
 ```
 
-Os oito tipos de `kind` são `signal`, `order`, `risk_decision`, `fill`, `halt`,
-`resume`, `anomaly` e `state_transition`. Uma reconstituição que ignore o
-último responde o que o robô decidiu, mas não de que posição ele partiu.
+`fechado_por` diz **o que** encerrou o episódio — `sinal` ou `prazo` —, e vem
+nulo na transição que abre posição, porque aí não há fechamento a explicar. O
+campo existe desde que a emenda 2.0.0 criou o prazo de 72 horas: antes dela a
+posição só fechava por um motivo, e não havia o que distinguir.
+
+### Reconciliação
+
+Compara a posição que o sistema julga ter com a que a corretora reporta.
+
+```sql
+SELECT seq, datetime(at_ms/1000, 'unixepoch')          AS quando,
+       json_extract(payload_json, '$.veredito')        AS veredito,
+       json_extract(payload_json, '$.local')           AS local,
+       json_extract(payload_json, '$.remota')          AS remota,
+       json_extract(payload_json, '$.diferenca')       AS diferenca,
+       json_extract(payload_json, '$.causa')           AS causa,
+       json_extract(payload_json, '$.requires_human')  AS exige_humano
+FROM audit_event
+WHERE run_id = :run AND kind = 'reconciliation'
+ORDER BY seq;
+```
+
+Os três vereditos têm nome escrito: `sincronizado`, `divergente` e
+`desconhecido`. **`desconhecido` não é sinônimo de `sincronizado`** — bloqueia
+entrada nova do mesmo jeito que divergência, e a diferença entre "não tem" e
+"não sei" é a razão de ele existir.
+
+O evento registra também a conferência que **deu certo**, e não só a que
+falhou. A parada por divergência já cabia em `halt`; o que não cabia em lugar
+nenhum era a prova de que se conferiu. Uma reconciliação que aconteceu e não
+ficou registrada não se reconstitui.
+
+### Os nove tipos
+
+`signal`, `order`, `risk_decision`, `fill`, `halt`, `resume`, `anomaly`,
+`state_transition` e `reconciliation`.
+
+Uma reconstituição que ignore `state_transition` responde o que o robô
+decidiu, mas não de que posição ele partiu. Uma que ignore `reconciliation`
+não sabe dizer se ele estava de acordo com a corretora quando decidiu.
 
 ---
 

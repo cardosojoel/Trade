@@ -14,35 +14,10 @@
 use rust_decimal::Decimal;
 use trade_domain::{Instrumento, Money, Qty};
 
-/// O que a comparação conclui.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Veredito {
-    /// Posições coincidem dentro da tolerância.
-    Sincronizado,
-    /// Divergem além da tolerância. Falha de integridade.
-    Divergente {
-        local: Qty,
-        remota: Qty,
-        diferenca: Qty,
-    },
-    /// Não foi possível saber. **Não é sinônimo de sincronizado**: bloqueia
-    /// nova entrada do mesmo jeito que divergência.
-    Desconhecido(String),
-}
-
-impl Veredito {
-    /// Pode abrir posição nova?
-    ///
-    /// Só quando sincronizado. `Desconhecido` bloqueia porque operar sem saber
-    /// a posição é exatamente o que o Princípio II chama de anomalia.
-    pub const fn permite_nova_entrada(&self) -> bool {
-        matches!(self, Veredito::Sincronizado)
-    }
-
-    pub const fn exige_revisao_humana(&self) -> bool {
-        matches!(self, Veredito::Divergente { .. })
-    }
-}
+// O veredito é vocabulário do domínio, e vive lá: o registro de auditoria
+// precisa nomeá-lo, e `trade-domain` não pode depender desta crate. O que
+// vive aqui é a **lógica** — é ela que conhece a tolerância.
+pub use trade_domain::Veredito;
 
 /// Compara quantidade detida local com a reportada.
 pub fn comparar(local: Qty, remota: Qty, instrumento: &Instrumento) -> Veredito {

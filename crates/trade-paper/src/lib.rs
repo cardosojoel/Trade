@@ -10,6 +10,7 @@
 //! a lógica crítica — identificador de ordem, stop obrigatório, resultado
 //! desconhecido — ficaria sem teste até alguém ter uma chave.
 
+pub mod conta;
 pub mod erros;
 pub mod executor;
 pub mod ordem;
@@ -17,6 +18,7 @@ pub mod permissao;
 pub mod reconcile;
 pub mod transporte;
 
+pub use conta::{ContaError, saldo_de};
 pub use executor::{PaperExecutor, PrecoCorrente};
 pub use permissao::{PermissaoError, verificar_sem_saque};
 pub use reconcile::{Veredito, comparar, comparar_saldo};

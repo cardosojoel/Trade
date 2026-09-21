@@ -14,5 +14,5 @@
 pub mod laco;
 pub mod relogio;
 
-pub use laco::{FimDaSessao, Sessao, SessaoConfig, SessaoInicio, SessaoOutcome};
+pub use laco::{Ambiente, FimDaSessao, Sessao, SessaoConfig, SessaoInicio, SessaoOutcome};
 pub use relogio::RelogioReal;

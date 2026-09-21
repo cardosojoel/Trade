@@ -62,6 +62,16 @@ pub trait LiveCandleSource {
     fn proxima(&mut self) -> Result<Option<Candle>, MarketError>;
 }
 
+/// Canal por onde o laço informa o preço de referência da vela corrente.
+///
+/// O executor está **dentro** do `RiskGuard` e não é alcançável de fora — é o
+/// que torna FR-018 uma propriedade do tipo. Mas ele precisa saber sobre que
+/// preço calcular o stop da ordem. Esta porta é o único fio entre os dois, e
+/// carrega um número só: não dá para submeter ordem por ela.
+pub trait PrecoDeReferencia {
+    fn definir(&self, preco: Money);
+}
+
 /// Destino das ordens.
 ///
 /// **Quem obtém um `OrderExecutor` obtém acesso ao mercado.** Por isso ele não

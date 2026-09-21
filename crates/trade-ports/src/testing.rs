@@ -221,6 +221,16 @@ impl MarketDataSource for VecMarketDataSource {
     }
 }
 
+/// Preço de referência que ninguém lê.
+///
+/// Para o laço testado sem executor de verdade do outro lado.
+#[derive(Debug, Default)]
+pub struct PrecoIgnorado;
+
+impl crate::PrecoDeReferencia for PrecoIgnorado {
+    fn definir(&self, _preco: Money) {}
+}
+
 /// Fonte ao vivo roteirizada: devolve as velas na ordem e depois se encerra.
 ///
 /// É o que torna o laço de sessão verificável sem rede e sem espera — a fonte

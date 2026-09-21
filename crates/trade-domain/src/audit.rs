@@ -9,6 +9,7 @@
 
 use crate::mode::ExecutionMode;
 use crate::position::Position;
+use crate::reconciliacao::Veredito;
 use crate::risk_types::{Anomaly, RiskDecision};
 use crate::types::{CausaDoFechamento, Fill, Order, Signal};
 use chrono::{DateTime, Utc};
@@ -58,6 +59,18 @@ pub enum AuditKind {
         /// que o `REQ-UI-044` fixou e o `FR-006` levou ao protocolo.
         fechado_por: Option<CausaDoFechamento>,
     },
+    /// Conferência entre a posição local e a reportada pela corretora.
+    ///
+    /// O nono `kind`, criado pela decisão 035 do Jev. Os oito anteriores
+    /// registram o que o robô **fez**; este registra o que ele **conferiu** —
+    /// e sem ele uma reconciliação que deu certo não deixa prova de ter
+    /// acontecido, que é a pendência P8. A divergência já cabia em `halt`; o
+    /// `SYNCED` de cada sessão não cabia em lugar nenhum.
+    Reconciliation {
+        veredito: Veredito,
+        /// A posição que o sistema julga ter.
+        local: crate::Qty,
+    },
 }
 
 impl AuditKind {
@@ -72,6 +85,7 @@ impl AuditKind {
             AuditKind::Resume { .. } => "resume",
             AuditKind::Anomaly { .. } => "anomaly",
             AuditKind::StateTransition { .. } => "state_transition",
+            AuditKind::Reconciliation { .. } => "reconciliation",
         }
     }
 }
@@ -193,6 +207,30 @@ impl AuditKind {
                 "requires_human": anomaly.requires_human(),
             }),
 
+            AuditKind::Reconciliation { veredito, local } => json!({
+                "veredito": veredito.as_str(),
+                "local": d(*local),
+                // A reportada e a diferença só existem quando diverge, e a
+                // causa só quando não se pôde saber. Presentes e nulos nos
+                // demais casos, nunca omitidos (REQ-UI-044).
+                "remota": match veredito {
+                    Veredito::Divergente { remota, .. } => Some(d(*remota)),
+                    _ => None,
+                },
+                "diferenca": match veredito {
+                    Veredito::Divergente { diferenca, .. } => Some(d(*diferenca)),
+                    _ => None,
+                },
+                "causa": match veredito {
+                    Veredito::Desconhecido(c) => Some(c.clone()),
+                    _ => None,
+                },
+                // É o que permite conferir por consulta que nenhuma ordem
+                // sucedeu uma reconciliação que não autorizava entrada.
+                "permite_nova_entrada": veredito.permite_nova_entrada(),
+                "requires_human": veredito.exige_revisao_humana(),
+            }),
+
             AuditKind::StateTransition {
                 from,
                 to,
@@ -238,6 +276,10 @@ mod tests {
             "max_position_size",
             "max_total_exposure",
             "max_price_deviation_ratio",
+            // Os três da reconciliação: quantidade é dinheiro do mesmo jeito.
+            "local",
+            "remota",
+            "diferenca",
         ];
         match v {
             Value::Object(m) => {
@@ -311,6 +353,14 @@ mod tests {
                 position: pos,
                 fechado_por: Some(CausaDoFechamento::Prazo),
             },
+            AuditKind::Reconciliation {
+                veredito: Veredito::Divergente {
+                    local: dec!(0.5),
+                    remota: dec!(0.4),
+                    diferenca: dec!(0.1),
+                },
+                local: dec!(0.5),
+            },
         ]
     }
 
@@ -363,6 +413,49 @@ mod tests {
         let anomalia = &todos_os_eventos()[6];
         assert_eq!(anomalia.payload()["requires_human"], false);
         assert_eq!(anomalia.payload()["classification"], "Transient");
+    }
+
+    #[test]
+    fn a_reconciliacao_que_deu_certo_tambem_deixa_prova() {
+        // P8: a divergência já cabia em `halt`. O que não cabia em lugar
+        // nenhum era o veredito da conferência que deu certo — e é ele que
+        // prova que se conferiu.
+        let ok = AuditKind::Reconciliation {
+            veredito: Veredito::Sincronizado,
+            local: dec!(0.5),
+        };
+        let p = ok.payload();
+        assert_eq!(ok.as_str(), "reconciliation");
+        assert_eq!(p["veredito"], "sincronizado");
+        assert_eq!(p["permite_nova_entrada"], true);
+        assert_eq!(p["requires_human"], false);
+        assert!(p["remota"].is_null(), "não diverge: presente e nulo");
+    }
+
+    #[test]
+    fn a_divergencia_traz_os_dois_lados_e_exige_humano() {
+        let p = todos_os_eventos()[8].payload();
+        assert_eq!(p["veredito"], "divergente");
+        assert_eq!(p["local"], "0.5");
+        assert_eq!(p["remota"], "0.4");
+        assert_eq!(p["diferenca"], "0.1");
+        assert_eq!(p["permite_nova_entrada"], false);
+        assert_eq!(p["requires_human"], true);
+    }
+
+    #[test]
+    fn o_desconhecido_nao_permite_entrada_e_nao_exige_humano() {
+        // Desconhecido não é sinônimo de sincronizado: bloqueia entrada nova.
+        // E não é divergência provada, então não aciona revisão humana — o
+        // que ele exige é reconciliar de novo.
+        let d = AuditKind::Reconciliation {
+            veredito: Veredito::Desconhecido("a corretora não respondeu".into()),
+            local: dec!(0.5),
+        };
+        let p = d.payload();
+        assert_eq!(p["veredito"], "desconhecido");
+        assert_eq!(p["permite_nova_entrada"], false);
+        assert_eq!(p["causa"], "a corretora não respondeu");
     }
 
     #[test]

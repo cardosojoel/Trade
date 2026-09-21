@@ -45,10 +45,65 @@ pub struct PaperArgs {
     pub acao: PaperAcao,
 }
 
+// Mesma razão do enum `Command`: boxear resolveria o aviso e acrescentaria uma
+// indireção a um enum construído uma única vez, na inicialização do processo.
+#[allow(clippy::large_enum_variant)]
 #[derive(Subcommand, Debug)]
 pub enum PaperAcao {
     /// Credencial, relógio e permissão da chave. Não emite ordem.
     Verificar,
+    /// Abre a sessão contínua na testnet. **Emite ordem.**
+    Rodar(RodarArgs),
+}
+
+#[derive(clap::Args, Debug)]
+pub struct RodarArgs {
+    /// Modo de execução. Obrigatório e sem valor padrão.
+    ///
+    /// Sem padrão pelo mesmo motivo do `backtest`: o Princípio I proíbe que a
+    /// ausência de configuração resulte em qualquer coisa que toque dinheiro.
+    /// Aqui `live` é recusado — esta é a Porta 2, não a 3.
+    #[arg(long, required = true, value_parser = parse_mode)]
+    pub mode: ExecutionMode,
+
+    #[arg(long, default_value = "BTCUSDT")]
+    pub symbol: String,
+
+    #[arg(long, default_value = "1m", value_parser = parse_interval)]
+    pub interval: Interval,
+
+    /// Capital de partida da sessão, quando ela não retoma nenhuma.
+    #[arg(long, value_parser = parse_decimal)]
+    pub capital: Decimal,
+
+    #[arg(long, default_value = "sma-cross")]
+    pub strategy: String,
+
+    #[arg(long, default_value = "")]
+    pub strategy_params: String,
+
+    #[arg(long, default_value = "limits.toml")]
+    pub limits: PathBuf,
+
+    #[arg(long, default_value = "fees.toml")]
+    pub fees: PathBuf,
+
+    #[arg(long, default_value = "instrumento.toml")]
+    pub instrumento: PathBuf,
+
+    #[arg(long, default_value = "data/runs.db")]
+    pub runs_db: PathBuf,
+
+    #[arg(long, default_value = "data/KILL")]
+    pub kill_file: PathBuf,
+
+    /// Prazo máximo de posição, em horas (FR-114, emenda 2.0.0).
+    #[arg(long, default_value_t = 72)]
+    pub prazo_horas: i64,
+
+    /// Fração abaixo do preço de entrada onde o stop é colocado.
+    #[arg(long, default_value = "0.02", value_parser = parse_decimal)]
+    pub stop_fracao: Decimal,
 }
 
 #[derive(clap::Args, Debug)]

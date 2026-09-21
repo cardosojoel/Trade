@@ -65,12 +65,12 @@ Verificável sem rede e sem credencial.
 > documento fora deste repositório, e renumerar as falsificaria. A ordem de
 > execução é a da posição, não a do número.
 
-- [ ] T040 **(TF)** `LiveCandleSource` contra a Bybit: última vela **fechada**, nunca a em formação
-- [ ] T041 **(TF)** A sessão abre reconciliando; `DIVERGENTE` e `DESCONHECIDO` impedem a primeira ordem (FR-108)
-- [ ] T042 **(TF)** O veredito da reconciliação ganha destino no registro (P8, P13, `REQ-UI-049`)
-- [ ] T043 **(TF)** O `seq` retoma de onde parou — hoje reiniciar **sobrescreve** a auditoria da sessão anterior
-- [ ] T044 `trade paper rodar`: compõe credencial, executor dentro do `RiskGuard`, estado recuperado, estratégia, fonte e registro
-- [ ] T045 **(TF)** A execução grava `run` com `mode = 'paper'`, mais extrato e métricas ao encerrar
+- [X] T040 **(TF)** `LiveCandleSource` contra a Bybit: última vela **fechada**, nunca a em formação
+- [X] T041 **(TF)** A sessão abre reconciliando; `DIVERGENTE` e `DESCONHECIDO` impedem a primeira ordem (FR-108)
+- [X] T042 **(TF)** O veredito da reconciliação ganha destino no registro (P8, P13, `REQ-UI-049`)
+- [X] T043 **(TF)** O `seq` retoma de onde parou — hoje reiniciar **sobrescreve** a auditoria da sessão anterior
+- [X] T044 `trade paper rodar`: compõe credencial, executor dentro do `RiskGuard`, estado recuperado, estratégia, fonte e registro
+- [X] T045 **(TF)** A execução grava `run` com `mode = 'paper'`, mais extrato e métricas ao encerrar
 
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 

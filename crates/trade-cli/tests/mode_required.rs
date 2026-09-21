@@ -49,13 +49,16 @@ fn modo_paper_nao_roda_sob_o_comando_backtest() {
 }
 
 #[test]
-fn modo_live_diz_que_ainda_nao_existe() {
+fn modo_live_e_recusado_e_diz_por_que() {
+    // A mensagem mudou quando `paper` passou a rodar de verdade: `live` não
+    // é "ainda não implementado", é **não liberado**. A promoção é ato humano
+    // registrado, e dizer que falta código sugeriria que basta escrevê-lo.
     trade()
         .args(base())
         .args(["--mode", "live"])
         .assert()
         .code(2)
-        .stderr(contains("ainda não implementado"));
+        .stderr(contains("não liberado"));
 }
 
 #[test]

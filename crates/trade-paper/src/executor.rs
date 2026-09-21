@@ -42,6 +42,12 @@ impl PrecoCorrente {
     }
 }
 
+impl trade_ports::PrecoDeReferencia for PrecoCorrente {
+    fn definir(&self, preco: Money) {
+        self.set(preco);
+    }
+}
+
 pub struct PaperExecutor<T: Transporte> {
     transporte: T,
     simbolo: String,
