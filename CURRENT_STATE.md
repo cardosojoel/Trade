@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**305 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**320 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
@@ -105,11 +105,10 @@ não chega a precisar de ADR.
 
 ## Em andamento: feature 002, paper trading
 
-Spec, plano e tarefas escritos. **25 das 31 tarefas que não precisam de
-credencial estão concluídas** — fatias 1 a 4 fechadas, fatia 5 inteira em
-aberto. São 39 tarefas no total; as catorze restantes são a fatia 5 (T026 a
-T031) e as fatias 6 e 7, que exigem credencial de testnet e tempo. Contado em
-`specs/002-paper-trading/tasks.md`, 2026-09-21.
+Spec, plano e tarefas escritos. **As 31 tarefas que não precisam de credencial
+estão concluídas** — fatias 1 a 5 fechadas. São 39 no total; as oito restantes
+são as fatias 6 e 7, que exigem chave de testnet e trinta dias corridos.
+Contado em `specs/002-paper-trading/tasks.md`, 2026-09-21.
 
 > Até 2026-09-21 este parágrafo dizia 25 de 31 quando eram 23, e a folha de
 > passagem do DsTrade dizia "fatias 1 a 4 fechadas" com T024 e T025 ainda
@@ -146,10 +145,44 @@ esteve parado** não contaria contra o limite do dia, e o freio seria contornado
 por acidente. Decisão 030 do Jev (`deduzir_a_linha_de_base`, 0,59 · confiança
 0,45 — margem fina, contra 0,23 de retomar sem deduzir).
 
-O que falta sem credencial: o laço contínuo — relógio real, prazo de 72 h,
-retentativa, virada de dia e encerramento limpo (T026 a T031). **O que só o
-mantenedor destrava**: criar a chave de testnet sem permissão de saque, e os 30
-dias correrem.
+**O laço contínuo existe (fatia 5).** Crate nova `trade-session`, com a mesma
+forma de `trade-backtest`: conhece a camada de risco, não conhece o mercado. O
+executor chega já movido para dentro do `RiskGuard`, então não existe ali tipo
+que alcance a corretora por fora da cerca. Ela também não declara
+`trade-backtest`, e é assim que FR-115 — o relógio simulado é inalcançável em
+paper — virou invariante de build em vez de recomendação. Conferido por
+violação deliberada em 2026-09-21: declarar a dependência faz
+`tests/architecture.rs` falhar.
+
+O que o laço faz por volta: vira o dia se for o caso, executa o sinal da vela
+anterior, faz cumprir o prazo de 72 h, marca a posição a mercado e pede a
+decisão nova à estratégia. O relógio é consultado **uma vez por vela**, e o
+instante vale para todos os eventos daquela volta.
+
+**A posição passou a fechar por dois motivos, e o registro diz qual.** O evento
+`state_transition` ganhou `fechado_por` — `"sinal"`, `"prazo"`, ou presente e
+nulo quando a transição abre posição. Isso resolve a pendência **P11** do
+DsTrade e o `REQ-UI-042`, que esperavam exatamente o código que fecha a posição
+existir. Decisão 033 do Jev (`gravar_agora_no_evento`, 0,96 · confiança 0,94).
+
+O encerramento é **cooperativo**: o laço consulta uma bandeira a cada volta, e
+quem instala o tratador de SIGINT/SIGTERM é a CLI (`parada::instalar`). Sair de
+dentro do tratador não roda destrutor nenhum e perderia o lote de eventos ainda
+em memória — a bandeira deixa a volta corrente terminar e gravar antes de sair.
+
+### A lacuna que fica, e que tarefa nenhuma cobre
+
+O laço roda contra um duplo e **não roda contra a Bybit**: não existe
+implementação de `LiveCandleSource` contra a corretora, e não existe
+`trade paper rodar`. Isso é composição, e a fatia 5 foi definida como
+"verificável com duplo" — mas as tarefas da fatia 6 são *criar a chave*,
+*primeira ordem real* e *divergências medidas*, e **nenhuma delas é escrever a
+composição**. Do jeito que o `tasks.md` está, ninguém consegue rodar a T033 sem
+antes fazer um trabalho que não está listado. Levantado em 2026-09-21; não
+inventei tarefa nova para não decidir no lugar de quem decide.
+
+**O que só o mantenedor destrava**: criar a chave de testnet sem permissão de
+saque, e os 30 dias correrem.
 
 ---
 

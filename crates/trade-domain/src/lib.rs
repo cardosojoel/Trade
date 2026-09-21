@@ -33,8 +33,8 @@ pub use risk_types::{
 };
 pub use strategy::{MarketContext, Strategy};
 pub use types::{
-    Coverage, Fill, Gap, Intent, Interval, Order, OrderId, Side, Signal, SignalId, SignalInputs,
-    Symbol, Trade,
+    CausaDoFechamento, Coverage, Fill, Gap, Intent, Interval, Order, OrderId, Side, Signal,
+    SignalId, SignalInputs, Symbol, Trade,
 };
 
 /// Valor monetário. Alias sobre [`rust_decimal::Decimal`] para que a intenção

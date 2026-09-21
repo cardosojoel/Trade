@@ -117,6 +117,29 @@ impl Side {
     }
 }
 
+/// O que encerrou um episódio de posição.
+///
+/// Existe desde que a emenda 2.0.0 criou o prazo máximo de 72 horas: a partir
+/// dela a posição passou a fechar por **dois** motivos, e um registro que não
+/// os distingue não reconstitui o episódio (Princípio IV, `REQ-UI-042`,
+/// `FR-010` da especificação do `trade serve`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum CausaDoFechamento {
+    /// A estratégia mandou sair.
+    Sinal,
+    /// A posição atingiu o prazo máximo e foi encerrada por ele (FR-114).
+    Prazo,
+}
+
+impl CausaDoFechamento {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            CausaDoFechamento::Sinal => "sinal",
+            CausaDoFechamento::Prazo => "prazo",
+        }
+    }
+}
+
 /// Intenção da estratégia em um instante.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Intent {

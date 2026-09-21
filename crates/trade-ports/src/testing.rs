@@ -55,6 +55,20 @@ impl InMemoryAuditSink {
             .filter(|e| e.kind.as_str() == kind)
             .count()
     }
+
+    /// As causas de fechamento registradas, na ordem, só das transições que
+    /// **fecharam** algo.
+    ///
+    /// Uma transição que abre posição traz o campo presente e nulo, e não
+    /// aparece aqui: o que se verifica é que todo fechamento diz o que o
+    /// causou (`REQ-UI-042`).
+    pub fn causas_de_fechamento(&self) -> Vec<String> {
+        self.events
+            .iter()
+            .filter(|e| e.kind.as_str() == "state_transition")
+            .filter_map(|e| e.kind.payload()["fechado_por"].as_str().map(str::to_string))
+            .collect()
+    }
 }
 
 impl AuditSink for InMemoryAuditSink {
@@ -204,6 +218,28 @@ impl MarketDataSource for VecMarketDataSource {
             .filter(move |c| c.open_time >= from && c.open_time < to)
             .map(|c| Ok(c.clone()));
         Ok(Box::new(it))
+    }
+}
+
+/// Fonte ao vivo roteirizada: devolve as velas na ordem e depois se encerra.
+///
+/// É o que torna o laço de sessão verificável sem rede e sem espera — a fonte
+/// de verdade bloqueia até a vela fechar, esta devolve o que já tem.
+pub struct VecLiveCandleSource {
+    restantes: VecDeque<Candle>,
+}
+
+impl VecLiveCandleSource {
+    pub fn new(candles: Vec<Candle>) -> Self {
+        VecLiveCandleSource {
+            restantes: candles.into(),
+        }
+    }
+}
+
+impl crate::LiveCandleSource for VecLiveCandleSource {
+    fn proxima(&mut self) -> Result<Option<Candle>, MarketError> {
+        Ok(self.restantes.pop_front())
     }
 }
 

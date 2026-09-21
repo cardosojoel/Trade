@@ -61,13 +61,38 @@ crates/
 │   └── src/auth.rs       HMAC, recv_window, ordenação de parâmetros
 ├── trade-paper/          crate nova — o adaptador
 │   ├── src/executor.rs   OrderExecutor contra a testnet
-│   ├── src/reconcile.rs  posição local × reportada
-│   └── src/loop.rs       o laço contínuo
+│   └── src/reconcile.rs  posição local × reportada
+├── trade-session/        crate nova — o laço contínuo
+│   ├── src/laco.rs       prazo de 72h, virada de dia, parada limpa
+│   └── src/relogio.rs    o relógio do mundo
 └── trade-cli/            compõe conforme o modo
 ```
 
 `trade-paper` depende de `trade-ports`, `trade-domain` e `trade-bybit`. **Não**
 depende de `trade-strategy` nem de `trade-risk`: quem compõe é a CLI.
+
+`trade-session` depende de `trade-ports`, `trade-domain` e `trade-risk`, e
+**não** depende de corretora, de rede nem de `trade-backtest`. Está na lista
+`ISOLATED` de `tests/architecture.rs`.
+
+> **Emenda de 2026-09-21 — decisão 032 do Jev** (`crate_nova_isolada`, 0,95 ·
+> confiança 0,93; emendar o plano, `noul` 0,89).
+>
+> Até aqui este plano dizia duas coisas que não podem valer juntas: que o laço
+> vive em `trade-paper/src/loop.rs`, e que `trade-paper` não depende de
+> `trade-risk`. A T029 manda o laço encaminhar pelo `RiskGuard`, e nomear o
+> `RiskGuard` exige declarar `trade-risk`.
+>
+> O que decidiu a escolha não foi a contradição, foi o custo dela.
+> `trade-paper` declara `trade-bybit`, porque é ela que fala com a corretora.
+> Pôr o laço lá dentro deixaria, na mesma crate, o cliente da corretora ao lado
+> do guard — e "nenhuma ordem alcança a corretora fora da camada de risco"
+> passaria de garantia de compilação a cuidado de quem escreve. `trade-session`
+> repete a forma que `trade-backtest` já tem: conhece o risco, não conhece o
+> mercado.
+>
+> `loop` também é palavra reservada em Rust, e um módulo não pode se chamar
+> assim. O arquivo é `laco.rs`.
 
 ## Ordem de implementação
 

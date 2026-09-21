@@ -10,7 +10,7 @@
 use crate::mode::ExecutionMode;
 use crate::position::Position;
 use crate::risk_types::{Anomaly, RiskDecision};
-use crate::types::{Fill, Order, Signal};
+use crate::types::{CausaDoFechamento, Fill, Order, Signal};
 use chrono::{DateTime, Utc};
 
 /// Envelope comum a todo evento (FR-033).
@@ -51,6 +51,12 @@ pub enum AuditKind {
         from: String,
         to: String,
         position: Position,
+        /// O que encerrou o episódio, quando a transição o encerra.
+        ///
+        /// `None` numa transição que **abre** ou aumenta posição: não há
+        /// fechamento a explicar. Presente e nulo, nunca omitido — é a regra
+        /// que o `REQ-UI-044` fixou e o `FR-006` levou ao protocolo.
+        fechado_por: Option<CausaDoFechamento>,
     },
 }
 
@@ -187,11 +193,17 @@ impl AuditKind {
                 "requires_human": anomaly.requires_human(),
             }),
 
-            AuditKind::StateTransition { from, to, position } => json!({
+            AuditKind::StateTransition {
+                from,
+                to,
+                position,
+                fechado_por,
+            } => json!({
                 "from": from,
                 "to": to,
                 "qty": d(position.qty()),
                 "avg_price": d(position.avg_price()),
+                "fechado_por": fechado_por.map(CausaDoFechamento::as_str),
             }),
         }
     }
@@ -294,9 +306,10 @@ mod tests {
                 recovered: true,
             },
             AuditKind::StateTransition {
-                from: "Flat".into(),
-                to: "Long".into(),
+                from: "Long".into(),
+                to: "Flat".into(),
                 position: pos,
+                fechado_por: Some(CausaDoFechamento::Prazo),
             },
         ]
     }
@@ -350,6 +363,29 @@ mod tests {
         let anomalia = &todos_os_eventos()[6];
         assert_eq!(anomalia.payload()["requires_human"], false);
         assert_eq!(anomalia.payload()["classification"], "Transient");
+    }
+
+    #[test]
+    fn a_transicao_diz_o_que_fechou_o_episodio() {
+        // REQ-UI-042: a partir da emenda 2.0.0 a posição fecha por dois
+        // motivos, e o registro tem de dizer qual.
+        let p = todos_os_eventos()[7].payload();
+        assert_eq!(p["fechado_por"], "prazo");
+    }
+
+    #[test]
+    fn a_transicao_que_abre_traz_o_campo_presente_e_nulo() {
+        // Presente e nulo, nunca omitido: é a regra do REQ-UI-044, e é o que
+        // permite a quem lê distinguir "não fechou" de "não sei".
+        let abre = AuditKind::StateTransition {
+            from: "Flat".into(),
+            to: "Long".into(),
+            position: crate::Position::default(),
+            fechado_por: None,
+        };
+        let p = abre.payload();
+        assert!(p.get("fechado_por").is_some(), "o campo existe");
+        assert!(p["fechado_por"].is_null(), "e vem nulo");
     }
 
     #[test]

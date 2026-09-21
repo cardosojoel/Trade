@@ -1,0 +1,31 @@
+# O laço de uma sessão ao vivo.
+#
+# Mesma forma de `trade-backtest`: declara `trade-risk`, `trade-domain` e
+# `trade-ports`, e NÃO declara corretora nem cliente de rede. O executor entra
+# por composição, já movido para dentro do `RiskGuard` — é o que mantém
+# "nenhuma ordem alcança a corretora fora da camada de risco" como garantia de
+# compilação, e não como disciplina de quem escreve o laço.
+#
+# Não declara `trade-backtest`: é assim que FR-115 — o relógio de backtest é
+# inalcançável em paper — deixa de depender de cuidado. `tests/architecture.rs`
+# falha o build se qualquer uma dessas linhas for cruzada.
+
+[package]
+name = "trade-session"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+trade-domain.workspace = true
+trade-ports.workspace = true
+trade-risk.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+
+[dev-dependencies]
+trade-ports = { workspace = true, features = ["testing"] }
+
+[lints]
+workspace = true

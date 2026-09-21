@@ -46,12 +46,12 @@ Verificável sem rede e sem credencial.
 
 ## Fatia 5 — o laço contínuo
 
-- [ ] T026 **(TF)** `Clock` real; o de backtest é inalcançável em paper (FR-115)
-- [ ] T027 **(TF)** Posição que atinge 72h é encerrada (FR-114, emenda 2.0.0)
-- [ ] T028 **(TF)** Falha transitória retenta dentro do limite; acima dele, para (FR-111)
-- [ ] T029 Laço lê vela em tempo real, avalia, encaminha pelo `RiskGuard`
-- [ ] T030 **(TF)** Virada de dia zera o freio com posição aberta atravessando (FR-019b)
-- [ ] T031 Encerramento limpo: sinal do sistema fecha o registro sem perder evento
+- [X] T026 **(TF)** `Clock` real; o de backtest é inalcançável em paper (FR-115)
+- [X] T027 **(TF)** Posição que atinge 72h é encerrada (FR-114, emenda 2.0.0)
+- [X] T028 **(TF)** Falha transitória retenta dentro do limite; acima dele, para (FR-111)
+- [X] T029 Laço lê vela em tempo real, avalia, encaminha pelo `RiskGuard`
+- [X] T030 **(TF)** Virada de dia zera o freio com posição aberta atravessando (FR-019b)
+- [X] T031 Encerramento limpo: sinal do sistema fecha o registro sem perder evento
 
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 

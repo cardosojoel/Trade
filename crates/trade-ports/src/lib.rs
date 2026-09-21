@@ -42,6 +42,26 @@ pub trait MarketDataSource {
     ) -> Result<Box<dyn Iterator<Item = Result<Candle, MarketError>> + 'a>, MarketError>;
 }
 
+/// Origem das velas **de uma sessão ao vivo**.
+///
+/// Separada de [`MarketDataSource`] de propósito. Aquela percorre um período
+/// fechado e termina; esta acompanha o mercado enquanto ele anda, e não tem
+/// fim conhecido no momento da chamada. Espalhar os dois casos sobre a mesma
+/// trait obrigaria o backtest a saber esperar e a sessão a saber terminar.
+///
+/// A implementação **bloqueia** até a próxima vela fechar. Quem acompanha o
+/// mercado espera; quem testa devolve uma sequência pronta. É o que mantém o
+/// laço livre de relógio e de espera — e portanto testável sem nenhum dos
+/// dois.
+pub trait LiveCandleSource {
+    /// A próxima vela **fechada**, ou `None` quando a fonte se encerra.
+    ///
+    /// Sempre fechada, nunca em formação: no meio de uma vela o preço de
+    /// fechamento é só o último negócio, e decidir sobre ele é decidir sobre
+    /// um número que ainda vai mudar.
+    fn proxima(&mut self) -> Result<Option<Candle>, MarketError>;
+}
+
 /// Destino das ordens.
 ///
 /// **Quem obtém um `OrderExecutor` obtém acesso ao mercado.** Por isso ele não

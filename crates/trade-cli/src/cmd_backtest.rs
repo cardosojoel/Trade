@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 use std::time::SystemTime;
 use trade_backtest::{BacktestConfig, BacktestEngine, RunOutcome};
 use trade_domain::{ExecutionMode, FeeModel, Strategy, Symbol};
-use trade_ports::AuditRecorder;
+use trade_ports::{AuditRecorder, Recorder};
 use trade_risk::KillSwitch;
 use trade_storage::runs_repo::{RunHeader, RunsRepository};
 use trade_storage::{SqliteAuditSink, SqliteMarketDataSource, open_market, open_runs};

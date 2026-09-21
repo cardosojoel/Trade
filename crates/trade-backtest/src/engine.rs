@@ -211,6 +211,12 @@ impl BacktestEngine {
                                                     from: estado_antes.into(),
                                                     to: estado(&position).into(),
                                                     position: position.clone(),
+                                                    // No backtest só existe um
+                                                    // motivo de saída: não há
+                                                    // prazo a atingir aqui.
+                                                    fechado_por: Some(
+                                                        trade_domain::CausaDoFechamento::Sinal,
+                                                    ),
                                                 },
                                             );
                                             trades.push(operacao);
@@ -223,6 +229,8 @@ impl BacktestEngine {
                                                     from: estado_antes.into(),
                                                     to: estado(&position).into(),
                                                     position: position.clone(),
+                                                    // Compra não fecha nada.
+                                                    fechado_por: None,
                                                 },
                                             );
                                         }

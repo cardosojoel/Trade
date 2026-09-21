@@ -300,6 +300,7 @@ fn a_transicao_de_estado_grava_valores_como_texto() {
             from: "Flat".into(),
             to: "Long".into(),
             position: Position::default(),
+            fechado_por: None,
         },
     )
     .unwrap();

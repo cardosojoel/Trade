@@ -21,6 +21,14 @@ pub trait Recorder {
     fn record(&mut self, at: DateTime<Utc>, kind: AuditKind) -> Result<(), AuditError>;
     /// Último `seq` atribuído.
     fn seq(&self) -> u64;
+    /// Leva ao destino o que ainda está em memória.
+    ///
+    /// Está na trait, e não só no tipo concreto, porque quem fecha uma sessão
+    /// precisa poder garantir que nada ficou no ar sem saber qual destino de
+    /// registro está por trás. Deixar isto fora obrigaria todo chamador a
+    /// lembrar — e a auditoria perdida em silêncio é o pior resultado
+    /// possível.
+    fn flush(&mut self) -> Result<(), AuditError>;
 }
 
 pub struct AuditRecorder<S: AuditSink> {
@@ -47,10 +55,6 @@ impl<S: AuditSink> AuditRecorder<S> {
     pub fn sink(&self) -> &S {
         &self.sink
     }
-
-    pub fn flush(&mut self) -> Result<(), AuditError> {
-        self.sink.flush()
-    }
 }
 
 impl<S: AuditSink> Recorder for AuditRecorder<S> {
@@ -67,5 +71,9 @@ impl<S: AuditSink> Recorder for AuditRecorder<S> {
 
     fn seq(&self) -> u64 {
         self.seq
+    }
+
+    fn flush(&mut self) -> Result<(), AuditError> {
+        self.sink.flush()
     }
 }

@@ -10,13 +10,24 @@ use std::collections::BTreeSet;
 use std::fs;
 
 /// Crates que não podem, em nenhuma hipótese, alcançar a rede ou a corretora.
-const ISOLATED: &[&str] = &["trade-strategy", "trade-risk", "trade-backtest"];
+const ISOLATED: &[&str] = &[
+    "trade-strategy",
+    "trade-risk",
+    "trade-backtest",
+    "trade-session",
+];
 
-/// Adaptador de corretora e clientes de rede.
+/// Adaptador de corretora, clientes de rede — e o motor de backtest.
+///
+/// `trade-backtest` entra na lista por causa de FR-115: o `BacktestClock`
+/// devolve instante simulado, e uma sessão ao vivo que o alcançasse poderia
+/// datar evento com hora que não é a do mundo. Não declarar a crate é o que
+/// torna isso impossível em vez de desaconselhado.
 const FORBIDDEN: &[&str] = &[
     "trade-bybit",
     "trade-paper",
     "trade-storage",
+    "trade-backtest",
     "ureq",
     "reqwest",
     "hyper",
