@@ -77,6 +77,15 @@ pub struct MetricasLidas {
     pub total_slippage: Money,
 }
 
+/// Um evento do registro, como ele foi gravado.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EventoLido {
+    pub seq: u64,
+    pub at: DateTime<Utc>,
+    pub kind: String,
+    pub payload: serde_json::Value,
+}
+
 pub struct RunsRepository {
     conn: Connection,
 }
@@ -359,6 +368,47 @@ impl RunsRepository {
                 qty: decimal(&qty, "qty")?,
                 fees: decimal(&fees, "fees")?,
                 pnl: decimal(&pnl, "pnl")?,
+            });
+        }
+        Ok(out)
+    }
+
+    /// A linha do tempo de uma execução.
+    ///
+    /// Ordenada por `seq`, **nunca** por `at_ms` (FR-012). Dois eventos do
+    /// mesmo instante simulado — e há muitos, porque a cadeia sinal → ordem →
+    /// decisão → preenchimento acontece toda dentro de uma vela — só têm
+    /// ordem definida pelo `seq`. Ordenar pelo instante devolveria a cadeia
+    /// embaralhada dentro da vela, e ninguém notaria.
+    pub fn linha_do_tempo(&self, run_id: &str) -> Result<Vec<EventoLido>, StorageError> {
+        let mut stmt = self
+            .conn
+            .prepare(
+                "SELECT seq, at_ms, kind, payload_json FROM audit_event \
+                 WHERE run_id = ?1 ORDER BY seq",
+            )
+            .map_err(consulta)?;
+        let linhas = stmt
+            .query_map([run_id], |r| {
+                Ok((
+                    r.get::<_, i64>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                ))
+            })
+            .map_err(consulta)?;
+
+        let mut out = Vec::new();
+        for l in linhas {
+            let (seq, at_ms, kind, payload) = l.map_err(consulta)?;
+            out.push(EventoLido {
+                seq: u64::try_from(seq).unwrap_or(0),
+                at: instante(at_ms)?,
+                kind,
+                payload: serde_json::from_str(&payload).map_err(|e| {
+                    StorageError::Query(format!("carga do seq {seq} ilegível: {e}"))
+                })?,
             });
         }
         Ok(out)

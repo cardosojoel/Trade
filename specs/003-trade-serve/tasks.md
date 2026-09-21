@@ -39,14 +39,14 @@ registro não existe hoje (pesquisa, item 1).
 
 ## Fatia 3 — reconstituição
 
-- [ ] T018 **(TF)** `trade-storage` lê a linha do tempo de uma execução, ordenada por `seq` e nunca por `at_ms` (FR-012)
-- [ ] T019 **(TF)** `GET /runs/{id}/episodes` — episódios com entrada, fechamento, número de saídas e resultado somado (FR-009)
-- [ ] T020 **(TF)** Cada episódio traz `fechado_por`; presente e nulo nos gravados antes do campo existir (FR-010)
-- [ ] T021 **(TF)** `GET /runs/{id}/episodes/{seq}/saidas` — cada linha com a taxa ao lado do resultado (FR-011)
-- [ ] T022 **(TF)** `GET /runs/{id}/chain/{seq}` — os cinco elos de uma decisão
-- [ ] T023 **(TF)** O elo `risk_decision` traz, para cada limite, o valor observado ao lado do teto (FR-013)
-- [ ] T024 **(TF)** Divergência entre pedido e preenchido é assinalada no elo `fill`, com a proporção (FR-014)
-- [ ] T025 **(TF)** Toda coleção declara teto e diz quando cortou (FR-025)
+- [X] T018 **(TF)** `trade-storage` lê a linha do tempo de uma execução, ordenada por `seq` e nunca por `at_ms` (FR-012)
+- [X] T019 **(TF)** `GET /runs/{id}/episodes` — episódios com entrada, fechamento, número de saídas e resultado somado (FR-009)
+- [X] T020 **(TF)** Cada episódio traz `fechado_por`; presente e nulo nos gravados antes do campo existir (FR-010)
+- [X] T021 **(TF)** `GET /runs/{id}/episodes/{seq}/saidas` — cada linha com a taxa ao lado do resultado (FR-011)
+- [X] T022 **(TF)** `GET /runs/{id}/chain/{seq}` — os cinco elos de uma decisão
+- [X] T023 **(TF)** O elo `risk_decision` traz, para cada limite, o valor observado ao lado do teto (FR-013)
+- [X] T024 **(TF)** Divergência entre pedido e preenchido é assinalada no elo `fill`, com a proporção (FR-014)
+- [X] T025 **(TF)** Toda coleção declara teto e diz quando cortou (FR-025)
 
 ## Fatia 4 — comparação e histórico
 

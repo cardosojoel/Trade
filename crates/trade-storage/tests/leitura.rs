@@ -208,3 +208,85 @@ fn operacao(seq: u64, pnl: rust_decimal::Decimal) -> Trade {
         pnl,
     }
 }
+
+// ---------------------------------------------------------------- T018
+
+/// Grava eventos de auditoria fora de ordem de instante, mas em ordem de seq.
+fn gravar_eventos(dir: &std::path::Path) {
+    use trade_domain::{AuditKind, CausaDoFechamento, OrderId, Position, Side, SignalId};
+    use trade_ports::{AuditRecorder, Recorder};
+    use trade_storage::SqliteAuditSink;
+
+    let sink = SqliteAuditSink::new(open_runs(dir.join("runs.db")).unwrap());
+    let mut rec = AuditRecorder::new("R1", ExecutionMode::Backtest, sink);
+
+    // Dois eventos no **mesmo instante simulado**. É exatamente o caso que o
+    // `seq` existe para desempatar: ordenar por `at_ms` os devolveria em
+    // ordem indefinida, e a cadeia sinal → ordem teria um elo ambíguo.
+    rec.record(
+        t(5),
+        AuditKind::Order(trade_domain::Order {
+            id: OrderId(1),
+            signal_ref: SignalId(1),
+            side: Side::Buy,
+            qty: dec!(1),
+            at: t(5),
+        }),
+    )
+    .unwrap();
+    rec.record(
+        t(5),
+        AuditKind::StateTransition {
+            from: "Flat".into(),
+            to: "Long".into(),
+            position: Position::default(),
+            fechado_por: None,
+        },
+    )
+    .unwrap();
+    rec.record(
+        t(9),
+        AuditKind::StateTransition {
+            from: "Long".into(),
+            to: "Flat".into(),
+            position: Position::default(),
+            fechado_por: Some(CausaDoFechamento::Prazo),
+        },
+    )
+    .unwrap();
+    rec.flush().unwrap();
+}
+
+#[test]
+fn a_linha_do_tempo_vem_ordenada_por_seq_e_nunca_por_instante() {
+    // FR-012. Dois eventos do mesmo instante têm ordem definida só pelo
+    // `seq`; ordenar por `at_ms` deixaria a cadeia ambígua dentro da vela.
+    let dir = tempdir().unwrap();
+    gravar_eventos(dir.path());
+    let r = RunsRepository::new(open_runs(dir.path().join("runs.db")).unwrap());
+
+    let eventos = r.linha_do_tempo("R1").unwrap();
+    let seqs: Vec<u64> = eventos.iter().map(|e| e.seq).collect();
+    assert_eq!(seqs, vec![1, 2, 3]);
+    assert_eq!(eventos[0].kind, "order");
+    assert_eq!(eventos[1].kind, "state_transition");
+}
+
+#[test]
+fn a_linha_do_tempo_traz_a_carga_de_cada_evento() {
+    let dir = tempdir().unwrap();
+    gravar_eventos(dir.path());
+    let r = RunsRepository::new(open_runs(dir.path().join("runs.db")).unwrap());
+
+    let eventos = r.linha_do_tempo("R1").unwrap();
+    assert_eq!(eventos[2].payload["fechado_por"], "prazo");
+    assert_eq!(eventos[0].payload["side"], "Buy");
+}
+
+#[test]
+fn a_linha_do_tempo_de_uma_execucao_nao_traz_a_de_outra() {
+    let dir = tempdir().unwrap();
+    gravar_eventos(dir.path());
+    let r = RunsRepository::new(open_runs(dir.path().join("runs.db")).unwrap());
+    assert!(r.linha_do_tempo("R2").unwrap().is_empty());
+}

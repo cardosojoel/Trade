@@ -9,6 +9,7 @@ use chrono::NaiveDate;
 use rust_decimal::Decimal;
 use serde_json::{Value, json};
 use trade_domain::{Money, Trade};
+use trade_storage::runs_repo::EventoLido;
 
 use crate::respostas::dinheiro;
 
@@ -176,4 +177,275 @@ pub fn porta1(e: &ExigenciasPorta1, o: ObservadoPorta1) -> Value {
 
 fn exigencia(nome: &str, exigido: String, observado: Value, passou: bool) -> Value {
     json!({ "exigencia": nome, "exigido": exigido, "observado": observado, "passou": passou })
+}
+
+// ------------------------------------------------------------ episódios
+
+/// Um episódio de posição: abre uma vez, pode sair muitas.
+///
+/// A distinção não é acadêmica. Numa das execuções gravadas, 146 episódios
+/// produziram 28.327 saídas — quem lê "28.327 operações" conclui atividade
+/// duzentas vezes maior do que houve.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Episodio {
+    pub entrada: chrono::DateTime<chrono::Utc>,
+    pub fechamento: chrono::DateTime<chrono::Utc>,
+    pub duracao_horas: Money,
+    /// `sinal`, `prazo`, ou `None` quando o registro não distingue — é o caso
+    /// de tudo que foi gravado antes de a emenda 2.0.0 criar o prazo.
+    pub fechado_por: Option<String>,
+    pub saidas: usize,
+    pub resultado: Money,
+    pub taxas: Money,
+}
+
+/// Agrupa o extrato em episódios.
+///
+/// A chave é o **instante de entrada**: a posição guarda o instante em que
+/// abriu e o mantém até ficar zerada, de modo que todas as saídas de um mesmo
+/// episódio carregam a mesma entrada. Não é coincidência a ser explorada — é
+/// o que `Position::apply_fill` faz, e o que torna o episódio reconstituível
+/// sem replicar o fluxo inteiro.
+pub fn episodios(extrato: &[Trade], fechamentos: &[EventoLido]) -> Vec<Episodio> {
+    let mut por_entrada: std::collections::BTreeMap<
+        chrono::DateTime<chrono::Utc>,
+        (chrono::DateTime<chrono::Utc>, usize, Money, Money),
+    > = std::collections::BTreeMap::new();
+
+    for t in extrato {
+        let e =
+            por_entrada
+                .entry(t.entry_at)
+                .or_insert((t.exit_at, 0, Decimal::ZERO, Decimal::ZERO));
+        e.0 = e.0.max(t.exit_at);
+        e.1 += 1;
+        e.2 += t.pnl;
+        e.3 += t.fees;
+    }
+
+    por_entrada
+        .into_iter()
+        .map(
+            |(entrada, (fechamento, saidas, resultado, taxas))| Episodio {
+                entrada,
+                fechamento,
+                duracao_horas: horas(fechamento - entrada),
+                fechado_por: causa_em(fechamentos, fechamento),
+                saidas,
+                resultado,
+                taxas,
+            },
+        )
+        .collect()
+}
+
+/// A causa gravada na transição que fechou a posição naquele instante.
+fn causa_em(fechamentos: &[EventoLido], quando: chrono::DateTime<chrono::Utc>) -> Option<String> {
+    fechamentos
+        .iter()
+        .filter(|e| e.kind == "state_transition" && e.payload["to"] == "Flat")
+        .find(|e| e.at == quando)
+        .and_then(|e| e.payload["fechado_por"].as_str())
+        .map(str::to_string)
+}
+
+/// Duração em horas, exata.
+///
+/// Dos milissegundos, e não das horas inteiras: um episódio de 59,7 horas
+/// arredondado para 59 ou 60 esconderia justamente o que interessa perto do
+/// teto de 72.
+fn horas(d: chrono::TimeDelta) -> Money {
+    Decimal::from(d.num_milliseconds()) / Decimal::from(3_600_000)
+}
+
+pub fn episodios_json(run_id: &str, eps: &[Episodio]) -> Value {
+    // O aviso existe porque nulo sozinho não distingue "ninguém sabe" de "o
+    // registro é anterior ao campo". A segunda é dizível, e dizer é melhor.
+    let algum_nulo = eps.iter().any(|e| e.fechado_por.is_none());
+    json!({
+        "execucao": run_id,
+        "episodios": eps.iter().map(|e| json!({
+            "entrada_ms": e.entrada.timestamp_millis(),
+            "fechamento_ms": e.fechamento.timestamp_millis(),
+            "duracao_horas": dinheiro(e.duracao_horas),
+            "fechado_por": e.fechado_por,
+            "saidas": e.saidas,
+            "resultado": dinheiro(e.resultado),
+            "taxas": dinheiro(e.taxas),
+        })).collect::<Vec<_>>(),
+        "total_de_episodios": eps.len(),
+        "aviso": if algum_nulo {
+            Value::String(
+                "`fechado_por` é nulo onde o registro não distingue fechamento por sinal \
+                 de fechamento por prazo — é o caso de tudo gravado antes da emenda 2.0.0"
+                    .into(),
+            )
+        } else {
+            Value::Null
+        },
+        "origem": "runs.db",
+    })
+}
+
+/// As saídas de um episódio, com a taxa ao lado do resultado (FR-011).
+pub fn saidas_json(
+    run_id: &str,
+    entrada: chrono::DateTime<chrono::Utc>,
+    extrato: &[Trade],
+    teto: usize,
+) -> Value {
+    let todas: Vec<&Trade> = extrato.iter().filter(|t| t.entry_at == entrada).collect();
+    let cortou = todas.len() > teto;
+    let mostradas = todas.iter().take(teto);
+    json!({
+        "execucao": run_id,
+        "entrada_ms": entrada.timestamp_millis(),
+        "saidas": mostradas.map(|t| json!({
+            "seq": t.seq,
+            "saida_ms": t.exit_at.timestamp_millis(),
+            "preco_de_entrada": dinheiro(t.entry_price),
+            "preco_de_saida": dinheiro(t.exit_price),
+            "quantidade": dinheiro(t.qty),
+            "resultado": dinheiro(t.pnl),
+            // Ao lado, sempre: parte do resultado é custo, e sem a taxa a
+            // linha não se explica (REQ-UI-030).
+            "taxas": dinheiro(t.fees),
+        })).collect::<Vec<_>>(),
+        // Declarados sempre, e não só quando cortou: uma resposta que só
+        // avisasse ao cortar faria a tela concluir, no silêncio, que não há
+        // teto nenhum (FR-025).
+        "teto": teto,
+        "cortou": cortou,
+        "total": todas.len(),
+        "origem": "runs.db",
+    })
+}
+
+// ---------------------------------------------------------------- cadeia
+
+/// Os cinco elos de uma decisão, a partir de qualquer `seq` da cadeia.
+///
+/// Ordenados por `seq`, nunca por instante: os cinco acontecem dentro da
+/// mesma vela, e o instante não os separa (FR-012).
+pub fn cadeia(eventos: &[EventoLido], seq: u64) -> Option<Value> {
+    const ELOS: [&str; 5] = [
+        "signal",
+        "order",
+        "risk_decision",
+        "fill",
+        "state_transition",
+    ];
+    let alvo = eventos.iter().find(|e| e.seq == seq)?;
+
+    // A cadeia é a vizinhança do alvo: o elo mais próximo de cada tipo, sem
+    // pular para outra cadeia. Procura-se para trás a partir do alvo e para
+    // frente a partir dele, o que mantém a cadeia inteira dentro da mesma
+    // sequência de eventos.
+    let mais_proximo = |tipo: &str| {
+        eventos
+            .iter()
+            .filter(|e| e.kind == tipo)
+            .min_by_key(|e| e.seq.abs_diff(alvo.seq))
+    };
+
+    // A quantidade **pedida** vive no elo `order`, não no `fill`: o
+    // preenchimento diz o que veio, e só a ordem diz o que se pediu. Sem
+    // cruzar os dois não há como assinalar divergência (FR-014).
+    let pedido = mais_proximo("order").map(|o| o.payload["qty"].clone());
+
+    let elos: Vec<Value> = ELOS
+        .iter()
+        .filter_map(|tipo| Some(elo(mais_proximo(tipo)?, pedido.as_ref())))
+        .collect();
+
+    Some(json!({
+        "seq_pedido": seq,
+        "elos": elos,
+        // Cinco é fixo, e por isso esta rota não tem teto (FR-025).
+        "elos_esperados": ELOS.len(),
+        "origem": "runs.db",
+    }))
+}
+
+fn elo(e: &EventoLido, pedido: Option<&Value>) -> Value {
+    let mut v = json!({
+        "tipo": e.kind,
+        "seq": e.seq,
+        "instante_ms": e.at.timestamp_millis(),
+    });
+    match e.kind.as_str() {
+        "risk_decision" => {
+            v["veredito"] = e.payload["verdict"].clone();
+            v["limite_violado"] = e.payload["breach"].clone();
+            v["limites"] = limites_com_observado(&e.payload);
+        }
+        "fill" => {
+            let (divergente, proporcao) = divergencia(pedido, &e.payload["qty"]);
+            v["pedido"] = pedido.cloned().unwrap_or(Value::Null);
+            v["obtido"] = e.payload["qty"].clone();
+            v["preco"] = e.payload["price"].clone();
+            v["taxa"] = e.payload["fee"].clone();
+            v["divergente"] = Value::Bool(divergente);
+            v["proporcao"] = proporcao;
+        }
+        _ => {}
+    }
+    v["carga"] = e.payload.clone();
+    v
+}
+
+/// Cada limite com o valor observado ao lado do teto (FR-013, `REQ-UI-025`).
+fn limites_com_observado(p: &Value) -> Value {
+    let l = &p["limits"];
+    let s = &p["state"];
+    json!([
+        par(
+            "max_daily_loss",
+            l["max_daily_loss"].clone(),
+            s["daily_pnl"].clone()
+        ),
+        par(
+            "max_total_exposure",
+            l["max_total_exposure"].clone(),
+            s["exposure"].clone()
+        ),
+        par(
+            "max_position_size",
+            l["max_position_size"].clone(),
+            s["exposure"].clone()
+        ),
+        par(
+            "max_orders_per_window",
+            l["max_orders_per_window"].clone(),
+            s["orders_in_window"].clone()
+        ),
+    ])
+}
+
+fn par(limite: &str, teto: Value, observado: Value) -> Value {
+    json!({ "limite": limite, "teto": teto, "observado": observado })
+}
+
+/// Quanto da ordem foi preenchido, e se divergiu (FR-014).
+///
+/// Na execução `01M2ZG2N88…` foram **quatro ordens em 28.618** preenchidas em
+/// parte, e nenhum evento registra a causa. A interface mostra a divergência;
+/// mostrar a causa ela não pode, porque a causa não está gravada — é o achado
+/// 2 do DsTrade, pendência P3.
+fn divergencia(pedido: Option<&Value>, obtido: &Value) -> (bool, Value) {
+    use std::str::FromStr;
+    let ler = |v: Option<&Value>| {
+        v.and_then(Value::as_str)
+            .and_then(|s| Decimal::from_str(s).ok())
+            .filter(|d| *d > Decimal::ZERO)
+    };
+    match (ler(pedido), ler(Some(obtido))) {
+        (Some(pedido), Some(obtido)) => {
+            let prop = obtido / pedido;
+            (obtido != pedido, Value::String(dinheiro(prop)))
+        }
+        // Sem o pedido no registro não dá para afirmar divergência. Dizer
+        // `false` sem base seria afirmar que conferiu.
+        _ => (false, Value::Null),
+    }
 }
