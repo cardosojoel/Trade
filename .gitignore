@@ -9,10 +9,11 @@ release/
 # de execução. Nenhum dos dois pertence ao repositório.
 /data
 
-# Credenciais — nenhuma existe nesta feature, mas o padrão entra antes de
-# qualquer código de integração, conforme a constitution
-.env
-.env.*
+# Credenciais — o padrão entra antes de qualquer código de integração,
+# conforme a constitution. `.env*` no lugar de `.env` mais `.env.*` porque
+# aqueles dois exigem o nome exato ou um ponto depois, e deixavam passar
+# credencial com espaço no nome — `.env api jev` chegou a ficar na árvore.
+.env*
 *.key
 *.pem
 secrets/
