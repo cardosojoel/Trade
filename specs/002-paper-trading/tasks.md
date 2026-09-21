@@ -72,6 +72,28 @@ Verificável sem rede e sem credencial.
 - [X] T044 `trade paper rodar`: compõe credencial, executor dentro do `RiskGuard`, estado recuperado, estratégia, fonte e registro
 - [X] T045 **(TF)** A execução grava `run` com `mode = 'paper'`, mais extrato e métricas ao encerrar
 
+## Fatia 5c — a medição, antes do dado *(não exige credencial)*
+
+> Acrescentada em 2026-09-21 pela **decisão 039** do Jev
+> (`fatia_nova_de_medicao`, **1,00 · confiança 1,00** — unânime, as três
+> alternativas em 0,00).
+>
+> As oito tarefas das fatias 6 e 7 estão escritas como **atos**, e quatro delas
+> escondem código. A T036 pede mediana e p95 do slippage: os dados exigem os
+> trinta dias, mas o medidor é código e não existe. A T038 pede a divergência
+> entre paper e backtest medida e explicada — idem. A T039 pede o relatório da
+> Porta 2 — idem.
+>
+> É a mesma forma que a decisão 034 corrigiu com a fatia 5b. Escrito antes, o
+> dado real chega e encontra medição pronta e exercitada; escrito depois, a
+> medição do período mais caro do projeto é feita por código recém-escrito.
+
+- [X] T046 **(TF)** Mediana e p95 do slippage sobre os preenchimentos do registro
+- [X] T047 **(TF)** Amostra abaixo do mínimo não vira medida — devolve quantas faltam (SC-102)
+- [X] T048 **(TF)** Divergência entre paper e backtest no mesmo período: medida e decomposta (SC-106)
+- [X] T049 **(TF)** Relatório da Porta 2 com os seis critérios `SC-101` a `SC-106` e o veredito de cada um
+- [X] T050 `trade porta2` na CLI, gerando o relatório a partir do registro
+
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 
 - [ ] T032 Chave de testnet criada, sem permissão de saque, e verificada

@@ -39,6 +39,22 @@ pub enum Command {
     Paper(PaperArgs),
     /// Sobe o servidor local de leitura do registro.
     Serve(ServeArgs),
+    /// Relatório da Porta 2, para a revisão que precede a Porta 3.
+    Porta2(Porta2Args),
+}
+
+#[derive(clap::Args, Debug)]
+pub struct Porta2Args {
+    #[arg(long, default_value = "data/runs.db")]
+    pub runs_db: PathBuf,
+
+    /// Dias corridos exigidos (SC-101). Valor de partida, ajustável.
+    #[arg(long, default_value_t = 30)]
+    pub dias_exigidos: u32,
+
+    /// Preenchimentos mínimos para o slippage virar medida (SC-102).
+    #[arg(long, default_value_t = 100)]
+    pub amostra_minima: usize,
 }
 
 #[derive(clap::Args, Debug, Clone)]

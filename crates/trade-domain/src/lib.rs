@@ -11,6 +11,7 @@
 pub mod audit;
 pub mod candle;
 pub mod instrumento;
+pub mod medicao;
 pub mod metrics;
 pub mod mode;
 pub mod perfil;
@@ -24,6 +25,10 @@ pub mod types;
 pub use audit::{AuditEvent, AuditKind};
 pub use candle::{Candle, CandleError};
 pub use instrumento::{Instrumento, InstrumentoError};
+pub use medicao::{
+    Criterio, Divergencia, MedicaoError, ObservadoPorta2, RelatorioPorta2, Slippage, divergencia,
+    relatorio_porta2, slippage,
+};
 pub use metrics::RunMetrics;
 pub use mode::{ExecutionMode, ModeError};
 pub use perfil::{ParametrosDerivacao, Perfil, PerfilError};

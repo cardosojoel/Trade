@@ -3,7 +3,9 @@
 use clap::Parser;
 use std::process::ExitCode;
 use trade_cli::cli::{Cli, Command};
-use trade_cli::{cmd_backtest, cmd_collect, cmd_paper, cmd_paper_rodar, cmd_perfil, cmd_serve};
+use trade_cli::{
+    cmd_backtest, cmd_collect, cmd_paper, cmd_paper_rodar, cmd_perfil, cmd_porta2, cmd_serve,
+};
 use trade_risk::KillSwitch;
 
 fn main() -> ExitCode {
@@ -57,6 +59,16 @@ fn main() -> ExitCode {
                 ExitCode::from(codigo as u8)
             }
         },
+
+        Command::Porta2(args) => {
+            let (codigo, saida) = cmd_porta2::run(args);
+            if codigo == trade_cli::cmd_backtest::ExitCode::Ok {
+                println!("{saida}");
+            } else {
+                eprintln!("{saida}");
+            }
+            ExitCode::from(codigo as u8)
+        }
 
         Command::Serve(args) => {
             let (codigo, saida) = cmd_serve::run(args);

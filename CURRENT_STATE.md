@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**445 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**462 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
@@ -148,10 +148,44 @@ Três coisas que quem for implementar precisa saber antes:
 
 ## Concluída até onde o código alcança: feature 002, paper trading
 
-Spec, plano e tarefas escritos. **37 de 45 tarefas concluídas** — fatias 1 a 5b
-fechadas. **Tudo que não exige credencial está feito.** As oito abertas são as
-fatias 6 e 7: criar a chave de testnet, a primeira ordem real, e os trinta dias
-corridos. Contado em `specs/002-paper-trading/tasks.md`, 2026-09-21.
+Spec, plano e tarefas escritos. **42 de 50 tarefas concluídas** — fatias 1 a 5c
+fechadas. **Tudo que não exige credencial está feito.**
+
+As oito abertas são as fatias 6 e 7, e **nenhuma é trabalho de código**:
+
+| | |
+|---|---|
+| T032 | criar a chave de testnet na Bybit, sem permissão de saque |
+| T033, T034 | a primeira ordem real e as divergências — exigem a chave |
+| T035 | trinta dias corridos de operação |
+| T036 a T039 | exigem os trinta dias terem corrido |
+
+**A T032 é ato do dono do projeto**, na conta dele, num site de terceiro. A
+T035 é tempo passar. Nenhuma das duas se antecipa, e as outras seis dependem
+delas.
+
+O caminho, quando a chave existir:
+
+```
+trade paper verificar                       # credencial, relógio, permissão
+trade paper rodar --mode paper --capital …  # abre a sessão
+trade porta2                                # o relatório, quando os 30 dias correrem
+```
+
+### A fatia 5c — a medição, escrita antes do dado
+
+As quatro tarefas finais estavam escritas como **atos** e escondiam código: a
+T036 pede mediana e p95 do slippage, a T038 pede a divergência entre paper e
+backtest medida, a T039 pede o relatório da Porta 2. Os dados exigem os trinta
+dias; os **medidores** não, e nenhum existia.
+
+É a mesma forma que a decisão 034 corrigiu com a fatia 5b. Decisão 039
+(`fatia_nova_de_medicao`, **1,00 · confiança 1,00** — unânime): escrito antes,
+o dado real chega e encontra medição pronta e exercitada; escrito depois, a
+medição do período mais caro do projeto é feita por código recém-nascido.
+
+`trade porta2` existe e roda. Sem sessão de paper no registro, ele diz o que
+falta e com que comandos — em vez de dizer só "sem dados".
 
 > Até 2026-09-21 este parágrafo dizia 25 de 31 quando eram 23, e a folha de
 > passagem do DsTrade dizia "fatias 1 a 4 fechadas" com T024 e T025 ainda
