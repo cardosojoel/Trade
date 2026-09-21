@@ -50,25 +50,25 @@ registro não existe hoje (pesquisa, item 1).
 
 ## Fatia 4 — comparação e histórico
 
-- [ ] T026 **(TF)** `GET /runs/compare` — as duas cercas lado a lado
-- [ ] T027 **(TF)** A comparação se declara **não confiável** enquanto a versão do código não existir, ainda que cerca e taxas sejam idênticas (FR-007, SC-010)
-- [ ] T028 **(TF)** `GET /datasets` — cobertura e procedência, com as lacunas **como lacunas**, jamais interpoladas (FR-015)
-- [ ] T029 **(TF)** Toda resposta distingue o que vem do `market.db`, cache reconstruível, do que vem do `runs.db`, insubstituível (FR-016)
-- [ ] T030 **(TF)** `GET /runs/match` — o aviso de repetição, antes de iniciar
-- [ ] T031 **(TF)** Erro de histórico insuficiente diz o trecho ausente e o `trade collect` com as datas preenchidas (FR-022)
+- [X] T026 **(TF)** `GET /runs/compare` — as duas cercas lado a lado
+- [X] T027 **(TF)** A comparação se declara **não confiável** enquanto a versão do código não existir, ainda que cerca e taxas sejam idênticas (FR-007, SC-010)
+- [X] T028 **(TF)** `GET /datasets` — cobertura e procedência, com as lacunas **como lacunas**, jamais interpoladas (FR-015)
+- [X] T029 **(TF)** Toda resposta distingue o que vem do `market.db`, cache reconstruível, do que vem do `runs.db`, insubstituível (FR-016)
+- [X] T030 **(TF)** `GET /runs/match` — o aviso de repetição, antes de iniciar
+- [X] T031 **(TF)** Erro de histórico insuficiente diz o trecho ausente e o `trade collect` com as datas preenchidas (FR-022)
 
 ## Fatia 5 — a escrita
 
-- [ ] T032 **(TF)** Trait de ligação em `trade-ports`: aceita os parâmetros e devolve o identificador do trabalho
-- [ ] T033 **(TF)** `POST /runs` exige o modo declarado; ausência é recusada e nenhuma execução começa (FR-004, SC-003)
-- [ ] T034 **(TF)** `live` é recusado, com mensagem **distinta** da ausência de modo (FR-004, SC-004)
-- [ ] T035 **(TF)** `POST /runs` responde imediatamente com identificador e estado, sem esperar a conclusão (FR-017)
-- [ ] T036 **(TF)** `GET /jobs/{id}` — progresso por consulta; nenhuma conexão fica aberta empurrando evento (FR-018)
-- [ ] T037 **(TF)** Nenhuma rota aceita, guarda ou devolve credencial; o token não vai para o registro (FR-020)
-- [ ] T038 **(TF)** Não existe rota que emita ordem, altere limite ou taxa, toque o kill switch ou retome execução parada (FR-005)
+- [X] T032 **(TF)** Trait de ligação em `trade-ports`: aceita os parâmetros e devolve o identificador do trabalho
+- [X] T033 **(TF)** `POST /runs` exige o modo declarado; ausência é recusada e nenhuma execução começa (FR-004, SC-003)
+- [X] T034 **(TF)** `live` é recusado, com mensagem **distinta** da ausência de modo (FR-004, SC-004)
+- [X] T035 **(TF)** `POST /runs` responde imediatamente com identificador e estado, sem esperar a conclusão (FR-017)
+- [X] T036 **(TF)** `GET /jobs/{id}` — progresso por consulta; nenhuma conexão fica aberta empurrando evento (FR-018)
+- [X] T037 **(TF)** Nenhuma rota aceita, guarda ou devolve credencial; o token não vai para o registro (FR-020)
+- [X] T038 **(TF)** Não existe rota que emita ordem, altere limite ou taxa, toque o kill switch ou retome execução parada (FR-005)
 
 ## Fatia 6 — o comando
 
-- [ ] T039 `trade serve` na CLI, implementando a trait de ligação pela composição do `backtest` (FR-001)
-- [ ] T040 **(TF)** O token nasce a cada início do servidor e é mostrado uma vez, nunca gravado no registro (FR-019)
-- [ ] T041 Guia de verificação do `quickstart.md` roda de ponta a ponta sobre um `runs.db` real
+- [X] T039 `trade serve` na CLI, implementando a trait de ligação pela composição do `backtest` (FR-001)
+- [X] T040 **(TF)** O token nasce a cada início do servidor e é mostrado uma vez, nunca gravado no registro (FR-019)
+- [X] T041 Guia de verificação do `quickstart.md` roda de ponta a ponta sobre um `runs.db` real

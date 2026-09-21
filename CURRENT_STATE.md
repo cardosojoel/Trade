@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**345 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**445 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
@@ -103,16 +103,31 @@ da corretora e da aritmética, medidos do mercado e do capital, de autoridade, d
 promoção, e os limites da própria medição. Um desenho que não passa nessa folha
 não chega a precisar de ADR.
 
-## Aberta em 2026-09-21: feature 003, `trade serve`
+## Completa em 2026-09-21: feature 003, `trade serve`
 
-`specs/003-trade-serve/spec.md` existe — 5 user stories, **25 requisitos
-funcionais**, **15 critérios de sucesso**, as entidades e o contrato das onze
-rotas com exemplo de JSON. O texto veio pronto do DsTrade
-(`design/11_SPEC_TRADE_SERVE.md` v1.1, aceita), no formato que a decisão 020
-escolheu justamente para não haver retrabalho aqui.
+**41 de 41 tarefas.** O servidor sobe, escuta em `127.0.0.1` e serve as onze
+rotas sobre o registro real — conferido em 2026-09-21 contra o `data/runs.db`
+deste repositório, não só contra duplo.
 
-**Só a spec.** Não há plano, não há tarefas, não há código. O próximo passo do
-fluxo é `/speckit.plan`.
+Crate `trade-serve`, na lista `ISOLATED`: não declara corretora, rede, risco,
+backtest nem a própria CLI. Iniciar execução entra por uma trait de
+`trade-ports` que o `trade-cli` implementa — é o que faz `FR-001` e `SC-008`
+valerem juntos sem que o servidor herde, pelo grafo, tudo que a CLI alcança.
+
+O que a leitura contra o registro real mostrou, e vale como conferência do
+desenho: das nove execuções gravadas, o agrupamento devolve **quatro grupos** —
+seis idênticas, mais as duas que rodaram minutos antes e depois do commit que
+mudou o arredondamento, cada uma sozinha, mais uma de 189 saídas. As duas
+anômalas aparecem **separadas**, que é exatamente o achado 5 do DsTrade. E as
+quatro se declaram **não comparáveis**, porque a versão do código não está no
+registro.
+
+A execução `01M30EXVCX…` devolve **146 episódios**, e o primeiro tem 32 saídas
+em 21,18 horas. Quem lia "14.308 operações" concluía atividade duzentas vezes
+maior do que houve.
+
+O token de escrita é sorteado a cada início, impresso **uma vez** no terminal
+e morre com o processo. Sete testes falam HTTP com o binário por socket.
 
 Três coisas que quem for implementar precisa saber antes:
 

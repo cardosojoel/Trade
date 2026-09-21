@@ -162,3 +162,105 @@ fn resumo_de_metricas(m: &MetricasLidas) -> String {
 fn cru(s: &str) -> Value {
     serde_json::from_str(s).unwrap_or_else(|_| Value::String(s.to_string()))
 }
+
+/// `GET /runs/compare` — as duas cercas lado a lado.
+///
+/// A rota existe para **comparar**, não para mostrar duas coisas: além dos
+/// dois lados, ela diz em que diferem, e se a comparação se sustenta.
+pub fn comparar(repo: &RunsRepository, a: &str, b: &str) -> Result<Option<Value>, StorageError> {
+    let (Some(ea), Some(eb)) = (repo.execucao(a)?, repo.execucao(b)?) else {
+        return Ok(None);
+    };
+    Ok(Some(json!({
+        "a": lado(repo, &ea)?,
+        "b": lado(repo, &eb)?,
+        "cercas_diferem_em": diferencas(&ea, &eb),
+        // **Sempre falso hoje**, e não por defeito da comparação: sem a
+        // versão do código no registro, duas execuções com a mesma cerca e
+        // resultado diferente são indistinguíveis. Foi o que aconteceu com
+        // duas execuções que rodaram minutos antes e depois de um commit que
+        // mudou o arredondamento da quantidade (FR-007, SC-010).
+        "confiavel": false,
+        "por_que_nao_confiavel": POR_QUE_NAO_COMPARAVEL,
+        "origem": "runs.db",
+    })))
+}
+
+fn lado(repo: &RunsRepository, e: &ExecucaoLida) -> Result<Value, StorageError> {
+    let m = repo.metricas(&e.run_id)?;
+    Ok(json!({
+        "run_id": e.run_id,
+        "periodo": { "de_ms": e.from.timestamp_millis(), "ate_ms": e.to.timestamp_millis() },
+        "estrategia": e.strategy,
+        "cerca": { "limits": cru(&e.limits_json), "fees": cru(&e.fees_json) },
+        "metricas": m.as_ref().map(metricas_json),
+        "versao_do_codigo": Value::Null,
+    }))
+}
+
+/// Em que as duas cercas diferem, campo a campo.
+fn diferencas(a: &ExecucaoLida, b: &ExecucaoLida) -> Vec<String> {
+    let mut out = Vec::new();
+    for (rotulo, x, y) in [
+        ("limits", &a.limits_json, &b.limits_json),
+        ("fees", &a.fees_json, &b.fees_json),
+    ] {
+        let (va, vb) = (cru(x), cru(y));
+        match (va.as_object(), vb.as_object()) {
+            (Some(oa), Some(ob)) => {
+                for (k, v) in oa {
+                    if ob.get(k) != Some(v) {
+                        out.push(k.clone());
+                    }
+                }
+                for k in ob.keys() {
+                    if !oa.contains_key(k) {
+                        out.push(k.clone());
+                    }
+                }
+            }
+            // Cerca ilegível de um dos lados: dizer o rótulo é mais honesto
+            // que afirmar que são iguais.
+            _ if va != vb => out.push(rotulo.to_string()),
+            _ => {}
+        }
+    }
+    out.sort();
+    out.dedup();
+    out
+}
+
+/// O que se quer iniciar, para o aviso de repetição.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Pedido {
+    pub modo: String,
+    pub simbolo: String,
+    pub intervalo: String,
+    pub de_ms: i64,
+    pub ate_ms: i64,
+}
+
+/// `GET /runs/match` — já rodou isso antes?
+///
+/// Antes de iniciar, e não depois: refazer o que já foi feito gasta tempo e
+/// enche o registro de linhas que não acrescentam evidência.
+pub fn repetida(repo: &RunsRepository, p: &Pedido) -> Result<Value, StorageError> {
+    let iguais: Vec<String> = repo
+        .listar_execucoes()?
+        .into_iter()
+        .filter(|e| {
+            e.mode == p.modo
+                && e.symbol == p.simbolo
+                && e.interval == p.intervalo
+                && e.from.timestamp_millis() == p.de_ms
+                && e.to.timestamp_millis() == p.ate_ms
+        })
+        .map(|e| e.run_id)
+        .collect();
+
+    Ok(json!({
+        "ja_existe": !iguais.is_empty(),
+        "execucoes": iguais,
+        "origem": "runs.db",
+    }))
+}

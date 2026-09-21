@@ -11,6 +11,7 @@ use serde_json::{Value, json};
 use trade_domain::{Money, Trade};
 use trade_storage::runs_repo::EventoLido;
 
+use crate::erros::{Motivo, Recusa};
 use crate::respostas::dinheiro;
 
 /// O resultado de um dia.
@@ -448,4 +449,73 @@ fn divergencia(pedido: Option<&Value>, obtido: &Value) -> (bool, Value) {
         // `false` sem base seria afirmar que conferiu.
         _ => (false, Value::Null),
     }
+}
+
+// ------------------------------------------------------------- histórico
+
+/// A cobertura de um par e granularidade no `market.db`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dataset {
+    pub simbolo: String,
+    pub intervalo: String,
+    /// De onde veio. `FR-017` da feature 001: o histórico traz procedência.
+    pub procedencia: String,
+    pub primeira_ms: i64,
+    pub ultima_ms: i64,
+    pub velas: u64,
+    pub coletado_em_ms: i64,
+    /// Pares `(de_ms, ate_ms)`.
+    pub lacunas: Vec<(i64, i64)>,
+}
+
+/// `GET /datasets` — cobertura, procedência e lacunas.
+///
+/// **As lacunas vão como lacunas, jamais interpoladas** (FR-015). Interpolar
+/// inventa preço que não existiu, e a estratégia decidiria sobre um mercado
+/// imaginário — é a mesma regra que o coletor segue ao gravar.
+pub fn datasets_json(ds: &[Dataset]) -> Value {
+    json!({
+        "datasets": ds.iter().map(|d| json!({
+            "simbolo": d.simbolo,
+            "intervalo": d.intervalo,
+            "procedencia": d.procedencia,
+            "cobertura": { "de_ms": d.primeira_ms, "ate_ms": d.ultima_ms },
+            "velas": d.velas,
+            "coletado_em_ms": d.coletado_em_ms,
+            "lacunas": d.lacunas.iter().map(|(de, ate)| json!({
+                "de_ms": de, "ate_ms": ate,
+            })).collect::<Vec<_>>(),
+            "tem_lacunas": !d.lacunas.is_empty(),
+        })).collect::<Vec<_>>(),
+        "origem": "market.db",
+        // REQ-UI-028: o cache se reconstrói da fonte, a auditoria não. Quem
+        // lê precisa saber o que pode ser regenerado antes de decidir apagar.
+        "reconstruivel": true,
+    })
+}
+
+/// A recusa por histórico insuficiente, com o comando que resolve.
+///
+/// FR-022 e `REQ-UI-032`. Um erro que diz "histórico insuficiente" e para aí
+/// obriga quem lê a descobrir sozinho o que coletar — e quem está na tela não
+/// tem o `runs.db` aberto ao lado para ir ver.
+pub fn historico_insuficiente(simbolo: &str, intervalo: &str, de_ms: i64, ate_ms: i64) -> Recusa {
+    let dia = |ms: i64| {
+        chrono::DateTime::from_timestamp_millis(ms)
+            .map_or_else(|| "?".to_string(), |d| d.date_naive().to_string())
+    };
+    Recusa::nova(
+        Motivo::HistoricoInsuficiente,
+        format!(
+            "faltam velas de {simbolo} {intervalo} entre {} e {}",
+            dia(de_ms),
+            dia(ate_ms)
+        ),
+    )
+    .com_o_que_falta(json!({ "de_ms": de_ms, "ate_ms": ate_ms }))
+    .com_comando(format!(
+        "trade collect --symbol {simbolo} --interval {intervalo} --from {} --to {}",
+        dia(de_ms),
+        dia(ate_ms)
+    ))
 }

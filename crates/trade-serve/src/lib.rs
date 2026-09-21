@@ -9,12 +9,15 @@
 //! `tests/architecture.rs`, e o build falha se qualquer uma dessas linhas for
 //! cruzada — é assim que o `SC-008` deixa de depender de revisão humana.
 
+pub mod app;
 pub mod consultas;
 pub mod erros;
+pub mod escrita;
 pub mod guarda;
 pub mod respostas;
 pub mod servidor;
 
+pub use app::Aplicacao;
 pub use erros::{Motivo, Recusa};
 pub use guarda::Guarda;
 pub use servidor::Servidor;

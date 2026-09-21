@@ -81,20 +81,23 @@ impl Servidor {
         Ok(rota)
     }
 
-    /// Atende até o servidor ser derrubado. Por ora só responde as recusas —
-    /// as rotas de dado entram nas fatias seguintes.
-    pub fn atender(&self) {
-        for req in self.http.incoming_requests() {
+    /// Atende até o servidor ser derrubado.
+    ///
+    /// O laço não decide nada: lê, pergunta ao despacho se pode, pede a
+    /// resposta à aplicação, e escreve. Tudo que decide está em funções que
+    /// se testam sem socket.
+    pub fn atender(&self, app: &crate::app::Aplicacao<'_>) {
+        for mut req in self.http.incoming_requests() {
             let pedido = ler(&req);
-            let (status, corpo) = match self.despachar(&pedido) {
-                Ok(_) => (
-                    501,
-                    Recusa::nova(
-                        Motivo::RegistroIndisponivel,
-                        "rota reconhecida, ainda sem implementação",
-                    )
-                    .corpo(),
-                ),
+            let mut corpo_texto = String::new();
+            if pedido.metodo == "POST" {
+                let _ = req.as_reader().read_to_string(&mut corpo_texto);
+            }
+            let (status, corpo) = match self
+                .despachar(&pedido)
+                .and_then(|rota| app.responder(rota, &pedido, &corpo_texto))
+            {
+                Ok(v) => (200, v),
                 Err(r) => (r.status(), r.corpo()),
             };
             let resposta = Response::from_string(corpo.to_string())

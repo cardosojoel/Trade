@@ -37,6 +37,39 @@ pub enum Command {
     Perfil(PerfilArgs),
     /// Confere se a conta está pronta para paper trading. Não emite ordem.
     Paper(PaperArgs),
+    /// Sobe o servidor local de leitura do registro.
+    Serve(ServeArgs),
+}
+
+#[derive(clap::Args, Debug, Clone)]
+pub struct ServeArgs {
+    /// Porta em `127.0.0.1`. **Sem padrão**: um padrão seria um número que
+    /// alguém acabaria descobrindo estar aberto.
+    #[arg(long, required = true)]
+    pub porta: u16,
+
+    #[arg(long, default_value = "data/runs.db")]
+    pub runs_db: PathBuf,
+
+    #[arg(long, default_value = "data/market.db")]
+    pub market_db: PathBuf,
+
+    /// As cinco exigências da Porta 1. Lidas de arquivo, nunca embutidas
+    /// (FR-024) — a constitution manda tratá-las como valores de partida.
+    #[arg(long, default_value = "porta1.toml")]
+    pub porta1: PathBuf,
+
+    #[arg(long, default_value = "limits.toml")]
+    pub limits: PathBuf,
+
+    #[arg(long, default_value = "fees.toml")]
+    pub fees: PathBuf,
+
+    #[arg(long, default_value = "instrumento.toml")]
+    pub instrumento: PathBuf,
+
+    #[arg(long, default_value = "data/KILL")]
+    pub kill_file: PathBuf,
 }
 
 #[derive(clap::Args, Debug)]

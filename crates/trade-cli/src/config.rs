@@ -373,3 +373,32 @@ max_price_deviation_ratio = "0.20"
         ));
     }
 }
+
+/// As cinco exigências da Porta 1, lidas de arquivo (FR-024).
+///
+/// Sem `Default`, de propósito: um padrão com os números de hoje seria a
+/// constante embutida que o requisito proíbe. Sem o arquivo, o servidor não
+/// sobe — e não subir é melhor que subir julgando por números que ninguém
+/// escolheu.
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Porta1Config {
+    pub meses_minimos: u32,
+    pub operacoes_minimas: u64,
+    /// String, nunca número: número em TOML passa por ponto flutuante, e
+    /// 1.3 não é exatamente 1,3.
+    pub profit_factor_minimo: String,
+    pub drawdown_maximo_fracao: String,
+}
+
+pub fn load_porta1(path: impl AsRef<Path>) -> Result<Porta1Config, ConfigError> {
+    let p = path.as_ref();
+    let texto = std::fs::read_to_string(p).map_err(|e| ConfigError::Read {
+        path: p.display().to_string(),
+        cause: e.to_string(),
+    })?;
+    toml::from_str(&texto).map_err(|e| ConfigError::Parse {
+        path: p.display().to_string(),
+        cause: e.to_string(),
+    })
+}

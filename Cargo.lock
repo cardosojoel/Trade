@@ -1481,6 +1481,7 @@ dependencies = [
  "trade-paper",
  "trade-ports",
  "trade-risk",
+ "trade-serve",
  "trade-session",
  "trade-storage",
  "trade-strategy",

@@ -10,6 +10,7 @@ pub mod cmd_collect;
 pub mod cmd_paper;
 pub mod cmd_paper_rodar;
 pub mod cmd_perfil;
+pub mod cmd_serve;
 pub mod config;
 pub mod parada;
 pub mod report;
