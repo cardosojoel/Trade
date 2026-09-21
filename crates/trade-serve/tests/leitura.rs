@@ -20,6 +20,15 @@ fn repo() -> (tempfile::TempDir, RunsRepository) {
     (dir, RunsRepository::new(conn))
 }
 
+fn exigencias() -> trade_serve::consultas::ExigenciasPorta1 {
+    trade_serve::consultas::ExigenciasPorta1 {
+        meses_minimos: 12,
+        operacoes_minimas: 100,
+        profit_factor_minimo: dec!(1.3),
+        drawdown_maximo_fracao: dec!(0.15),
+    }
+}
+
 fn gravar(r: &mut RunsRepository, run_id: &str, pnl: rust_decimal::Decimal) {
     let sym = Symbol::new("BTCUSDT").unwrap();
     let lim = RiskLimits {
@@ -214,7 +223,9 @@ fn o_grupo_traz_a_cerca_sob_a_qual_correu() {
 fn a_execucao_traz_metricas_e_decomposicao_do_custo() {
     let (_d, mut r) = repo();
     gravar(&mut r, "01A", dec!(10));
-    let c = respostas::execucao(&r, "01A").unwrap().expect("existe");
+    let c = respostas::execucao(&r, "01A", &exigencias())
+        .unwrap()
+        .expect("existe");
     assert_eq!(c["run_id"], "01A");
     assert!(c["metricas"]["net_result"].is_string());
     assert!(c["custo"]["total_fees"].is_string());
@@ -224,7 +235,54 @@ fn a_execucao_traz_metricas_e_decomposicao_do_custo() {
 #[test]
 fn execucao_inexistente_devolve_nada() {
     let (_d, r) = repo();
-    assert!(respostas::execucao(&r, "nao-existe").unwrap().is_none());
+    assert!(
+        respostas::execucao(&r, "nao-existe", &exigencias())
+            .unwrap()
+            .is_none()
+    );
+}
+
+#[test]
+fn a_execucao_traz_o_estado_da_porta_1() {
+    // FR-024 e o contrato da rota: o servidor **devolve calculadas** as cinco
+    // exigências. Ter a função e não chamá-la de rota nenhuma é o mesmo que
+    // não tê-la — foi o que aconteceu até 2026-09-21.
+    let (_d, mut r) = repo();
+    gravar(&mut r, "01A", dec!(10));
+    let c = respostas::execucao(&r, "01A", &exigencias())
+        .unwrap()
+        .unwrap();
+    let p = &c["porta_1"];
+    assert_eq!(p["exigencias"].as_array().unwrap().len(), 5);
+    assert!(p.get("passou").is_some());
+}
+
+#[test]
+fn a_porta_1_reprova_por_operacoes_de_menos() {
+    // Duas operações contra as cem exigidas. O observado vem ao lado do
+    // exigido, e não só o veredito.
+    let (_d, mut r) = repo();
+    gravar(&mut r, "01A", dec!(10));
+    let c = respostas::execucao(&r, "01A", &exigencias())
+        .unwrap()
+        .unwrap();
+    let ops = &c["porta_1"]["exigencias"][1];
+    assert_eq!(ops["observado"], 2);
+    assert_eq!(ops["passou"], false);
+    assert_eq!(c["porta_1"]["passou"], false);
+}
+
+#[test]
+fn a_porta_1_usa_os_limiares_que_recebeu_e_nao_constantes() {
+    // FR-024: lidos de configuração. Trocar o limiar muda o veredito.
+    let (_d, mut r) = repo();
+    gravar(&mut r, "01A", dec!(10));
+    let frouxa = trade_serve::consultas::ExigenciasPorta1 {
+        operacoes_minimas: 1,
+        ..exigencias()
+    };
+    let c = respostas::execucao(&r, "01A", &frouxa).unwrap().unwrap();
+    assert_eq!(c["porta_1"]["exigencias"][1]["passou"], true);
 }
 
 // ---------------------------------------------------------------- T015
@@ -268,7 +326,9 @@ fn profit_factor_indefinido_vem_nulo_com_o_motivo() {
     r.save_metrics("01Z", &RunMetrics::from_trades(&trades, dec!(0)))
         .unwrap();
 
-    let c = respostas::execucao(&r, "01Z").unwrap().unwrap();
+    let c = respostas::execucao(&r, "01Z", &exigencias())
+        .unwrap()
+        .unwrap();
     assert!(c["metricas"]["profit_factor"].is_null());
     assert!(
         c["metricas"]["profit_factor_indefinido_porque"]

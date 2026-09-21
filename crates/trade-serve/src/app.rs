@@ -54,11 +54,14 @@ impl Aplicacao<'_> {
         match rota {
             Rota::Execucoes => respostas::execucoes(&repo()?).map_err(falha),
 
-            Rota::Execucao => nao_achou(respostas::execucao(&repo()?, &id()).map_err(falha)?),
+            Rota::Execucao => {
+                nao_achou(respostas::execucao(&repo()?, &id(), &self.exigencias).map_err(falha)?)
+            }
 
             Rota::Diario => {
                 let r = repo()?;
-                let e = nao_achou(respostas::execucao(&r, &id()).map_err(falha)?)?;
+                let e =
+                    nao_achou(respostas::execucao(&r, &id(), &self.exigencias).map_err(falha)?)?;
                 let extrato = r.extrato(&id()).map_err(falha)?;
                 // O limite vem da cerca **daquela execução**, e não da cerca
                 // de hoje: um dia rompeu o limite que valia então.

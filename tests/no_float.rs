@@ -9,14 +9,30 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const MONETARY_CRATES: &[&str] = &[
-    "trade-domain",
-    "trade-risk",
-    "trade-backtest",
-    // O adaptador de paper carrega preço, quantidade e taxa vindos da
-    // corretora: é caminho monetário como qualquer outro.
-    "trade-paper",
-];
+/// As crates do workspace, lidas do `Cargo.toml` da raiz.
+///
+/// Derivada, e não escrita à mão. Até 2026-09-21 esta lista era fixa, e as
+/// crates novas — `trade-session` e `trade-serve` — ficaram **fora dela sem
+/// que nada falhasse**: o invariante passava porque não olhava para o código
+/// novo. Conformidade por acidente não é conformidade.
+///
+/// Derivando dos membros do workspace, uma crate passa a ser coberta no
+/// instante em que é declarada, e esquecer deixa de ser possível.
+fn crates_do_workspace() -> Vec<String> {
+    let raiz = fs::read_to_string("Cargo.toml").expect("lendo Cargo.toml da raiz");
+    let doc: toml::Table = raiz.parse().expect("parse do Cargo.toml da raiz");
+    let membros = doc
+        .get("workspace")
+        .and_then(|w| w.get("members"))
+        .and_then(|m| m.as_array())
+        .expect("workspace.members");
+    membros
+        .iter()
+        .filter_map(|m| m.as_str())
+        .filter_map(|m| m.strip_prefix("crates/"))
+        .map(str::to_string)
+        .collect()
+}
 
 fn rs_files(dir: &Path, out: &mut Vec<PathBuf>) {
     let Ok(entries) = fs::read_dir(dir) else {
@@ -64,7 +80,7 @@ fn float_hits(src: &str) -> Vec<(usize, String)> {
 fn nenhum_ponto_flutuante_em_caminho_monetario() {
     let mut violacoes = Vec::new();
 
-    for &c in MONETARY_CRATES {
+    for c in crates_do_workspace() {
         let mut files = Vec::new();
         rs_files(Path::new(&format!("crates/{c}/src")), &mut files);
         files.sort();

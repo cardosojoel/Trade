@@ -16,17 +16,30 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const CRATES: &[&str] = &[
-    "trade-domain",
-    "trade-ports",
-    "trade-risk",
-    "trade-strategy",
-    "trade-backtest",
-    "trade-storage",
-    "trade-bybit",
-    "trade-paper",
-    "trade-cli",
-];
+/// As crates do workspace, lidas do `Cargo.toml` da raiz.
+///
+/// Derivada, e não escrita à mão. Até 2026-09-21 esta lista era fixa, e as
+/// crates novas — `trade-session` e `trade-serve` — ficaram **fora dela sem
+/// que nada falhasse**: o invariante passava porque não olhava para o código
+/// novo. Conformidade por acidente não é conformidade.
+///
+/// Derivando dos membros do workspace, uma crate passa a ser coberta no
+/// instante em que é declarada, e esquecer deixa de ser possível.
+fn crates_do_workspace() -> Vec<String> {
+    let raiz = fs::read_to_string("Cargo.toml").expect("lendo Cargo.toml da raiz");
+    let doc: toml::Table = raiz.parse().expect("parse do Cargo.toml da raiz");
+    let membros = doc
+        .get("workspace")
+        .and_then(|w| w.get("members"))
+        .and_then(|m| m.as_array())
+        .expect("workspace.members");
+    membros
+        .iter()
+        .filter_map(|m| m.as_str())
+        .filter_map(|m| m.strip_prefix("crates/"))
+        .map(str::to_string)
+        .collect()
+}
 
 /// Vocabulário que só existe para operar alavancado, vendido ou em derivativo.
 ///
@@ -98,7 +111,7 @@ fn codigo(linha: &str) -> Option<&str> {
 
 fn fontes() -> Vec<PathBuf> {
     let mut arquivos = Vec::new();
-    for c in CRATES {
+    for c in crates_do_workspace() {
         rs_files(Path::new(&format!("crates/{c}/src")), &mut arquivos);
     }
     arquivos.sort();

@@ -19,6 +19,15 @@ fn repo() -> (tempfile::TempDir, RunsRepository) {
     (dir, RunsRepository::new(conn))
 }
 
+fn exigencias() -> consultas::ExigenciasPorta1 {
+    consultas::ExigenciasPorta1 {
+        meses_minimos: 12,
+        operacoes_minimas: 100,
+        profit_factor_minimo: dec!(1.3),
+        drawdown_maximo_fracao: dec!(0.15),
+    }
+}
+
 fn gravar(r: &mut RunsRepository, run_id: &str, perda_diaria: &str, pnl: rust_decimal::Decimal) {
     use std::str::FromStr;
     let sym = Symbol::new("BTCUSDT").unwrap();
@@ -144,7 +153,9 @@ fn toda_resposta_declara_de_qual_banco_veio() {
 
     assert_eq!(respostas::execucoes(&r).unwrap()["origem"], "runs.db");
     assert_eq!(
-        respostas::execucao(&r, "01A").unwrap().unwrap()["origem"],
+        respostas::execucao(&r, "01A", &exigencias())
+            .unwrap()
+            .unwrap()["origem"],
         "runs.db"
     );
     let c = respostas::comparar(&r, "01A", "01A").unwrap().unwrap();

@@ -10,6 +10,7 @@
 //! conversão **não compila**. Ligar a feature o faria serializar como número,
 //! que é exatamente o que se quer proibir.
 
+use crate::consultas::{ExigenciasPorta1, ObservadoPorta1, porta1};
 use serde_json::{Value, json};
 use trade_domain::Money;
 use trade_ports::StorageError;
@@ -92,8 +93,17 @@ pub fn execucoes(repo: &RunsRepository) -> Result<Value, StorageError> {
     Ok(json!({ "grupos": saida, "origem": "runs.db" }))
 }
 
-/// `GET /runs/{id}` — uma execução, com a decomposição do custo.
-pub fn execucao(repo: &RunsRepository, run_id: &str) -> Result<Option<Value>, StorageError> {
+/// `GET /runs/{id}` — uma execução, a decomposição do custo e o estado da
+/// Porta 1.
+///
+/// As exigências chegam de fora porque são **configuração**, não constante: a
+/// constitution manda tratá-las como valores de partida ajustáveis, e o
+/// `FR-024` proíbe o servidor lê-las de dentro do código.
+pub fn execucao(
+    repo: &RunsRepository,
+    run_id: &str,
+    exigencias: &ExigenciasPorta1,
+) -> Result<Option<Value>, StorageError> {
     let Some(e) = repo.execucao(run_id)? else {
         return Ok(None);
     };
@@ -116,11 +126,33 @@ pub fn execucao(repo: &RunsRepository, run_id: &str) -> Result<Option<Value>, St
             "total_fees": dinheiro(x.total_fees),
             "total_slippage": dinheiro(x.total_slippage),
         })),
+        // FR-024: devolvidas **calculadas**, com o observado ao lado do
+        // exigido e o veredito de cada uma.
+        "porta_1": m.as_ref().map(|x| porta1(exigencias, ObservadoPorta1 {
+            meses_de_historico: meses(e.from, e.to),
+            operacoes: x.trade_count,
+            // Taxa e slippage discriminados na cerca gravada: é o que a
+            // terceira exigência pede, e está no `fees_json` da execução.
+            custo_modelado: cru(&e.fees_json).get("taker_fee_rate").is_some()
+                && cru(&e.fees_json).get("slippage_rate").is_some(),
+            profit_factor: x.profit_factor,
+            max_drawdown: x.max_drawdown,
+            capital_inicial: e.initial_capital,
+        })),
         "versao_do_codigo": Value::Null,
         "comparavel": false,
         "por_que_nao_comparavel": POR_QUE_NAO_COMPARAVEL,
         "origem": "runs.db",
     })))
+}
+
+/// Meses corridos de cobertura, arredondados para baixo.
+///
+/// Para baixo de propósito: onze meses e vinte e nove dias **não são** doze
+/// meses, e a primeira exigência da Porta 1 é cobertura mínima.
+fn meses(de: chrono::DateTime<chrono::Utc>, ate: chrono::DateTime<chrono::Utc>) -> u32 {
+    let dias = ate.signed_duration_since(de).num_days().max(0);
+    u32::try_from(dias / 30).unwrap_or(0)
 }
 
 fn metricas_json(m: &MetricasLidas) -> Value {
