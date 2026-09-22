@@ -50,6 +50,7 @@ fn gravar(r: &mut RunsRepository, run_id: &str, perda_diaria: &str, pnl: rust_de
         strategy: "sma-cross",
         strategy_params: &params,
         started_at: t(0),
+        code_version: Some("v1"),
     })
     .unwrap();
     let trades = vec![Trade {
@@ -114,14 +115,19 @@ fn comparar_com_execucao_inexistente_devolve_nada() {
 // ---------------------------------------------------------------- T027
 
 #[test]
-fn a_comparacao_se_declara_nao_confiavel_mesmo_com_cercas_identicas() {
+fn cercas_identicas_nao_bastam_sem_a_versao_do_codigo() {
     // FR-007 e SC-010, e o caso concreto que originou a regra: duas
     // execuções com a mesma cerca e as mesmas 14.308 operações deram
     // resultados diferentes, porque rodaram minutos antes e depois de um
-    // commit que mudou o arredondamento. Indistinguíveis no registro.
+    // commit que mudou o arredondamento.
+    //
+    // **Este teste mudou de forma quando P6/P9 foi implementada.** Antes, a
+    // comparação era sempre não confiável, porque a versão nunca existia.
+    // Agora o que a torna não confiável é a versão **faltar** — e o teste
+    // afirma isso, que é o que sempre significou.
     let (_d, mut r) = repo();
-    gravar(&mut r, "01A", "200.00", dec!(10));
-    gravar(&mut r, "01B", "200.00", dec!(999));
+    gravar_com_versao(&mut r, "01A", None);
+    gravar_com_versao(&mut r, "01B", None);
 
     let c = respostas::comparar(&r, "01A", "01B").unwrap().unwrap();
     assert!(
@@ -283,4 +289,131 @@ fn o_erro_de_historico_traz_o_trecho_e_o_comando_ja_preenchido() {
         "as datas já preenchidas: {cmd}"
     );
     assert_eq!(r.status(), 409);
+}
+
+// ------------------ P6/P9: a comparação passa a poder se sustentar
+
+/// Grava com uma versão de código declarada.
+fn gravar_com_versao(r: &mut RunsRepository, run_id: &str, versao: Option<&str>) {
+    use trade_domain::Trade;
+    let sym = Symbol::new("BTCUSDT").unwrap();
+    let lim = RiskLimits::default();
+    let fees = FeeModel::default();
+    let params = BTreeMap::new();
+    r.start_run(&RunHeader {
+        run_id,
+        mode: ExecutionMode::Backtest,
+        symbol: &sym,
+        interval: Interval::M1,
+        from: t(0),
+        to: t(12),
+        initial_capital: dec!(10000),
+        limits: &lim,
+        fees: &fees,
+        strategy: "sma-cross",
+        strategy_params: &params,
+        started_at: t(0),
+        code_version: versao,
+    })
+    .unwrap();
+    let trades = vec![Trade {
+        seq: 1,
+        entry_at: t(1),
+        entry_price: dec!(100),
+        exit_at: t(2),
+        exit_price: dec!(110),
+        qty: dec!(1),
+        fees: dec!(0.1),
+        pnl: dec!(10),
+    }];
+    r.save_trades(run_id, &trades).unwrap();
+    r.save_metrics(run_id, &RunMetrics::from_trades(&trades, dec!(0)))
+        .unwrap();
+    r.finish_run(run_id, t(12), "completed", None).unwrap();
+}
+
+#[test]
+fn com_a_versao_no_registro_a_comparacao_passa_a_se_sustentar() {
+    // É o que o FR-007 sempre previu: não confiável **enquanto** a versão não
+    // estiver no registro. Ela está.
+    let (_d, mut r) = repo();
+    gravar_com_versao(&mut r, "01A", Some("abc123def456"));
+    gravar_com_versao(&mut r, "01B", Some("abc123def456"));
+
+    let c = respostas::comparar(&r, "01A", "01B").unwrap().unwrap();
+    assert_eq!(c["a"]["versao_do_codigo"], "abc123def456");
+    assert_eq!(c["confiavel"], true);
+    assert!(c["por_que_nao_confiavel"].is_null());
+}
+
+#[test]
+fn versoes_diferentes_nao_se_comparam() {
+    // O caso real: duas execuções com a mesma cerca e resultado diferente,
+    // separadas por um commit que mudou o arredondamento.
+    let (_d, mut r) = repo();
+    gravar_com_versao(&mut r, "01A", Some("abc123def456"));
+    gravar_com_versao(&mut r, "01B", Some("999888777666"));
+
+    let c = respostas::comparar(&r, "01A", "01B").unwrap().unwrap();
+    assert_eq!(c["confiavel"], false);
+    assert!(
+        c["por_que_nao_confiavel"]
+            .as_str()
+            .unwrap()
+            .contains("versões diferentes"),
+        "veio {}",
+        c["por_que_nao_confiavel"]
+    );
+}
+
+#[test]
+fn versao_de_arvore_suja_nunca_sustenta_comparacao() {
+    // **O ponto que não é óbvio.** Duas execuções marcadas `abc-sujo` podem
+    // ter rodado códigos diferentes: a marca existe justamente porque o
+    // commit não identifica o que estava na árvore. Iguais no texto, e ainda
+    // assim não comparáveis.
+    let (_d, mut r) = repo();
+    gravar_com_versao(&mut r, "01A", Some("abc123def456-sujo"));
+    gravar_com_versao(&mut r, "01B", Some("abc123def456-sujo"));
+
+    let c = respostas::comparar(&r, "01A", "01B").unwrap().unwrap();
+    assert_eq!(c["confiavel"], false, "texto igual não é código igual");
+    assert!(
+        c["por_que_nao_confiavel"]
+            .as_str()
+            .unwrap()
+            .contains("não commitada"),
+        "veio {}",
+        c["por_que_nao_confiavel"]
+    );
+}
+
+#[test]
+fn execucao_anterior_a_coluna_continua_nao_comparavel() {
+    let (_d, mut r) = repo();
+    gravar_com_versao(&mut r, "01A", None);
+    gravar_com_versao(&mut r, "01B", Some("abc123def456"));
+
+    let c = respostas::comparar(&r, "01A", "01B").unwrap().unwrap();
+    assert_eq!(c["confiavel"], false);
+    assert!(c["a"]["versao_do_codigo"].is_null());
+    assert!(
+        c["por_que_nao_confiavel"]
+            .as_str()
+            .unwrap()
+            .contains("não guarda"),
+        "veio {}",
+        c["por_que_nao_confiavel"]
+    );
+}
+
+#[test]
+fn a_execucao_devolve_a_versao_que_a_produziu() {
+    let (_d, mut r) = repo();
+    gravar_com_versao(&mut r, "01A", Some("abc123def456"));
+    let c = respostas::execucao(&r, "01A", &exigencias())
+        .unwrap()
+        .unwrap();
+    assert_eq!(c["versao_do_codigo"], "abc123def456");
+    assert_eq!(c["comparavel"], true);
 }

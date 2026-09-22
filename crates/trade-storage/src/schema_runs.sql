@@ -16,7 +16,13 @@ CREATE TABLE IF NOT EXISTS run (
     started_at           INTEGER NOT NULL,
     ended_at             INTEGER,
     outcome              TEXT,               -- completed | halted | capital_exhausted
-    halt_reason          TEXT                -- FR-024c
+    halt_reason          TEXT,               -- FR-024c
+    -- A versão do código que produziu a execução (P6/P9, decisões 009 e 043).
+    --
+    -- Anulável porque o registro é insubstituível: as execuções gravadas antes
+    -- de a coluna existir não ganham versão inventada. Nulo aqui significa "o
+    -- registro não sabe", que é diferente de qualquer valor que se pudesse pôr.
+    code_version         TEXT
 );
 
 -- seq dá ordem TOTAL aos eventos dentro de uma execução, inclusive entre dois

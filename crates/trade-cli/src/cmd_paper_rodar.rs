@@ -118,6 +118,7 @@ fn executar(args: &RodarArgs) -> Saida {
                 strategy: strategy.name(),
                 strategy_params: &params,
                 started_at: agora,
+                code_version: crate::versao_do_codigo(),
             })
             .map_err(|e| (ExitCode::Uso, e.to_string()))?;
             (id, None, false)

@@ -23,6 +23,12 @@ pub struct RunHeader<'a> {
     pub strategy: &'a str,
     pub strategy_params: &'a BTreeMap<String, String>,
     pub started_at: DateTime<Utc>,
+    /// A versão do código que está produzindo esta execução.
+    ///
+    /// `None` só quando o binário não soube dizer — árvore sem git, por
+    /// exemplo. Nunca uma string inventada: nulo significa "o registro não
+    /// sabe", e a interface é obrigada a declarar isso (FR-006, FR-007).
+    pub code_version: Option<&'a str>,
 }
 
 /// Uma execução que começou e não foi encerrada.
@@ -58,6 +64,7 @@ pub struct ExecucaoLida {
     pub ended_at: Option<DateTime<Utc>>,
     pub outcome: Option<String>,
     pub halt_reason: Option<String>,
+    pub code_version: Option<String>,
 }
 
 /// As métricas de uma execução.
@@ -170,8 +177,9 @@ impl RunsRepository {
         self.conn
             .execute(
                 "INSERT INTO run (run_id, mode, symbol, interval, from_ms, to_ms, \
-                 initial_capital, limits_json, fees_json, strategy, strategy_params_json, started_at) \
-                 VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)",
+                 initial_capital, limits_json, fees_json, strategy, strategy_params_json, \
+                 started_at, code_version) \
+                 VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13)",
                 rusqlite::params![
                     h.run_id,
                     h.mode.as_str(),
@@ -185,6 +193,7 @@ impl RunsRepository {
                     h.strategy,
                     json_map(h.strategy_params),
                     h.started_at.timestamp_millis(),
+                    h.code_version,
                 ],
             )
             .map_err(escrita)?;
@@ -487,6 +496,7 @@ mod tests {
             strategy: "sma-cross",
             strategy_params: params,
             started_at: t,
+            code_version: Some("teste"),
         }
     }
 
@@ -616,6 +626,7 @@ mod testes_retomada {
             strategy: "sma-cross",
             strategy_params: &params,
             started_at: t,
+            code_version: Some("teste"),
         })
         .unwrap();
     }
@@ -660,7 +671,7 @@ mod testes_retomada {
 
 const SELECT_EXECUCAO: &str = "SELECT run_id, mode, symbol, interval, from_ms, to_ms, \
      initial_capital, limits_json, fees_json, strategy, strategy_params_json, \
-     started_at, ended_at, outcome, halt_reason FROM run";
+     started_at, ended_at, outcome, halt_reason, code_version FROM run";
 
 fn consulta(e: rusqlite::Error) -> StorageError {
     StorageError::Query(e.to_string())
@@ -703,6 +714,7 @@ fn le_execucao(r: &rusqlite::Row<'_>) -> rusqlite::Result<Result<ExecucaoLida, S
     let ended: Option<i64> = r.get(12)?;
     let outcome: Option<String> = r.get(13)?;
     let halt_reason: Option<String> = r.get(14)?;
+    let code_version: Option<String> = r.get(15)?;
 
     Ok((|| {
         Ok(ExecucaoLida {
@@ -721,6 +733,7 @@ fn le_execucao(r: &rusqlite::Row<'_>) -> rusqlite::Result<Result<ExecucaoLida, S
             ended_at: ended.map(instante).transpose()?,
             outcome,
             halt_reason,
+            code_version,
         })
     })())
 }

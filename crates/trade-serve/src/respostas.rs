@@ -21,15 +21,50 @@ pub fn dinheiro(v: Money) -> String {
     v.to_string()
 }
 
-/// Por que a comparação entre execuções não se sustenta hoje.
+/// Se a comparação entre duas execuções se sustenta, e por que não quando não.
 ///
-/// Enquanto a tabela `run` não gravar a versão do código, duas execuções com a
-/// mesma cerca e resultado diferente são indistinguíveis no registro — e foi
-/// exatamente o que aconteceu: duas execuções rodaram minutos antes de um
-/// commit que mudou o arredondamento da quantidade, e divergiram em 14.299 das
-/// 14.308 operações. `FR-007`, `SC-010`.
-const POR_QUE_NAO_COMPARAVEL: &str =
-    "o registro não guarda a versão do código que produziu a execução";
+/// O `FR-007` sempre disse "não confiável **enquanto** a versão do código não
+/// estiver no registro". Desde a implementação de P6/P9 ela está — e a
+/// resposta passou a poder ser sim.
+///
+/// **A marca de árvore suja não se compara com nada, nem consigo mesma.** Duas
+/// execuções marcadas `abc123-sujo` podem ter rodado códigos diferentes: a
+/// marca existe justamente porque o commit não identifica o que estava na
+/// árvore. Texto igual não é código igual, e tratar como igual seria repetir o
+/// defeito original com uma camada a mais de confiança.
+fn comparabilidade(a: Option<&str>, b: Option<&str>) -> (bool, Option<String>) {
+    match (a, b) {
+        (None, _) | (_, None) => (
+            false,
+            Some("o registro não guarda a versão do código de ao menos uma das execuções".into()),
+        ),
+        (Some(x), Some(y)) if x.ends_with(SUJO) || y.ends_with(SUJO) => (
+            false,
+            Some(
+                "ao menos uma execução rodou a partir de árvore com alteração não \
+                 commitada: o identificador não descreve o código que rodou, e duas \
+                 marcas iguais podem ser códigos diferentes"
+                    .into(),
+            ),
+        ),
+        (Some(x), Some(y)) if x != y => (
+            false,
+            Some(format!(
+                "as execuções rodaram versões diferentes do código: {x} e {y}"
+            )),
+        ),
+        (Some(_), Some(_)) => (true, None),
+    }
+}
+
+/// Sufixo que o `build.rs` acrescenta quando a árvore não estava limpa.
+const SUJO: &str = "-sujo";
+
+/// Uma execução sozinha é comparável quando o registro sabe qual código a
+/// produziu — e árvore suja não sabe.
+fn comparavel_sozinha(v: Option<&str>) -> (bool, Option<String>) {
+    comparabilidade(v, v)
+}
 
 /// `GET /runs` — os grupos de execuções.
 ///
@@ -84,10 +119,11 @@ pub fn execucoes(repo: &RunsRepository) -> Result<Value, StorageError> {
             "metricas": metricas.as_ref().map(metricas_json),
             "cerca": { "limits": cru(&primeira.limits_json),
                        "fees": cru(&primeira.fees_json) },
-            // Presente e nulo, nunca omitido (FR-006, REQ-UI-044).
-            "versao_do_codigo": Value::Null,
-            "comparavel": false,
-            "por_que_nao_comparavel": POR_QUE_NAO_COMPARAVEL,
+            // Presente e nulo quando o registro não sabe, nunca omitido
+            // (FR-006, REQ-UI-044).
+            "versao_do_codigo": primeira.code_version,
+            "comparavel": comparavel_sozinha(primeira.code_version.as_deref()).0,
+            "por_que_nao_comparavel": comparavel_sozinha(primeira.code_version.as_deref()).1,
         }));
     }
     Ok(json!({ "grupos": saida, "origem": "runs.db" }))
@@ -139,9 +175,9 @@ pub fn execucao(
             max_drawdown: x.max_drawdown,
             capital_inicial: e.initial_capital,
         })),
-        "versao_do_codigo": Value::Null,
-        "comparavel": false,
-        "por_que_nao_comparavel": POR_QUE_NAO_COMPARAVEL,
+        "versao_do_codigo": e.code_version,
+        "comparavel": comparavel_sozinha(e.code_version.as_deref()).0,
+        "por_que_nao_comparavel": comparavel_sozinha(e.code_version.as_deref()).1,
         "origem": "runs.db",
     })))
 }
@@ -203,17 +239,17 @@ pub fn comparar(repo: &RunsRepository, a: &str, b: &str) -> Result<Option<Value>
     let (Some(ea), Some(eb)) = (repo.execucao(a)?, repo.execucao(b)?) else {
         return Ok(None);
     };
+    let (confiavel, motivo) =
+        comparabilidade(ea.code_version.as_deref(), eb.code_version.as_deref());
     Ok(Some(json!({
         "a": lado(repo, &ea)?,
         "b": lado(repo, &eb)?,
         "cercas_diferem_em": diferencas(&ea, &eb),
-        // **Sempre falso hoje**, e não por defeito da comparação: sem a
-        // versão do código no registro, duas execuções com a mesma cerca e
-        // resultado diferente são indistinguíveis. Foi o que aconteceu com
-        // duas execuções que rodaram minutos antes e depois de um commit que
-        // mudou o arredondamento da quantidade (FR-007, SC-010).
-        "confiavel": false,
-        "por_que_nao_confiavel": POR_QUE_NAO_COMPARAVEL,
+        // FR-007 e SC-010. Duas execuções com a mesma cerca e resultado
+        // diferente foram indistinguíveis por não gravarem a versão — e o que
+        // as separava era um commit que mudou o arredondamento da quantidade.
+        "confiavel": confiavel,
+        "por_que_nao_confiavel": motivo,
         "origem": "runs.db",
     })))
 }
@@ -226,7 +262,7 @@ fn lado(repo: &RunsRepository, e: &ExecucaoLida) -> Result<Value, StorageError> 
         "estrategia": e.strategy,
         "cerca": { "limits": cru(&e.limits_json), "fees": cru(&e.fees_json) },
         "metricas": m.as_ref().map(metricas_json),
-        "versao_do_codigo": Value::Null,
+        "versao_do_codigo": e.code_version,
     }))
 }
 

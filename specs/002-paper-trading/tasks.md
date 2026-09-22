@@ -94,6 +94,21 @@ Verificável sem rede e sem credencial.
 - [X] T049 **(TF)** Relatório da Porta 2 com os seis critérios `SC-101` a `SC-106` e o veredito de cada um
 - [X] T050 `trade porta2` na CLI, gerando o relatório a partir do registro
 
+## Fatia 5d — o que precisa entrar antes dos trinta dias *(não exige credencial)*
+
+> Acrescentada em 2026-09-21 pela **decisão 043** do Jev
+> (`as_duas_versao_primeiro`, 0,97 · confiança 0,95).
+>
+> O Princípio I diz que **qualquer alteração em lógica de estratégia, risco ou
+> execução reinicia a contagem da Porta 2**. O que for entrar, entra antes de
+> os trinta dias começarem — depois, cada mudança zera o relógio.
+
+- [X] T051 **(TF)** A tabela `run` grava a versão do código (P6/P9, decisão 009)
+- [X] T052 **(TF)** A versão é o commit, com marca quando a árvore está suja (decisão 043)
+- [X] T053 **(TF)** Banco gravado antes da coluna continua legível, e a migração é idempotente
+- [X] T054 **(TF)** A comparação entre execuções passa a se sustentar quando as versões conferem
+- [ ] T055 **(TF)** A causa de um preenchimento parcial é registrada (P3, achado 2)
+
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 
 - [ ] T032 Chave de Demo Trading criada, sem permissão de saque, e verificada

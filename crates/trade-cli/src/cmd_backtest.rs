@@ -127,6 +127,7 @@ fn executar(args: &BacktestArgs) -> Result<(ExitCode, String), (ExitCode, String
         strategy: strategy.name(),
         strategy_params: &params,
         started_at: iniciado_em,
+        code_version: crate::versao_do_codigo(),
     })
     .map_err(|e| (ExitCode::Uso, e.to_string()))?;
 

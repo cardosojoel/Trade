@@ -42,7 +42,37 @@ pub fn open_market(path: impl AsRef<Path>) -> Result<Connection, StorageError> {
 
 /// Abre o banco de execuções e auditoria, criando o esquema se necessário.
 pub fn open_runs(path: impl AsRef<Path>) -> Result<Connection, StorageError> {
-    open_with(path.as_ref(), SCHEMA_RUNS)
+    let conn = open_with(path.as_ref(), SCHEMA_RUNS)?;
+    migrar_runs(&conn)?;
+    Ok(conn)
+}
+
+/// Alcança bancos que já existiam antes de uma coluna ser acrescentada.
+///
+/// `CREATE TABLE IF NOT EXISTS` não altera tabela existente: um banco gravado
+/// sob esquema antigo continuaria sem a coluna, e a primeira gravação falharia.
+/// O `runs.db` deste repositório tem nove execuções nessas condições, e o
+/// registro é **insubstituível** — uma migração que o quebrasse destruiria
+/// auditoria que não se reconstrói de fonte nenhuma.
+///
+/// Só acrescenta coluna anulável. Nunca remove, nunca reescreve linha.
+fn migrar_runs(conn: &Connection) -> Result<(), StorageError> {
+    const NOVAS: &[(&str, &str)] = &[("code_version", "TEXT")];
+
+    for (coluna, tipo) in NOVAS {
+        let existe: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM pragma_table_info('run') WHERE name = ?1",
+                [coluna],
+                |r| r.get(0),
+            )
+            .map_err(|e| StorageError::Query(e.to_string()))?;
+        if existe == 0 {
+            conn.execute_batch(&format!("ALTER TABLE run ADD COLUMN {coluna} {tipo}"))
+                .map_err(|e| StorageError::Write(e.to_string()))?;
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]

@@ -45,6 +45,7 @@ fn gravar(r: &mut RunsRepository, run_id: &str, hora: u32, capital: rust_decimal
         strategy: "sma-cross",
         strategy_params: &params,
         started_at: t(hora),
+        code_version: Some("teste"),
     })
     .unwrap();
 }

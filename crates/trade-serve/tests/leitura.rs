@@ -29,6 +29,30 @@ fn exigencias() -> trade_serve::consultas::ExigenciasPorta1 {
     }
 }
 
+/// Como `gravar`, mas sem versão — o caso das execuções anteriores à coluna.
+fn gravar_sem_versao(r: &mut RunsRepository, run_id: &str) {
+    let sym = Symbol::new("BTCUSDT").unwrap();
+    let lim = RiskLimits::default();
+    let fees = FeeModel::default();
+    let params = BTreeMap::new();
+    r.start_run(&RunHeader {
+        run_id,
+        mode: ExecutionMode::Backtest,
+        symbol: &sym,
+        interval: Interval::M1,
+        from: t(0),
+        to: t(12),
+        initial_capital: dec!(10000),
+        limits: &lim,
+        fees: &fees,
+        strategy: "sma-cross",
+        strategy_params: &params,
+        started_at: t(0),
+        code_version: None,
+    })
+    .unwrap();
+}
+
 fn gravar(r: &mut RunsRepository, run_id: &str, pnl: rust_decimal::Decimal) {
     let sym = Symbol::new("BTCUSDT").unwrap();
     let lim = RiskLimits {
@@ -50,6 +74,7 @@ fn gravar(r: &mut RunsRepository, run_id: &str, pnl: rust_decimal::Decimal) {
         strategy: "sma-cross",
         strategy_params: &params,
         started_at: t(0),
+        code_version: Some("v1"),
     })
     .unwrap();
     let trades = vec![
@@ -156,22 +181,30 @@ fn contagem_continua_sendo_numero() {
 // ---------------------------------------------------------------- T011
 
 #[test]
-fn a_versao_do_codigo_vem_presente_e_nula() {
-    // FR-006 e SC-009: presente e nulo, **nunca omitido**. É o que permite à
-    // tela distinguir "o registro não guarda" de "esqueceram de mandar".
+fn a_versao_do_codigo_vem_presente_mesmo_quando_o_registro_nao_sabe() {
+    // FR-006 e SC-009: **presente**, nunca omitido. Nulo significa "o
+    // registro não sabe", e é diferente de "esqueceram de mandar".
+    //
+    // Mudou de forma quando P6/P9 entrou: antes o campo era sempre nulo
+    // porque a coluna não existia. Agora ele é nulo quando a execução é
+    // anterior à coluna — e o que o teste afirma continua o mesmo.
     let (_d, mut r) = repo();
     gravar(&mut r, "01A", dec!(10));
     let g = &respostas::execucoes(&r).unwrap()["grupos"][0];
     assert!(g.get("versao_do_codigo").is_some(), "o campo existe");
-    assert!(g["versao_do_codigo"].is_null(), "e vem nulo");
+    assert_eq!(
+        g["versao_do_codigo"], "v1",
+        "e traz o que o registro guarda"
+    );
 }
 
 #[test]
 fn sem_versao_do_codigo_a_execucao_se_declara_nao_comparavel() {
-    // FR-007: não confiável ainda que cerca e taxas sejam idênticas.
+    // FR-007: não confiável enquanto a versão não estiver no registro.
     let (_d, mut r) = repo();
-    gravar(&mut r, "01A", dec!(10));
-    let g = &respostas::execucoes(&r).unwrap()["grupos"][0];
+    gravar_sem_versao(&mut r, "01Z");
+    let g = respostas::execucoes(&r).unwrap()["grupos"][0].clone();
+    assert!(g["versao_do_codigo"].is_null());
     assert_eq!(g["comparavel"], false);
     assert!(
         g["por_que_nao_comparavel"]
@@ -180,6 +213,15 @@ fn sem_versao_do_codigo_a_execucao_se_declara_nao_comparavel() {
             .contains("versão do código"),
         "a resposta diz por quê, em vez de só negar"
     );
+}
+
+#[test]
+fn com_a_versao_no_registro_a_execucao_passa_a_ser_comparavel() {
+    let (_d, mut r) = repo();
+    gravar(&mut r, "01A", dec!(10));
+    let g = &respostas::execucoes(&r).unwrap()["grupos"][0];
+    assert_eq!(g["comparavel"], true);
+    assert!(g["por_que_nao_comparavel"].is_null());
 }
 
 // ---------------------------------------------------------------- T012
@@ -309,6 +351,7 @@ fn profit_factor_indefinido_vem_nulo_com_o_motivo() {
         strategy: "s",
         strategy_params: &params,
         started_at: t(0),
+        code_version: Some("v1"),
     })
     .unwrap();
     // Só operação vencedora: o fator fica indefinido.
