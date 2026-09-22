@@ -32,26 +32,67 @@ pub fn run() -> Result<String, (u8, String)> {
     match cliente.relogio_esta_sincronizado() {
         Ok(true) => linhas.push("  Relógio                  sincronizado".into()),
         Ok(false) => {
-            return Err((
-                2,
+            return Err(com_diagnostico(
+                &linhas,
                 "o relógio local está fora da janela que a Bybit aceita. Toda requisição \
                  assinada seria recusada com mensagem genérica. Sincronize o relógio (NTP) \
-                 antes de operar."
-                    .into(),
+                 antes de operar.",
+                &[],
             ));
         }
-        Err(e) => return Err((2, format!("não foi possível conferir o relógio: {e}"))),
+        Err(e) => {
+            return Err(com_diagnostico(
+                &linhas,
+                &format!("não foi possível conferir o relógio: {e}"),
+                &[
+                    "a URL acima está alcançável desta máquina?",
+                    "há proxy ou firewall entre esta máquina e a Bybit?",
+                ],
+            ));
+        }
     }
 
     match verificar_sem_saque(&cliente) {
         Ok(()) => linhas.push("  Permissão da chave       negocia, não saca".into()),
-        Err(e) => return Err((2, e.to_string())),
+        Err(e) => {
+            return Err(com_diagnostico(
+                &linhas,
+                &e.to_string(),
+                &[
+                    "a chave foi criada em testnet.bybit.com, e não em bybit.com?",
+                    "não é chave de **Demo Trading**? Demo roda na infraestrutura de \
+                     produção e a chave dela não vale na testnet.",
+                    "a chave e o segredo foram copiados inteiros, sem espaço nas pontas?",
+                    "a chave está ativa, e não expirada nem revogada?",
+                ],
+            ));
+        }
     }
 
     linhas.push(String::new());
     linhas.push("  Conta pronta para a Porta 2.".into());
     linhas.push(String::new());
     Ok(linhas.join("\n"))
+}
+
+/// Devolve o erro **com o que já foi conferido**.
+///
+/// Sem isto, quem vê "API key is invalid" não sabe contra qual URL a tentativa
+/// foi feita, nem quais checagens já haviam passado — e as duas coisas são o
+/// que separa "a chave está errada" de "a chave é de outro ambiente". É a
+/// mesma regra que o `FR-022` fixa para o servidor: o erro diz o que falta, e
+/// não só que falhou.
+fn com_diagnostico(linhas: &[String], causa: &str, perguntas: &[&str]) -> (u8, String) {
+    let mut s = linhas.join("\n");
+    s.push_str("\n\n  ");
+    s.push_str(causa);
+    if !perguntas.is_empty() {
+        s.push_str("\n\n  Confira, nesta ordem:\n");
+        for p in perguntas {
+            s.push_str(&format!("    · {p}\n"));
+        }
+    }
+    (2, s)
 }
 
 /// Só o suficiente para conferir que é a chave certa, nunca a chave inteira.
