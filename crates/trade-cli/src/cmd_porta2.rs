@@ -35,8 +35,9 @@ fn executar(args: &Porta2Args) -> Result<(ExitCode, String), (ExitCode, String)>
             ExitCode::HistoricoAusente,
             format!(
                 "nenhuma execução em modo `paper` em {}.\n\
-                 A Porta 2 se mede sobre trinta dias na testnet, e eles ainda não\n\
-                 correram. Antes disso: criar a chave de testnet sem permissão de saque,\n\
+                 A Porta 2 se mede sobre trinta dias em Demo Trading, e eles ainda\n\
+                 não correram. Antes disso: criar a chave em bybit.com → Demo Trading,\n\
+                 sem permissão de saque,\n\
                  conferir com `trade paper verificar`, e abrir a sessão com\n\
                  `trade paper rodar --mode paper`.",
                 args.runs_db.display()

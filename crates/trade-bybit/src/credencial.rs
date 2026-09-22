@@ -12,17 +12,51 @@
 use std::fmt;
 
 /// Contra qual ambiente a credencial opera.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// **Enum exaustivo, sem variante coringa.** Acrescentar um ambiente quebra a
+/// compilação em todo `match` que os trate, que é o comportamento desejado: um
+/// ambiente novo que caísse num padrão genérico cairia no domínio errado, e o
+/// domínio errado aqui é a conta de produção.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Ambiente {
     Testnet,
+    /// Demo Trading — livro e preços de produção, saldo fictício.
+    ///
+    /// É o ambiente da Porta 2 desde a emenda **2.1.0**. A chave é emitida
+    /// pela conta de produção, e `api-demo.bybit.com` difere de
+    /// `api.bybit.com` por um prefixo: é por isso que o domínio não vem de
+    /// configuração em lugar nenhum.
+    Demo,
     Producao,
 }
 
 impl Ambiente {
+    /// O **único** lugar do código onde os domínios existem.
+    ///
+    /// `tests/um_dominio_so.rs` varre as fontes e falha se o literal de
+    /// produção aparecer em qualquer outro arquivo. Um domínio que pudesse ser
+    /// escrito em dois lugares poderia divergir num deles, e divergir aqui é
+    /// enviar ordem para a corretora errada.
     pub const fn base_url(self) -> &'static str {
         match self {
             Ambiente::Testnet => "https://api-testnet.bybit.com",
+            Ambiente::Demo => "https://api-demo.bybit.com",
             Ambiente::Producao => "https://api.bybit.com",
+        }
+    }
+
+    /// Todos, para que um teste possa percorrer o conjunto em vez de um
+    /// exemplo. Acrescentar variante sem acrescentar aqui quebra os testes que
+    /// contam.
+    pub const fn todos() -> [Ambiente; 3] {
+        [Ambiente::Testnet, Ambiente::Demo, Ambiente::Producao]
+    }
+
+    pub const fn nome(self) -> &'static str {
+        match self {
+            Ambiente::Testnet => "Testnet",
+            Ambiente::Demo => "Demo Trading",
+            Ambiente::Producao => "Produção",
         }
     }
 }
@@ -69,25 +103,44 @@ pub struct Credencial {
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum CredencialError {
     #[error(
-        "credenciais de testnet ausentes: defina BYBIT_TESTNET_KEY e \
-         BYBIT_TESTNET_SECRET no ambiente. Modo paper não inicia sem elas."
+        "credenciais ausentes: defina BYBIT_DEMO_KEY e BYBIT_DEMO_SECRET no \
+         ambiente. O Demo Trading é o ambiente da Porta 2 desde a emenda \
+         2.1.0, e o modo paper não inicia sem credencial."
     )]
     Ausente,
     #[error(
-        "credenciais de testnet e de produção presentes no mesmo ambiente. O \
-         Princípio VI exige que não coexistam: uma configuração que carrega as \
-         duas é uma troca de variável de distância de um envio para a corretora \
+        "credenciais de {primeiro} e de {segundo} presentes no mesmo ambiente. \
+         O Princípio VI exige que não coexistam: uma configuração que carrega \
+         as duas está a uma troca de variável de enviar ordem para a corretora \
          errada."
     )]
-    AmbasPresentes,
+    MaisDeUma {
+        primeiro: &'static str,
+        segundo: &'static str,
+    },
     #[error("a variável {0} está definida mas vazia")]
     Vazia(&'static str),
 }
 
-const TESTNET_KEY: &str = "BYBIT_TESTNET_KEY";
-const TESTNET_SECRET: &str = "BYBIT_TESTNET_SECRET";
-const PROD_KEY: &str = "BYBIT_KEY";
-const PROD_SECRET: &str = "BYBIT_SECRET";
+/// As variáveis de cada ambiente, na ordem em que os ambientes são listados.
+const VARIAVEIS: [(Ambiente, &str, &str); 3] = [
+    (
+        Ambiente::Testnet,
+        "BYBIT_TESTNET_KEY",
+        "BYBIT_TESTNET_SECRET",
+    ),
+    (Ambiente::Demo, "BYBIT_DEMO_KEY", "BYBIT_DEMO_SECRET"),
+    (Ambiente::Producao, "BYBIT_KEY", "BYBIT_SECRET"),
+];
+
+/// Uma credencial encontrada no ambiente, ainda não validada.
+struct Achada {
+    ambiente: Ambiente,
+    nome_chave: &'static str,
+    nome_segredo: &'static str,
+    chave: Option<String>,
+    segredo: Option<String>,
+}
 
 impl Credencial {
     /// Lê do ambiente do processo.
@@ -97,31 +150,54 @@ impl Credencial {
 
     /// Lê de onde a closure mandar. É esta que os testes exercitam.
     pub fn a_partir_de(ler: impl Fn(&str) -> Option<String>) -> Result<Self, CredencialError> {
-        let tk = ler(TESTNET_KEY);
-        let ts = ler(TESTNET_SECRET);
-        let pk = ler(PROD_KEY);
-        let ps = ler(PROD_SECRET);
-
-        let tem_testnet = tk.is_some() || ts.is_some();
-        let tem_producao = pk.is_some() || ps.is_some();
-
-        if tem_testnet && tem_producao {
-            return Err(CredencialError::AmbasPresentes);
+        // Percorre os três ambientes em vez de nomear dois. Acrescentar um
+        // quarto é acrescentar uma linha em `VARIAVEIS`, e a regra de não
+        // coexistência passa a valer para ele sem que ninguém se lembre.
+        let mut presentes: Vec<Achada> = Vec::new();
+        for (ambiente, nome_chave, nome_segredo) in VARIAVEIS {
+            let chave = ler(nome_chave);
+            let segredo = ler(nome_segredo);
+            if chave.is_some() || segredo.is_some() {
+                presentes.push(Achada {
+                    ambiente,
+                    nome_chave,
+                    nome_segredo,
+                    chave,
+                    segredo,
+                });
+            }
         }
-        let (Some(chave), Some(segredo)) = (tk, ts) else {
+
+        // Qualquer par entre os ambientes reconhecidos, e não só testnet
+        // contra produção (constitution 2.1.0). Com o Demo Trading as duas
+        // credenciais saem da mesma conta, e separá-las por nome de variável
+        // virou convenção — a barreira precisa ser a recusa.
+        if presentes.len() > 1 {
+            return Err(CredencialError::MaisDeUma {
+                primeiro: presentes[0].ambiente.nome(),
+                segundo: presentes[1].ambiente.nome(),
+            });
+        }
+
+        let Some(a) = presentes.pop() else {
+            return Err(CredencialError::Ausente);
+        };
+        // Meia credencial não é credencial: passaria adiante e falharia na
+        // assinatura, com mensagem genérica da corretora.
+        let (Some(chave), Some(segredo)) = (a.chave, a.segredo) else {
             return Err(CredencialError::Ausente);
         };
         if chave.trim().is_empty() {
-            return Err(CredencialError::Vazia(TESTNET_KEY));
+            return Err(CredencialError::Vazia(a.nome_chave));
         }
         if segredo.trim().is_empty() {
-            return Err(CredencialError::Vazia(TESTNET_SECRET));
+            return Err(CredencialError::Vazia(a.nome_segredo));
         }
 
         Ok(Self {
             chave,
             segredo: Segredo(segredo),
-            ambiente: Ambiente::Testnet,
+            ambiente: a.ambiente,
         })
     }
 }
@@ -130,6 +206,11 @@ impl Credencial {
 mod tests {
     use super::*;
     use std::collections::HashMap;
+
+    const TESTNET_KEY: &str = VARIAVEIS[0].1;
+    const TESTNET_SECRET: &str = VARIAVEIS[0].2;
+    const PROD_KEY: &str = VARIAVEIS[2].1;
+    const PROD_SECRET: &str = VARIAVEIS[2].2;
 
     fn ambiente(pares: &[(&str, &str)]) -> impl Fn(&str) -> Option<String> + use<> {
         let m: HashMap<String, String> = pares
@@ -162,7 +243,7 @@ mod tests {
             (PROD_SECRET, "sp"),
         ]))
         .unwrap_err();
-        assert_eq!(e, CredencialError::AmbasPresentes);
+        assert!(matches!(e, CredencialError::MaisDeUma { .. }), "veio {e:?}");
     }
 
     #[test]
@@ -173,7 +254,7 @@ mod tests {
             (PROD_KEY, "kp"),
         ]))
         .unwrap_err();
-        assert_eq!(e, CredencialError::AmbasPresentes);
+        assert!(matches!(e, CredencialError::MaisDeUma { .. }), "veio {e:?}");
     }
 
     #[test]

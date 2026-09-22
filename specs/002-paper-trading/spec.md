@@ -1,12 +1,23 @@
 # Feature Specification: Paper Trading na Testnet da Bybit
 
+
+> **Emenda 2.1.0 da constitution, 2026-09-21.** O ambiente da Porta 2 passou de
+> **testnet** para **Demo Trading**. O texto abaixo foi atualizado. O motivo, o
+> custo declarado e as três salvaguardas estão em
+> `docs/emendas/2026-09-21-demo-trading-na-porta-2.md`.
+>
+> Resumo: a testnet tem livro raso, e os dois critérios que a Porta 2 existe
+> para produzir — slippage real e divergência contra o backtest — são medições
+> sobre o mercado. Medidas contra um livro que quase não tem ordens, produzem
+> números que saem e não significam.
+
 **Feature Branch**: `002-paper-trading`
 
 **Created**: 2026-09-20
 
 **Status**: Draft
 
-**Input**: Adaptador de paper trading contra a testnet da Bybit, com o mesmo
+**Input**: Adaptador de paper trading contra a Demo Trading da Bybit, com o mesmo
 código que iria para `live`. É o que destrava a Porta 2 da constitution — 30
 dias corridos ininterruptos — e o que mede pela primeira vez o slippage real,
 hoje a única premissa de custo ainda presumida.
@@ -18,7 +29,7 @@ de 72 horas.
 ## Por que esta feature, e por que agora
 
 O backtest terminou. Ele responde o que teria acontecido; não responde o que
-acontece. Três coisas que o projeto hoje presume e só a testnet mede:
+acontece. Três coisas que o projeto hoje presume e só o mercado real mede:
 
 1. **Slippage.** 0,05% por ida e volta é analogia, nunca medida. É um quinto do
    custo total, e o custo é o que decide se a estratégia vive.
@@ -35,9 +46,9 @@ manutenção da corretora sem perder o fio.
 
 O ator continua sendo o **mantenedor**.
 
-### User Story 1 - Operar na testnet com o mesmo código que iria para live (Priority: P1)
+### User Story 1 - Operar no Demo Trading com o mesmo código que iria para live (Priority: P1)
 
-O mantenedor configura credenciais de testnet e roda `trade run --mode paper`.
+O mantenedor configura credenciais de Demo Trading e roda `trade run --mode paper`.
 O sistema opera continuamente: lê velas em tempo real, avalia a estratégia,
 envia ordens pela camada de risco e registra tudo de forma reconstituível.
 
@@ -45,9 +56,9 @@ envia ordens pela camada de risco e registra tudo de forma reconstituível.
 caminho para capital real.
 
 **Teste de aceitação**:
-1. **Dado** credenciais de testnet válidas e modo `paper`, **quando** a
+1. **Dado** credenciais de Demo Trading válidas e modo `paper`, **quando** a
    estratégia emite um sinal de compra dentro dos limites, **então** uma ordem
-   é enviada à testnet e o preenchimento recebido atualiza a posição local.
+   é enviada ao Demo Trading e o preenchimento recebido atualiza a posição local.
 2. **Dado** que o modo é `paper`, **quando** o código de estratégia e de risco
    é inspecionado, **então** ele é byte a byte o mesmo que rodaria em `live` —
    o que muda é apenas qual implementação de `OrderExecutor` é composta.
@@ -64,7 +75,7 @@ presumido.
 deixar de ter parâmetro `ASSUMED` governando decisão.
 
 **Teste de aceitação**:
-1. **Dado** um preenchimento na testnet, **quando** o evento é registrado,
+1. **Dado** um preenchimento no Demo Trading, **quando** o evento é registrado,
    **então** ele contém preço de referência, preço obtido, taxa cobrada e a
    moeda em que a taxa saiu.
 2. **Dado** uma série de preenchimentos, **quando** o relatório é gerado,
@@ -127,7 +138,7 @@ simulador.
   versionado, e MUST NOT aparecer em log, erro ou registro de auditoria.
 - **FR-103**: O sistema MUST verificar, antes da primeira ordem, que a chave
   não tem permissão de saque, e MUST abortar se tiver.
-- **FR-104**: Chave de testnet e de produção MUST NOT coexistir na mesma
+- **FR-104**: Chave de Demo Trading e de produção MUST NOT coexistir na mesma
   configuração carregada.
 - **FR-105**: O adaptador de paper MUST implementar `OrderExecutor` sem exigir
   alteração em estratégia, risco ou motor.
@@ -155,7 +166,7 @@ simulador.
 
 ### Key Entities
 
-- **Credencial**: chave e segredo de testnet, lidos do ambiente. Nunca
+- **Credencial**: chave e segredo de Demo Trading, lidos do ambiente. Nunca
   persistidos, nunca registrados.
 - **OrdemRemota**: a ordem como a corretora a conhece, com o identificador dela
   e o nosso, e o estado do ciclo de vida.
@@ -167,7 +178,7 @@ simulador.
 
 ### Measurable Outcomes
 
-- **SC-101**: 30 dias corridos de operação ininterrupta na testnet, sem
+- **SC-101**: 30 dias corridos de operação ininterrupta no Demo Trading, sem
   intervenção manual, com o registro completo e sem buraco de `seq`.
 - **SC-102**: Slippage real medido sobre no mínimo 100 preenchimentos, com
   mediana e p95 registrados no `27_CONFIGURATION_REGISTRY.md` e o parâmetro
@@ -184,7 +195,7 @@ simulador.
 
 ## Assumptions
 
-- A testnet da Bybit tem o mesmo comportamento de API que a produção. Onde
+- A Demo Trading da Bybit tem o mesmo comportamento de API que a produção. Onde
   divergir, a divergência é achado a registrar, não a contornar.
 - O histórico público continua vindo do endpoint sem credencial, como hoje.
 - Uma máquina com conectividade estável está disponível pelos 30 dias. Esta

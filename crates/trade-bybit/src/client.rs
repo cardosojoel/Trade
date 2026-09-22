@@ -47,8 +47,17 @@ fn cabecalho_u32(resposta: &ureq::http::Response<ureq::Body>, nome: &str) -> Opt
 }
 
 impl BybitClient {
+    /// Histórico público, da origem de produção.
+    ///
+    /// O domínio vem de [`Ambiente::base_url`], e não escrito aqui: desde a
+    /// emenda 2.1.0 ele existe num lugar só, e `tests/um_dominio_so.rs` falha
+    /// o build se for escrito em outro.
+    ///
+    /// Produção é o certo **para vela**, e não contradiz a Porta 2: vela é
+    /// dado público, não alcança conta nenhuma, e o histórico da testnet é
+    /// inventado. Nenhuma ordem passa por este cliente — ele não assina nada.
     pub fn new() -> Self {
-        Self::with_base_url("https://api.bybit.com")
+        Self::with_base_url(crate::credencial::Ambiente::Producao.base_url())
     }
 
     /// Aponta para outra origem — usado pelos testes contra servidor local.

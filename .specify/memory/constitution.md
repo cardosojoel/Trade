@@ -149,8 +149,14 @@ impede paper trading honesto e transforma uma mudança de API alheia em reescrit
 - A chave de API usada em produção MUST ter permissão mínima: negociação sim,
   **saque não**. A ausência de permissão de saque MUST ser verificada antes da
   primeira execução `live`.
-- Chaves de `paper`/testnet e de `live` MUST ser distintas e MUST NOT coexistir na
-  mesma configuração carregada.
+- Chaves de `paper` e de `live` MUST ser distintas e MUST NOT coexistir na mesma
+  configuração carregada. A regra vale para **qualquer par** entre os ambientes
+  reconhecidos, e a conferência MUST percorrer todas as combinações de presença,
+  não um subconjunto escolhido (emenda 2.1.0).
+- A ausência de permissão de saque MUST ser condição de partida da sessão de
+  `paper`, e não apenas da primeira execução `live`: a chave de Demo Trading é
+  emitida pela conta de produção, e ali permissão de saque é acesso a fundo real
+  (emenda 2.1.0).
 
 **Racional:** a chave com permissão de saque transforma qualquer comprometimento —
 do código, da máquina, de uma dependência — em perda total em vez de perda limitada.
@@ -158,7 +164,12 @@ do código, da máquina, de uma dependência — em perda total em vez de perda 
 ## Restrições Operacionais e de Segurança
 
 **Corretora:** Bybit, acessada exclusivamente através da camada de abstração do
-Princípio V. Testnet da Bybit é o ambiente da porta de paper trading.
+Princípio V. O **Demo Trading** da Bybit é o ambiente da porta de paper trading
+(emenda 2.1.0).
+
+O domínio de produção MUST ser inalcançável em modo `paper`, e a garantia MUST
+ser de construção e conferida pelo build — não de configuração. Configuração se
+erra em silêncio; o que não compila não se erra.
 
 **Ativo:** Bitcoin. Qualquer outro ativo está fora de escopo até emenda MINOR.
 A restrição vale para posição de qualquer natureza, inclusive a mantida apenas
@@ -194,7 +205,7 @@ alterá-los MUST ser troca de configuração, não alteração de programa.
 | Porta | Critério mínimo |
 |---|---|
 | 1. Backtest | ≥ 12 meses de dados, incluindo ao menos um mercado de baixa sustentado e um evento de alta volatilidade; ≥ 100 operações; taxas e slippage modelados explicitamente |
-| 2. Paper trading | ≥ 30 dias corridos ininterruptos em testnet, com o mesmo código que iria para `live` |
+| 2. Paper trading | ≥ 30 dias corridos ininterruptos em **Demo Trading**, com o mesmo código que iria para `live` |
 | 3. Liberação | Ato humano registrado, após revisão dos resultados das portas 1 e 2 |
 
 **Métricas mínimas** exigidas nas portas 1 e 2 (valores de partida provisórios):
@@ -274,7 +285,43 @@ emenda formal desta constitution.
 **Orientação de runtime.** Enquanto o projeto não tiver um `CLAUDE.md`, este
 documento é a única fonte de orientação de desenvolvimento em tempo de execução.
 
-**Version**: 2.0.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-20
+**Version**: 2.1.0 | **Ratified**: 2026-09-20 | **Last Amended**: 2026-09-21
+
+**Emenda 2.1.0** — MINOR. Proposta em
+`docs/emendas/2026-09-21-demo-trading-na-porta-2.md` e aprovada pelo mantenedor
+em 2026-09-21. O ambiente da porta de paper trading passa de **testnet** para
+**Demo Trading**.
+
+**Racional.** A testnet da Bybit tem livro de ofertas raso e movimento
+artificial. Dois critérios da Porta 2 são medições sobre o mercado, não sobre o
+código: slippage real sobre no mínimo cem preenchimentos, e a divergência entre
+o resultado do paper e o do backtest. Medidos contra um livro que quase não tem
+ordens, os dois produzem números que saem e não significam — e o de slippage
+seria promovido de `ASSUMED` a `MEASURED` sem que a medição tivesse medido o
+mercado. O Demo Trading opera sobre o livro e os preços de produção, com saldo
+fictício. O que a Porta 2 valida não é apenas que o código funciona: é **quanto
+custa operá-lo**, e essa pergunta não tem resposta num mercado que não existe.
+
+**O que a troca custa.** A isolação enfraquece, e é o preço declarado. A chave
+de testnet pertence a conta inteiramente separada; a de Demo Trading é emitida
+**a partir da conta de produção**, e `api-demo.bybit.com` difere de
+`api.bybit.com` por um prefixo. Antes desta emenda, apontar para produção por
+engano não produziria ordem alguma — a chave de testnet não existe lá. Depois
+dela, produziria. Por isso a emenda traz três salvaguardas, cada uma com o que a
+cobra no build, descritas na proposta.
+
+**Impacto sobre specs e código existentes:** nenhuma execução de `paper`
+existe — o `runs.db` tem nove execuções, todas em `backtest`, e zero linhas com
+`mode = 'paper'` (lido em 2026-09-21). Nada que já rodou deixa de estar
+conforme. As fatias 1 a 5c da feature 002 não mudam: transporte, assinatura,
+adaptador, reconciliação, laço e medição são independentes do domínio. O que
+muda é a composição, o conjunto de ambientes reconhecidos, e os invariantes que
+o build passa a cobrar.
+
+**Por que MINOR e não MAJOR:** nenhuma execução de paper existiu, então não há
+processo em conformidade a invalidar. O Princípio V, onde o trecho da corretora
+vive, não é marcado NÃO-NEGOCIÁVEL. O Princípio I, que é, não nomeia ambiente —
+exige as três portas na ordem, e continua exigindo.
 
 **Emenda 2.0.0** — MAJOR, por redefinir um princípio marcado NÃO-NEGOCIÁVEL.
 Duas mudanças, propostas em `MD BOT/34_ADR_EMENDAS.md` e aceitas pelo mantenedor

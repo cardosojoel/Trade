@@ -10,9 +10,9 @@ teste escrito e **falhando** antes da implementação, conforme o Princípio III
 Verificável sem rede e sem credencial.
 
 - [X] T001 **(TF)** `ExecutionMode::Paper` passa a existir; `live` continua recusado
-- [X] T002 **(TF)** Leitura de `BYBIT_TESTNET_KEY` e `BYBIT_TESTNET_SECRET` do ambiente
+- [X] T002 **(TF)** Leitura de `BYBIT_DEMO_KEY` e `BYBIT_DEMO_SECRET` do ambiente
 - [X] T003 **(TF)** Ausência de credencial aborta a inicialização em `paper` (FR-102)
-- [X] T004 **(TF)** Chave de testnet e de produção no mesmo ambiente aborta (FR-104)
+- [X] T004 **(TF)** Chave de Demo Trading e de produção no mesmo ambiente aborta (FR-104)
 - [X] T005 Segredo MUST NOT aparecer em `Debug`, log ou erro — tipo que redige a si mesmo
 - [X] T006 [P] `trade-paper` criada, declarada no workspace, sem código ainda
 - [X] T007 Teste de arquitetura passa a cobrar que estratégia, risco e backtest não declarem `trade-paper`
@@ -96,9 +96,9 @@ Verificável sem rede e sem credencial.
 
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 
-- [ ] T032 Chave de testnet criada, sem permissão de saque, e verificada
-- [ ] T033 Primeira ordem real na testnet, com registro completo
-- [ ] T034 Divergências entre testnet e o que o simulador previa: registradas
+- [ ] T032 Chave de Demo Trading criada, sem permissão de saque, e verificada
+- [ ] T033 Primeira ordem real no Demo Trading, com registro completo
+- [ ] T034 Divergências entre o Demo Trading e o que o simulador previa: registradas
 
 ## Fatia 7 — os 30 dias *(exige credencial e tempo)*
 
@@ -121,4 +121,4 @@ credencial.
 
 **Fatias 1 a 5**: 31 tarefas, nenhuma precisa de credencial.
 **Fatias 6 e 7**: 8 tarefas, todas dependem do mantenedor criar a chave de
-testnet e do tempo correr.
+Demo Trading e do tempo correr.

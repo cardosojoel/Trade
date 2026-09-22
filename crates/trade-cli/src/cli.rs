@@ -101,7 +101,7 @@ pub struct PaperArgs {
 pub enum PaperAcao {
     /// Credencial, relógio e permissão da chave. Não emite ordem.
     Verificar,
-    /// Abre a sessão contínua na testnet. **Emite ordem.**
+    /// Abre a sessão contínua no Demo Trading. **Emite ordem.**
     Rodar(RodarArgs),
 }
 

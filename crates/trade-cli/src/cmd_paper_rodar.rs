@@ -1,4 +1,4 @@
-//! `trade paper rodar` — a sessão contínua na testnet (T041, T044, T045).
+//! `trade paper rodar` — a sessão contínua no Demo Trading (T041, T044, T045).
 //!
 //! O segundo ponto de composição do sistema, e o mais carregado: aqui a
 //! credencial vira cliente autenticado, o cliente vira `OrderExecutor`, o

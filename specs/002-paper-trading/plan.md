@@ -6,7 +6,7 @@
 
 ## Summary
 
-Uma crate nova, `trade-paper`, que implementa `OrderExecutor` contra a testnet
+Uma crate nova, `trade-paper`, que implementa `OrderExecutor` contra o Demo Trading
 da Bybit, e um laço de execução contínua que substitui o laço de backtest sem
 tocar em estratégia, risco ou motor de decisão.
 
@@ -26,8 +26,8 @@ WebSocket, que está fora de escopo.
 `timestamp + api_key + recv_window + payload`, conforme a documentação da
 Bybit.
 
-**Credenciais**: variáveis de ambiente `BYBIT_TESTNET_KEY` e
-`BYBIT_TESTNET_SECRET`. Nunca arquivo, nunca argumento de linha de comando — o
+**Credenciais**: variáveis de ambiente `BYBIT_DEMO_KEY` e
+`BYBIT_DEMO_SECRET`. Nunca arquivo, nunca argumento de linha de comando — o
 argumento aparece em `ps`.
 
 **Estado**: o `runs.db` que já existe passa a ser fonte de recuperação, não só
@@ -60,7 +60,7 @@ crates/
 ├── trade-bybit/          ganha o cliente autenticado e a assinatura
 │   └── src/auth.rs       HMAC, recv_window, ordenação de parâmetros
 ├── trade-paper/          crate nova — o adaptador
-│   ├── src/executor.rs   OrderExecutor contra a testnet
+│   ├── src/executor.rs   OrderExecutor contra o Demo Trading
 │   └── src/reconcile.rs  posição local × reportada
 ├── trade-session/        crate nova — o laço contínuo
 │   ├── src/laco.rs       prazo de 72h, virada de dia, parada limpa
@@ -108,7 +108,7 @@ Em fatias que fecham sozinhas, cada uma verificável sem a seguinte:
    duplo.
 5b. **A composição.** Fonte de velas ao vivo, reconciliação na abertura e o
    comando que liga tudo. Verificável com duplo.
-6. **Primeira ordem real na testnet.** Exige credencial.
+6. **Primeira ordem real no Demo Trading.** Exige credencial.
 7. **Os 30 dias.** Exige credencial e tempo.
 
 As fatias 1 a 5b não precisam de credencial e podem ser feitas agora. As 6 e 7

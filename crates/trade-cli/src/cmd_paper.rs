@@ -59,9 +59,12 @@ pub fn run() -> Result<String, (u8, String)> {
                 &linhas,
                 &e.to_string(),
                 &[
-                    "a chave foi criada em testnet.bybit.com, e não em bybit.com?",
-                    "não é chave de **Demo Trading**? Demo roda na infraestrutura de \
-                     produção e a chave dela não vale na testnet.",
+                    "a chave foi criada em bybit.com → Demo Trading → avatar → API?",
+                    "não é chave de testnet? A Porta 2 usa Demo Trading desde a emenda \
+                     2.1.0, e a chave de testnet não vale no domínio de demo.",
+                    "não foi criada no modo demo **de dentro da testnet**? Esse quarto \
+                     ambiente não tem domínio de API publicado, e a chave dele não \
+                     funciona em lugar nenhum.",
                     "a chave e o segredo foram copiados inteiros, sem espaço nas pontas?",
                     "a chave está ativa, e não expirada nem revogada?",
                 ],
