@@ -128,6 +128,7 @@ impl StubOrderExecutor {
             fee: Decimal::ZERO,
             slippage: Decimal::ZERO,
             at: DateTime::<Utc>::MIN_UTC,
+            causa_parcial: None,
         }));
         StubOrderExecutor::scripted(respostas)
     }
@@ -164,6 +165,7 @@ impl OrderExecutor for StubOrderExecutor {
                 fee_base: Decimal::ZERO,
                 slippage: Decimal::ZERO,
                 at: order.at,
+                causa_parcial: None,
             }),
             None => Err(ExecError::Unavailable(
                 "stub sem resposta roteirizada".into(),

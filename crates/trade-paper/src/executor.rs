@@ -19,7 +19,7 @@ use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::cell::RefCell;
 use std::rc::Rc;
-use trade_domain::{Fill, Money, Order, Qty, Side};
+use trade_domain::{CausaParcial, Fill, Money, Order, Qty, Side};
 use trade_ports::{ExecError, OrderExecutor};
 
 /// Caminho de consulta do preenchimento.
@@ -237,6 +237,11 @@ impl<T: Transporte> OrderExecutor for PaperExecutor<T> {
             // Porta 2 existe para produzir.
             slippage: ((preco - referencia).abs() * qty).round_dp(8),
             at: order.at,
+            // A corretora preencheu menos do que se pediu. O **porquê** é
+            // dela: o registro de execuções diz o que foi executado, não o
+            // que impediu o resto. Dizer "a corretora" é o que se sabe, e
+            // afirmar mais seria inventar (T055, achado 2).
+            causa_parcial: (qty < order.qty).then_some(CausaParcial::Corretora),
         })
     }
 }

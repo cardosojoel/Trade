@@ -162,6 +162,7 @@ fn comprado_em(qty: Money, preco: Money, quando: DateTime<Utc>) -> Position {
             fee_base: Decimal::ZERO,
             slippage: Decimal::ZERO,
             at: quando,
+            causa_parcial: None,
         },
     )
     .unwrap();

@@ -11,7 +11,7 @@ use crate::mode::ExecutionMode;
 use crate::position::Position;
 use crate::reconciliacao::Veredito;
 use crate::risk_types::{Anomaly, RiskDecision};
-use crate::types::{CausaDoFechamento, Fill, Order, Signal};
+use crate::types::{CausaDoFechamento, CausaParcial, Fill, Order, Signal};
 use chrono::{DateTime, Utc};
 
 /// Envelope comum a todo evento (FR-033).
@@ -166,6 +166,11 @@ impl AuditKind {
                 "fee": d(f.fee),
                 "fee_base": d(f.fee_base),
                 "slippage": d(f.slippage),
+                // Presente e nulo quando o preenchimento foi integral. Nulo
+                // aqui significa **não foi parcial**, e não "não sei por quê"
+                // — que era exatamente o que o registro dizia antes da T055,
+                // em quatro ordens de 28.618 (achado 2, P3).
+                "causa_parcial": f.causa_parcial.map(CausaParcial::as_str),
             }),
 
             AuditKind::Halt { reason, anomaly } => json!({
@@ -331,6 +336,7 @@ mod tests {
                 fee_base: dec!(0),
                 slippage: dec!(0.32),
                 at: instante(),
+                causa_parcial: None,
             }),
             AuditKind::Halt {
                 reason: "divergência".into(),

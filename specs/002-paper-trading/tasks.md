@@ -107,7 +107,7 @@ Verificável sem rede e sem credencial.
 - [X] T052 **(TF)** A versão é o commit, com marca quando a árvore está suja (decisão 043)
 - [X] T053 **(TF)** Banco gravado antes da coluna continua legível, e a migração é idempotente
 - [X] T054 **(TF)** A comparação entre execuções passa a se sustentar quando as versões conferem
-- [ ] T055 **(TF)** A causa de um preenchimento parcial é registrada (P3, achado 2)
+- [X] T055 **(TF)** A causa de um preenchimento parcial é registrada (P3, achado 2)
 
 ## Fatia 6 — primeira ordem real *(exige credencial)*
 

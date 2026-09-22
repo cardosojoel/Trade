@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**480 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**494 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
@@ -143,6 +143,59 @@ Três coisas que quem for implementar precisa saber antes:
   honesta, não defeito. É a pendência **P6/P9**, ainda aberta.
 - **Nenhum limiar de desempenho dela foi medido**; os dois que existem nascem
   como configuração de partida.
+
+---
+
+## O que entrou antes dos trinta dias (fatia 5d)
+
+O Princípio I: *"qualquer alteração em lógica de estratégia, risco ou execução
+MUST reiniciar a contagem da porta de paper trading"*. O que fosse entrar,
+entrava **antes** — depois, cada mudança zera trinta dias de relógio. Decisão
+043 do Jev (`as_duas_versao_primeiro`, 0,97 · confiança 0,95).
+
+### A versão do código no registro (P6/P9)
+
+A tabela `run` grava o **commit, com marca quando a árvore está suja**. Versão
+de pacote não serviria: é a mesma nos dois binários que o achado 5 mostrou
+diferentes. Conferido numa execução real — gravou `fda692fe8424-sujo`.
+
+**A marca de sujo não se compara com nada, nem consigo mesma.** Duas execuções
+marcadas `abc123-sujo` podem ter rodado códigos diferentes: a marca existe
+porque o commit não identifica o que estava na árvore. Texto igual não é código
+igual.
+
+Com isso, o `FR-007` deixou de ser sempre negativo: ele sempre disse "não
+confiável **enquanto** a versão não estiver no registro", e o *enquanto*
+acabou. A comparação entre execuções passa a poder responder que sim.
+
+A migração é idempotente e só acrescenta coluna anulável. O `runs.db` tem nove
+execuções sob o esquema antigo, e o registro é insubstituível.
+
+### A causa do preenchimento parcial (P3, achado 2)
+
+Quatro ordens em 28.618 foram preenchidas em parte e **nenhum evento
+registrava a causa**. A ordem 65 pediu 0,008553 e recebeu 0,004391. A causa
+sempre foi conhecida por quem preenche — só não era dita.
+
+| Onde | Causa que ele sabe |
+|---|---|
+| Backtest | `volume_da_vela` — a vela não negociou o suficiente |
+| Demo/real | `corretora` — ela preencheu menos, e o porquê é dela |
+
+O segundo caso é deliberadamente modesto: o registro de execuções diz o que foi
+executado, não o que impediu o resto. **Dizer "a corretora" é o que se sabe, e
+afirmar mais seria inventar.**
+
+Nulo significa **não foi parcial**, e não "não sei por quê" — que era
+exatamente o que o registro dizia antes. A rota `/runs/{id}/chain/{seq}` mostra
+a causa ao lado da divergência que já assinalava.
+
+### Um teste instável, que é defeito por si só
+
+O teste de ponta a ponta do `trade serve` escolhia a porta ligando um socket e
+soltando — e entre soltar e o servidor ligar, outro teste em paralelo podia
+tomá-la. Passava isolado e falhava na suíte. Agora o servidor pede porta 0 e o
+teste lê qual saiu: quem liga é quem escolhe. Seis suítes seguidas limpas.
 
 ---
 

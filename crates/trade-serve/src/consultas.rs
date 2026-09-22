@@ -388,6 +388,11 @@ fn elo(e: &EventoLido, pedido: Option<&Value>) -> Value {
             v["taxa"] = e.payload["fee"].clone();
             v["divergente"] = Value::Bool(divergente);
             v["proporcao"] = proporcao;
+            // Até a T055 a interface mostrava a divergência e **não podia
+            // mostrar a causa**, porque a causa não estava gravada. Agora
+            // está — e vem presente e nula quando o preenchimento foi
+            // integral.
+            v["causa_parcial"] = e.payload["causa_parcial"].clone();
         }
         _ => {}
     }

@@ -186,6 +186,7 @@ mod tests {
             fee_base: Decimal::ZERO,
             slippage: Decimal::ZERO,
             at: em(h),
+            causa_parcial: None,
         }
     }
 
@@ -199,6 +200,7 @@ mod tests {
             fee_base,
             slippage: Decimal::ZERO,
             at: em(h),
+            causa_parcial: None,
         }
     }
 

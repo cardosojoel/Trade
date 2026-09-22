@@ -66,6 +66,7 @@ fn negociar(
             fee_base: dec!(0),
             slippage: dec!(0),
             at,
+            causa_parcial: None,
         }),
     )
     .unwrap();

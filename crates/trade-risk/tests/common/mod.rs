@@ -54,6 +54,7 @@ pub fn comprado(qty: Money, preco: Money) -> Position {
             fee_base: Decimal::ZERO,
             slippage: Decimal::ZERO,
             at: at(1, 0),
+            causa_parcial: None,
         },
     )
     .unwrap();

@@ -70,6 +70,7 @@ fn gravar_cadeia(rec: &mut AuditRecorder<SqliteAuditSink>) {
             fee_base: rust_decimal::Decimal::ZERO,
             slippage: dec!(0.32),
             at: t(1),
+            causa_parcial: None,
         }),
     )
     .unwrap();

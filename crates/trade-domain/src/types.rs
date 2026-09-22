@@ -210,6 +210,36 @@ pub struct Order {
 /// quando uma estratégia lucrativa no papel dá prejuízo na simulação, a
 /// primeira pergunta é quanto foi custo de transação, e ela precisa ser
 /// respondível por consulta, não por dedução.
+/// Por que um preenchimento veio menor que a ordem.
+///
+/// Existe por causa do achado 2: na execução `01M2ZG2N88…`, quatro ordens em
+/// 28.618 foram preenchidas em parte e **nenhum evento registrava a causa**.
+/// O Princípio IV exige reconstituir a decisão a partir do registro, e um
+/// preenchimento parcial sem causa não se reconstitui.
+///
+/// A causa sempre foi conhecida por quem preenche — só não era dita.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum CausaParcial {
+    /// O volume da vela não comportou a ordem inteira. É o caso do backtest:
+    /// não há contraparte para mais do que a vela negociou.
+    VolumeDaVela,
+    /// A corretora preencheu menos do que se pediu.
+    ///
+    /// O **porquê** dela é dela: o registro de execuções diz o que foi
+    /// executado, não o que impediu o resto. Dizer "a corretora" é o que se
+    /// sabe, e afirmar mais seria inventar.
+    Corretora,
+}
+
+impl CausaParcial {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            CausaParcial::VolumeDaVela => "volume_da_vela",
+            CausaParcial::Corretora => "corretora",
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Fill {
     pub order_ref: OrderId,
@@ -224,6 +254,10 @@ pub struct Fill {
     pub fee_base: Qty,
     pub slippage: Money,
     pub at: DateTime<Utc>,
+    /// Por que veio menos do que se pediu. `None` significa **não foi
+    /// parcial** — e não "não sei por quê". A diferença entre as duas é o que
+    /// torna o campo útil.
+    pub causa_parcial: Option<CausaParcial>,
 }
 
 /// Um ciclo fechado de compra e venda, com resultado realizado.

@@ -3,7 +3,7 @@
 use rust_decimal::Decimal;
 use std::cell::RefCell;
 use std::rc::Rc;
-use trade_domain::{Candle, FeeModel, Fill, Money, Order, Side};
+use trade_domain::{Candle, CausaParcial, FeeModel, Fill, Money, Order, Side};
 use trade_ports::{ExecError, OrderExecutor};
 
 /// Canal por onde o motor informa ao executor qual é a vela corrente.
@@ -63,9 +63,13 @@ impl OrderExecutor for SimulatedExecutor {
         let referencia = vela.open;
 
         // Preenchimento parcial quando o volume da vela não comporta a ordem.
-        // Explícito, e não silencioso: a diferença aparece na quantidade do
-        // Fill e no extrato.
+        //
+        // A **causa** vai junto desde a T055. Antes ela ficava aqui, no código,
+        // e quem lesse o registro veria uma quantidade menor sem saber por
+        // quê — foi o achado 2, quatro ordens em 28.618 sem explicação. Quem
+        // preenche sabe por que preencheu menos, e passa a dizer.
         let qty = order.qty.min(vela.volume);
+        let causa_parcial = (qty < order.qty).then_some(CausaParcial::VolumeDaVela);
 
         let ajuste = referencia * self.fees.slippage_rate;
         let preco = match order.side {
@@ -97,6 +101,7 @@ impl OrderExecutor for SimulatedExecutor {
             fee_base,
             slippage: trade_domain::quantizar(ajuste * qty),
             at: vela.open_time,
+            causa_parcial,
         })
     }
 }

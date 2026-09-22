@@ -27,18 +27,24 @@ impl Drop for Servidor {
 impl Servidor {
     fn subir() -> Servidor {
         let dir = tempfile::tempdir().unwrap();
-        // Porta livre, pedida ao sistema e devolvida antes de o servidor usá-la.
-        let porta = {
-            let l = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
-            l.local_addr().unwrap().port()
-        };
         let raiz = concat!(env!("CARGO_MANIFEST_DIR"), "/../..");
+
+        // **Porta 0, e a real lida da saída do processo.**
+        //
+        // Escolher a porta aqui — ligando um socket, guardando o número e
+        // soltando — abre uma janela entre soltar e o servidor ligar, e nela
+        // outro teste rodando em paralelo pode tomá-la. O teste então falha
+        // por disputa de porta, não por defeito no que ele mede. Foi o que
+        // aconteceu: passava isolado e falhava na suíte inteira.
+        //
+        // Pedir 0 ao sistema e ler qual porta saiu elimina a janela: quem
+        // liga é quem escolhe.
         let mut p = Command::new(env!("CARGO_BIN_EXE_trade"))
             .current_dir(raiz)
             .args([
                 "serve",
                 "--porta",
-                &porta.to_string(),
+                "0",
                 "--porta1",
                 "examples/porta1.toml",
                 "--limits",
@@ -56,19 +62,26 @@ impl Servidor {
             .spawn()
             .expect("subir o servidor");
 
-        // O token é impresso **uma vez**, e é daqui que o teste o lê — como
-        // quem opera leria.
+        // O token é impresso **uma vez**, e a porta ao lado — é daqui que o
+        // teste lê as duas, como quem opera leria.
         let saida = BufReader::new(p.stdout.take().unwrap());
         let mut token = String::new();
+        let mut porta = 0u16;
         for linha in saida.lines().map_while(Result::ok) {
-            if let Some(t) = linha.split_whitespace().last()
-                && linha.contains("Token de escrita")
+            if linha.contains("Servidor em")
+                && let Some(p) = linha.rsplit(':').next()
+            {
+                porta = p.trim().parse().unwrap_or(0);
+            }
+            if linha.contains("Token de escrita")
+                && let Some(t) = linha.split_whitespace().last()
             {
                 token = t.to_string();
                 break;
             }
         }
         assert!(!token.is_empty(), "o servidor não imprimiu o token");
+        assert_ne!(porta, 0, "o servidor não imprimiu a porta em que ligou");
         Servidor {
             processo: p,
             porta,

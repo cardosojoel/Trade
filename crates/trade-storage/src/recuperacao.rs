@@ -142,6 +142,7 @@ pub fn recuperar(
                     fee_base: dinheiro(&v, "fee_base")?,
                     slippage: dinheiro(&v, "slippage")?,
                     at,
+                    causa_parcial: None,
                 };
                 ultimo_preco = Some(fill.price);
                 // Pelo mesmo `apply_fill` que os produziu: a posição retomada
