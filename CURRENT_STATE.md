@@ -14,7 +14,7 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**462 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**480 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
 `cargo test --workspace --all-features`
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
@@ -143,6 +143,53 @@ Três coisas que quem for implementar precisa saber antes:
   honesta, não defeito. É a pendência **P6/P9**, ainda aberta.
 - **Nenhum limiar de desempenho dela foi medido**; os dois que existem nascem
   como configuração de partida.
+
+---
+
+## Emenda 2.1.0, 2026-09-21: a Porta 2 passou para o Demo Trading
+
+A constitution nomeava **testnet** em três lugares; agora nomeia **Demo
+Trading**. Proposta, racional e impacto em
+`docs/emendas/2026-09-21-demo-trading-na-porta-2.md`; decisões 041 e 042.
+
+**Por quê.** A testnet tem livro de ofertas raso e movimento artificial. Dois
+critérios da Porta 2 são medições sobre o **mercado**, não sobre o código:
+slippage real sobre cem preenchimentos (`SC-102`) e divergência contra o
+backtest (`SC-106`). Medidos ali, produzem números que saem e não significam —
+e o de slippage seria promovido de `ASSUMED` a `MEASURED` sem ter medido nada.
+O que a Porta 2 valida não é só que o código funciona: é **quanto custa
+operá-lo**, e isso não tem resposta num mercado que não existe.
+
+**O que custa, declarado na emenda.** A chave de testnet pertence a conta
+separada. A de Demo Trading é emitida **pela conta de produção**, e
+`api-demo.bybit.com` difere de `api.bybit.com` por um prefixo. Antes, apontar
+para produção por engano não produziria ordem — a chave de testnet não existe
+lá. Agora produziria.
+
+**As três salvaguardas, e o que cobra cada uma:**
+
+| Salvaguarda | Conferida por |
+|---|---|
+| O domínio de produção existe em **um lugar só** | `tests/um_dominio_so.rs` varre as fontes — achou uma duplicata real em `client.rs` na primeira execução |
+| Nenhum ambiente que não seja produção resolve para lá | teste que percorre **todas** as variantes de `Ambiente`, não um exemplo |
+| Saque barra a partida com **zero ordens** no transporte | teste que conta as requisições que saíram, não só o código de saída |
+| Não coexistência entre os **três** ambientes | teste sobre as **oito** combinações de presença |
+
+`Ambiente` é enum exaustivo sem variante coringa: um quarto ambiente quebra a
+compilação em todo `match`, em vez de cair num padrão genérico — e o padrão
+genérico aqui seria a conta de produção.
+
+**A chave de testnet continua funcionando** como ambiente próprio. A emenda
+mudou qual ambiente a Porta 2 usa, não removeu um.
+
+### O que falta para os trinta dias começarem
+
+```
+bybit.com → Demo Trading → avatar → API     criar a chave, sem saque
+export BYBIT_DEMO_KEY=… BYBIT_DEMO_SECRET=…
+trade paper verificar
+trade paper rodar --mode paper --capital …
+```
 
 ---
 
