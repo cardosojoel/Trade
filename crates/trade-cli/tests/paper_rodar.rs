@@ -13,6 +13,8 @@ fn trade() -> Command {
     // Nenhum teste pode herdar credencial da máquina de quem roda.
     c.env_remove("BYBIT_TESTNET_KEY")
         .env_remove("BYBIT_TESTNET_SECRET")
+        .env_remove("BYBIT_DEMO_KEY")
+        .env_remove("BYBIT_DEMO_SECRET")
         .env_remove("BYBIT_KEY")
         .env_remove("BYBIT_SECRET");
     c
@@ -96,4 +98,48 @@ fn sem_credencial_nao_comeca() {
         .current_dir(env!("CARGO_MANIFEST_DIR").to_string() + "/../..")
         .assert()
         .code(2);
+}
+
+fn rodar_com(chave: &str, segredo: &str) -> assert_cmd::assert::Assert {
+    trade()
+        .args([
+            "paper",
+            "rodar",
+            "--mode",
+            "paper",
+            "--capital",
+            "1000",
+            "--limits",
+            "examples/limits.toml",
+            "--fees",
+            "examples/fees.toml",
+            "--instrumento",
+            "examples/instrumento.toml",
+        ])
+        .env(chave, "k")
+        .env(segredo, "s")
+        .current_dir(env!("CARGO_MANIFEST_DIR").to_string() + "/../..")
+        .assert()
+}
+
+#[test]
+fn credencial_de_producao_nao_comeca_a_sessao_paper() {
+    // Princípio I. Sem esta recusa, `BYBIT_KEY` sozinha levava a sessão
+    // "paper" a `api.bybit.com`, com dinheiro real e `mode = 'paper'` no
+    // registro. A recusa vem antes de qualquer requisição: a chave falsa
+    // daqui nunca chega à rede.
+    rodar_com("BYBIT_KEY", "BYBIT_SECRET")
+        .code(2)
+        .stderr(contains("só opera com credencial de Demo Trading"))
+        .stderr(contains("Produção"));
+}
+
+#[test]
+fn credencial_de_testnet_nao_comeca_a_sessao_paper() {
+    // Emenda 2.1.0: a Porta 2 é o Demo Trading. Uma sessão na testnet
+    // produziria trinta dias que não valem como evidência da porta.
+    rodar_com("BYBIT_TESTNET_KEY", "BYBIT_TESTNET_SECRET")
+        .code(2)
+        .stderr(contains("só opera com credencial de Demo Trading"))
+        .stderr(contains("Testnet"));
 }

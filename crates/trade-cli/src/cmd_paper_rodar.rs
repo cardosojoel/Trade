@@ -11,7 +11,8 @@
 //!
 //! 1. O modo é `paper`. `live` é recusado aqui, não na décima ordem.
 //! 2. A cerca e o instrumento são lidos do arquivo, e o perfil é validado.
-//! 3. A credencial existe, não convive com a de produção, e não saca.
+//! 3. A credencial existe, é de Demo Trading, não convive com outra, e não
+//!    saca.
 //! 4. A sessão retoma a execução anterior, se houver uma em aberto.
 //! 5. **A posição local é reconciliada com a da corretora.** Divergente ou
 //!    desconhecido, a sessão não começa.
@@ -24,7 +25,7 @@ use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use std::time::SystemTime;
 use trade_bybit::cliente_autenticado::ClienteAutenticado;
-use trade_bybit::credencial::Credencial;
+use trade_bybit::credencial::{Ambiente as AmbienteBybit, Credencial};
 use trade_bybit::{BybitClient, FonteAoVivo};
 use trade_domain::{
     AuditKind, EstadoRetomado, ExecutionMode, FeeModel, Position, Symbol, Veredito,
@@ -68,6 +69,20 @@ fn executar(args: &RodarArgs) -> Saida {
         .map_err(|e| (ExitCode::Uso, e))?;
 
     let credencial = Credencial::do_ambiente().map_err(|e| (ExitCode::Uso, e.to_string()))?;
+    // Antes do cliente existir, e portanto antes de qualquer requisição. Sem
+    // esta recusa, uma chave de produção sozinha no ambiente levava a sessão
+    // `paper` a operar dinheiro real (Princípio I); uma de testnet produzia
+    // trinta dias que a Porta 2 não aceita (emenda 2.1.0).
+    if credencial.ambiente != AmbienteBybit::Demo {
+        return Err((
+            ExitCode::Uso,
+            format!(
+                "`paper rodar` só opera com credencial de Demo Trading, e a do \
+                 ambiente é de {}. Defina BYBIT_DEMO_KEY e BYBIT_DEMO_SECRET.",
+                credencial.ambiente.nome()
+            ),
+        ));
+    }
     let cliente = ClienteAutenticado::novo(credencial);
     verificar_sem_saque(&cliente).map_err(|e| (ExitCode::Uso, e.to_string()))?;
 
