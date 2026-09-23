@@ -1,7 +1,7 @@
 # Estado atual do projeto
 
 **Projeto:** Trade — robô de day trade automatizado de Bitcoin
-**Atualizado em:** 2026-09-22
+**Atualizado em:** 2026-09-23
 **Repositório:** https://github.com/cardosojoel/Trade (privado)
 
 ---
@@ -14,17 +14,19 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**494 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-21 com
+**495 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-23 com
 `cargo test --workspace --all-features`
 
-**Todo número desta folha foi conferido contra o repositório em 2026-09-21**,
-no commit `5558b51` (decisão 031, `conferir_o_que_os_documentos_afirmam`,
-`noul` 0,73). Conferem: 105 de 105 tarefas da feature 001; nove execuções,
+**Todo número desta folha foi conferido contra o repositório em 2026-09-23**,
+no commit `ba2f361`, pelo agente `verificador-de-realidade` (a conferência
+anterior, de 2026-09-21, no commit `5558b51`, foi a decisão 031). Conferem: 105 de 105 tarefas da feature 001; nove execuções,
 1.146.977 eventos e 114.653 linhas de extrato no `runs.db`; 525.600 velas e
 zero lacunas no `market.db`; 229.443 ordens para 229.443 decisões de risco;
-constitution 2.0.0, ratificada em 2026-09-20; e nenhuma linha com
-`mode = 'paper'`, porque a sessão ainda não existe. **A única afirmação que
-estava errada era a da feature 002**, corrigida abaixo.
+constitution 2.1.0, emendada em 2026-09-21; e nenhuma linha com
+`mode = 'paper'`, porque a sessão ainda não existe. **Estavam erradas três
+afirmações, todas corrigidas nesta folha:** a contagem de testes (494 → 495),
+a versão da constitution (2.0.0 → 2.1.0) e a contagem da feature 002
+(42 de 50 → 47 de 55).
 
 ---
 
@@ -268,14 +270,14 @@ trade paper rodar --mode paper --capital …
 
 ## Concluída até onde o código alcança: feature 002, paper trading
 
-Spec, plano e tarefas escritos. **42 de 50 tarefas concluídas** — fatias 1 a 5c
+Spec, plano e tarefas escritos. **47 de 55 tarefas concluídas** — fatias 1 a 5d
 fechadas. **Tudo que não exige credencial está feito.**
 
 As oito abertas são as fatias 6 e 7, e **nenhuma é trabalho de código**:
 
 | | |
 |---|---|
-| T032 | criar a chave de testnet na Bybit, sem permissão de saque |
+| T032 | criar a chave de Demo Trading na Bybit, sem permissão de saque |
 | T033, T034 | a primeira ordem real e as divergências — exigem a chave |
 | T035 | trinta dias corridos de operação |
 | T036 a T039 | exigem os trinta dias terem corrido |
@@ -423,7 +425,7 @@ Duas delas vieram de achados do levantamento:
   desde sempre que "o `seq` continua sem buraco entre reinícios", e não havia
   como cumprir: `recuperar` devolve `proximo_seq` e nada sabe consumi-lo.
 
-**O que só o mantenedor destrava**: criar a chave de testnet sem permissão de
+**O que só o mantenedor destrava**: criar a chave de Demo Trading sem permissão de
 saque, e os 30 dias correrem.
 
 ---
@@ -710,7 +712,7 @@ a calibração que a constitution exige antes da Porta 3.
 | **Linguagem** | Rust estável 1.98.1, edition 2024 |
 | **Armazenamento** | SQLite em dois arquivos: `market.db` (cache) e `runs.db` (auditoria) |
 
-A constitution (`.specify/memory/constitution.md`, **v1.3.0**) governa tudo e
+A constitution (`.specify/memory/constitution.md`, **v2.1.0**) governa tudo e
 tem precedência sobre qualquer outra prática.
 
 ---
@@ -813,7 +815,7 @@ A feature 001 entregou o núcleo. A constitution define as próximas portas:
 | Porta | O que exige |
 |---|---|
 | **1. Backtest** | ≥ 12 meses com mercado de baixa e evento de alta volatilidade; ≥ 100 operações; profit factor ≥ 1.3; drawdown ≤ 15% |
-| **2. Paper trading** | ≥ 30 dias ininterruptos em testnet, com o mesmo código que iria para live |
+| **2. Paper trading** | ≥ 30 dias corridos ininterruptos em Demo Trading, com o mesmo código que iria para live |
 | **3. Liberação** | Ato humano registrado |
 
 Nenhuma estratégia passou a Porta 1 — a de referência não passa nem perto, e
