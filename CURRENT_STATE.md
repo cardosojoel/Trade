@@ -124,6 +124,29 @@ III: teste escrito e falhando antes.
 
 ## Decisões esperando por você
 
+### Com o dono: sete passos antes da Porta 2 (registrado em 2026-09-23)
+
+Passo a passo em https://claude.ai/artifact/HgMYW7mGtSSBM2XAPSiadS (privado).
+Tudo é ato na conta da Bybit ou na máquina do dono, e ninguém faz por ele:
+
+1. Revogar a chave de Demo de `3666f9d` (C2).
+2. Conferir e revogar a chave de `MD BOT/bybit api.png`, no Demo e na conta
+   principal (C2).
+3. Conferir uso das duas desde 2026-09-21 22:47.
+4. Emitir a chave nova de Demo (T032): só Spot, sem derivativo, sem saque,
+   sem transferência, com restrição de IP. Até o código recusar derivativo e
+   falta de IP, essa configuração é a única barreira contra as duas.
+5. Guardá-la em `~/.config/trade/demo.env` (600), fora do repositório, e
+   apagar `env keys api demo` da raiz.
+6. `trade paper verificar` com `Ambiente Demo` — **não** `paper rodar`
+   enquanto C3 a C6 estiverem abertos.
+7. Quando puder: a taxa taker e maker do spot da conta, que o backtest supõe
+   em 0,1%.
+
+**Retomada combinada para 2026-09-24.** Do lado do código, a ordem é C4, depois
+C3, C5 e C6, tirar a imagem do índice e corrigir a mensagem do
+`paper verificar`. A emenda da Porta 1 e a reescrita do histórico vão ao Jev.
+
 ### A credencial de Demo Trading esteve versionada
 
 O arquivo `env keys api demo` entrou no commit `3666f9d`. Em 2026-09-22 ele
