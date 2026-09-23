@@ -64,10 +64,10 @@ impl Servidor {
 
         // O token é impresso **uma vez**, e a porta ao lado — é daqui que o
         // teste lê as duas, como quem opera leria.
-        let saida = BufReader::new(p.stdout.take().unwrap());
+        let mut linhas = BufReader::new(p.stdout.take().unwrap()).lines();
         let mut token = String::new();
         let mut porta = 0u16;
-        for linha in saida.lines().map_while(Result::ok) {
+        for linha in linhas.by_ref().map_while(Result::ok) {
             if linha.contains("Servidor em")
                 && let Some(p) = linha.rsplit(':').next()
             {
@@ -80,6 +80,12 @@ impl Servidor {
                 break;
             }
         }
+        // **O resto da saída continua sendo lido.** O servidor imprime o aviso
+        // em várias escritas, e duas vêm depois da linha do token. Fechar o
+        // pipe aqui fazia a escrita seguinte falhar com `Broken pipe`, o
+        // `println!` entrar em pânico e o servidor morrer antes de responder —
+        // no CI, mais lento, a pergunta chegava a um processo morto.
+        std::thread::spawn(move || linhas.for_each(drop));
         assert!(!token.is_empty(), "o servidor não imprimiu o token");
         assert_ne!(porta, 0, "o servidor não imprimiu a porta em que ligou");
         Servidor {
