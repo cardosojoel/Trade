@@ -204,6 +204,45 @@ fn as_recusas_chegam_pelo_socket_com_o_corpo_unico() {
 }
 
 #[test]
+fn o_servidor_sobrevive_a_saida_fechada() {
+    // `trade serve | head`, ou um terminal que foi embora: quem lia o aviso de
+    // partida sumiu, e o servidor tem de continuar atendendo. Antes, o
+    // `println!` do aviso entrava em pânico com `Broken pipe` e o levava junto.
+    let dir = tempfile::tempdir().unwrap();
+    let (leitor, escritor) = std::io::pipe().unwrap();
+    drop(leitor);
+    let mut p = Command::new(env!("CARGO_BIN_EXE_trade"))
+        .current_dir(concat!(env!("CARGO_MANIFEST_DIR"), "/../.."))
+        .args([
+            "serve",
+            "--porta",
+            "0",
+            "--porta1",
+            "examples/porta1.toml",
+            "--limits",
+            "examples/limits.toml",
+            "--fees",
+            "examples/fees.toml",
+            "--instrumento",
+            "examples/instrumento.toml",
+            "--runs-db",
+            dir.path().join("runs.db").to_str().unwrap(),
+            "--market-db",
+            dir.path().join("market.db").to_str().unwrap(),
+        ])
+        .stdout(escritor)
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("subir o servidor");
+
+    std::thread::sleep(std::time::Duration::from_secs(2));
+    let saiu = p.try_wait().unwrap();
+    let _ = p.kill();
+    let _ = p.wait();
+    assert_eq!(saiu, None, "o servidor morreu com a saída fechada");
+}
+
+#[test]
 fn a_leitura_responde_sem_token() {
     // FR-019: quem lê não muda nada. Exigir token para ler faria a interface
     // guardá-lo onde não precisa.

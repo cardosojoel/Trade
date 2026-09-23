@@ -14,6 +14,7 @@ use crate::cmd_backtest::ExitCode;
 use crate::config::load_porta1;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
+use std::io::Write;
 use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use trade_domain::{ExecutionMode, Interval};
@@ -140,7 +141,12 @@ fn executar(args: &ServeArgs) -> Result<(ExitCode, String), (ExitCode, String)> 
     // **Uma vez, aqui, e em lugar nenhum mais.** O token não vai para o
     // registro, para log, para mensagem de erro nem para resposta de rota
     // alguma (FR-019, FR-020). Quem não copiou agora reinicia o servidor.
-    println!(
+    //
+    // O erro de escrita é ignorado de propósito: com a saída fechada
+    // (`trade serve | head`, terminal que foi embora) não há quem leia o
+    // aviso, e o `println!` entraria em pânico e derrubaria o servidor.
+    let _ = writeln!(
+        std::io::stdout(),
         "\n  Servidor em               http://{endereco}\n  \
          Token de escrita          {}\n  \
          Registro                  {}\n  \
