@@ -1,7 +1,7 @@
 # Estado atual do projeto
 
 **Projeto:** Trade — robô de day trade automatizado de Bitcoin
-**Atualizado em:** 2026-09-21
+**Atualizado em:** 2026-09-22
 **Repositório:** https://github.com/cardosojoel/Trade (privado)
 
 ---
@@ -29,6 +29,26 @@ estava errada era a da feature 002**, corrigida abaixo.
 ---
 
 ## Decisões esperando por você
+
+### A credencial de Demo Trading esteve versionada
+
+O arquivo `env keys api demo` entrou no commit `3666f9d`. Em 2026-09-22 ele
+saiu do índice (`67f0c6d`, com `/env*` no `.gitignore`) e o CI ganhou varredura
+de segredo com gitleaks (`0640d3f`) — decisão 046 do DsTrade. O dono avaliou
+que não houve vazamento, porque o repositório é privado, e não pediu revogação.
+A chave segue no histórico; o Princípio VI proíbe chave commitada em qualquer
+momento dele, então reescrever o histórico continua em aberto.
+
+### Sete agentes em `.claude/agents/`
+
+Decisões 044 e 045: dos ~250 agentes de `msitarzewski/agency-agents` (MIT),
+sete foram adaptados em português — `revisor-de-codigo`,
+`engenheiro-de-mudanca-minima`, `estatistico`, `arqueologo-do-codigo`,
+`verificador-de-realidade`, `engenheiro-de-credenciais` e
+`arquiteto-de-seguranca`. Os revisores só leem; só os dois engenheiros editam.
+Commitados por instrução do dono em 2026-09-22.
+
+### As anteriores
 
 Nenhuma bloqueia o que existe. Mudam comportamento e não são minhas para tomar.
 
