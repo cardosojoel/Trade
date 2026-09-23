@@ -14,8 +14,9 @@ reconstituível e mantém toda ordem sob uma camada de risco que a estratégia n
 consegue contornar. Tudo em modo backtest — paper trading e capital real são
 recusados explicitamente.
 
-**495 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-23 com
-`cargo test --workspace --all-features`
+**497 testes verdes · clippy limpo · `fmt` limpo** — contados em 2026-09-23 com
+`cargo test --workspace --all-features` (495 em `ba2f361`, mais os dois de
+`b0c8cda`)
 
 **Todo número desta folha foi conferido contra o repositório em 2026-09-23**,
 no commit `ba2f361`, pelo agente `verificador-de-realidade` (a conferência
@@ -30,6 +31,97 @@ a versão da constitution (2.0.0 → 2.1.0) e a contagem da feature 002
 
 ---
 
+## Revisão completa de 2026-09-23: a Porta 2 ainda não pode começar
+
+Os sete agentes de `.claude/agents/` revisaram o projeto no commit `ba2f361`
+(seis revisores; o `engenheiro-de-mudanca-minima` não, porque edita). **O
+núcleo de backtest, os bancos e as travas de build estão íntegros.** O modo
+paper, não: tem defeitos críticos de execução, de retomada e de credencial.
+Os trinta dias ainda não começaram, e por isso corrigir agora não reinicia
+janela nenhuma. Toda correção abaixo em risco ou execução segue o Princípio
+III: teste escrito e falhando antes.
+
+### 🔴 Críticos — impedem a T032
+
+| # | Achado | Onde | Estado |
+|---|---|---|---|
+| C1 | `paper rodar` aceitava credencial de produção e mandava ordem real para `api.bybit.com`, gravando `mode = 'paper'` | `cmd_paper_rodar.rs` | **resolvido** em `b0c8cda` (testnet também recusada) |
+| C2 | A chave de `3666f9d` segue no histórico, e `MD BOT/bybit api.png` (`48c730c`, ainda rastreada) mostra identificador da chave, ausência de restrição de IP e permissões de Contratos e transferência. O gitleaks não lê imagem | histórico do git | aberto — revogar é ato do dono |
+| C3 | Retomar a sessão paper a quebra: o contador de ordens volta a zero e o `orderLinkId` se repete (FR-106); o caixa volta ao `--capital` sem reconciliação (`comparar_saldo` não tem chamador); SIGINT/SIGTERM grava `ended_at` e a volta abre execução nova, recomeçando os 30 dias; a versão do código não é reconferida | `cmd_paper_rodar.rs`, `laco.rs`, `reconcile.rs`, `runs_repo.rs` | aberto |
+| C4 | Falha ao gravar a decisão de risco não impede a ordem: todo `audit.record` é `let _ =`, e o sink guarda até 500 eventos em memória | `guard.rs`, `laco.rs`, `audit_sink.rs` | aberto |
+| C5 | A retentativa do `RiskGuard` produz ordem órfã: ordem criada e ainda não preenchida vira `Timeout`, o guard reenvia com o mesmo `orderLinkId`, a Bybit recusa como duplicada e a posição local fica zerada. O retCode 170007 na criação também é tratado como transitório | `trade-paper/executor.rs`, `guard.rs`, `erros.rs` | aberto |
+| C6 | O backtest grava `max_position_hours` no registro mas não o aplica: a Porta 1 mede um sistema diferente do que roda em paper | `trade-backtest/src/engine.rs` | aberto |
+
+### 🟠 Altos
+
+- **Prazo de 72 h herdado.** A taxa em BTC deixa resíduo, `qty > 0` impede
+  zerar `opened_at`, e depois de 72 h de sessão toda compra nova é vendida na
+  mesma vela como `Prazo` (`position.rs`, `laco.rs`).
+- **Zero desliga freio.** `max_daily_loss = "0"` e
+  `max_price_deviation_ratio = "0"` desativam a checagem; a constitution exige
+  a perda diária sem exceção configurável. E `max_position_hours = 0`, que a
+  documentação diz ser "sem prazo", fecha a posição a cada vela (`config.rs`).
+- **Preço implausível só é visto depois da ordem.** Uma vela a 1/10 do real
+  gera quantidade 10× maior, que passa em `max_position_size` porque o valor é
+  calculado sobre o preço falso (`rules.rs`, `guard.rs`).
+- **A Porta 1 não é estatisticamente defensável.** Com 100 operações, aprova
+  uma estratégia de PF real 0,9 em ~4% das vezes e reprova uma de PF real 1,3
+  em ~48%. Não há trecho fora da amostra, o critério é pontual e as variações
+  tentadas não são contadas. Os 12 meses têm **um** regime de baixa. Proposta
+  do `estatistico`, que exige emenda: trecho reservado fixado antes, limite
+  inferior do intervalo por blocos do PF acima de 1,0, ≥ ~300 operações e
+  registro de toda variação. **Decisão do Jev.**
+
+### 🟡 Médios
+
+- `trade serve`: sem conferência do cabeçalho `Host` (DNS rebinding lê as
+  rotas); corpo do POST lido antes da autorização e sem teto; `GET
+  /trabalho/{id}` lê um quadro que a thread não atualiza e responde "em
+  andamento" para sempre; `open_runs` aplica esquema e migração, então o
+  primeiro GET altera o `runs.db` real; o erro de abertura devolve o caminho
+  interno.
+- `tests/no_leverage.rs` só confere linhas que já mencionam `category`: uma
+  chamada que o omite passa, e a Bybit assume `linear`.
+- `verificar_sem_saque` não recusa permissão de derivativo nem chave sem
+  restrição de IP.
+- Não há gitleaks no pre-commit: o CI só vê o segredo depois do push, e baixa o
+  gitleaks sem conferir checksum.
+- `trade paper` (diagnóstico) ainda diz "Conta pronta para a Porta 2" com
+  credencial de produção ou testnet, contradizendo o `paper rodar` depois de
+  `b0c8cda` (`cmd_paper.rs`).
+- Registro ambíguo: `--stop-fracao` é argumento e não vai ao registro; o
+  slippage do paper usa `abs()` e perde o sinal; todo `Integrity`, até um
+  timeout, vira `PositionDivergence` e distorce o SC-103; a lista de execuções
+  parcial é tratada como definitiva; o preço de referência não entra no
+  payload de `fill` (FR-109).
+- A retentativa do guard não espera nem consulta o kill switch entre as
+  tentativas.
+- A âncora de `MD BOT/00_FRONTEIRA.md` aponta para a constitution 2.0.0.
+
+### ⚪ Baixos
+
+- `tests/architecture.rs` lê só `[dependencies]` direto do TOML: escapam
+  dependências renomeadas, por alvo, de build e transitivas (o grafo hoje está
+  limpo).
+- O kill switch usa `exists()`, que devolve falso em erro de permissão e deixa
+  o freio desarmado.
+- `quantizar` trunca em vez de arredondar, sempre a favor do resultado.
+- O teste do `serve` depende de `sleep(2s)`.
+- O `serve` imprime o token no stdout; `| tee` ou o journal o gravariam.
+- Nesta folha: "8 crates" (são 11), "tudo em modo backtest" (o paper existe) e
+  uma linha `fda692fe…-sujo` que nenhum `runs.db` reproduz.
+
+### Ordem proposta
+
+1. **Dono:** revogar a chave de `3666f9d` e a da captura; emitir a de Demo só
+   spot, sem transferência e com restrição de IP.
+2. **Antes da T032:** C3 a C6, o prazo herdado e o zero que desliga freio.
+3. **Jev:** emenda da Porta 1; reescrita do histórico, agora incluindo a
+   imagem.
+4. **Depois:** o `serve`, o pre-commit e os médios restantes.
+
+---
+
 ## Decisões esperando por você
 
 ### A credencial de Demo Trading esteve versionada
@@ -40,6 +132,9 @@ de segredo com gitleaks (`0640d3f`) — decisão 046 do DsTrade. O dono avaliou
 que não houve vazamento, porque o repositório é privado, e não pediu revogação.
 A chave segue no histórico; o Princípio VI proíbe chave commitada em qualquer
 momento dele, então reescrever o histórico continua em aberto.
+
+A revisão de 2026-09-23 achou uma segunda exposição, fora do alcance do
+gitleaks: `MD BOT/bybit api.png` (`48c730c`), ainda rastreada — ver C2 acima.
 
 ### Sete agentes em `.claude/agents/`
 
@@ -265,6 +360,9 @@ export BYBIT_DEMO_KEY=… BYBIT_DEMO_SECRET=…
 trade paper verificar
 trade paper rodar --mode paper --capital …
 ```
+
+**Antes disso, os críticos C2 a C6 da revisão de 2026-09-23.** Começar os
+trinta dias com eles abertos produziria evidência que a Porta 2 não aceita.
 
 ---
 
