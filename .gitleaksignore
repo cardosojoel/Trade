@@ -1,0 +1,6 @@
+# Achado conhecido, e não perdoado: a credencial de Demo Trading commitada em
+# 3666f9d. Ela só deixa de ser vazamento quando for revogada na Bybit
+# (Princípio VI). Esta linha existe para que a varredura barre o próximo
+# segredo em vez de falhar para sempre neste; sai daqui se o histórico for
+# reescrito.
+3666f9ddf810219e62c1401d4b83b7cdeeabf6b9:env keys api demo:generic-api-key:1
