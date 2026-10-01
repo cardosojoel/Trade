@@ -46,7 +46,7 @@ III: teste escrito e falhando antes.
 | # | Achado | Onde | Estado |
 |---|---|---|---|
 | C1 | `paper rodar` aceitava credencial de produção e mandava ordem real para `api.bybit.com`, gravando `mode = 'paper'` | `cmd_paper_rodar.rs` | **resolvido** em `b0c8cda` (testnet também recusada) |
-| C2 | A chave de `3666f9d` segue no histórico, e `MD BOT/bybit api.png` (`48c730c`, ainda rastreada) mostra identificador da chave, ausência de restrição de IP e permissões de Contratos e transferência. O gitleaks não lê imagem | histórico do git | aberto — revogar é ato do dono |
+| C2 | A credencial de Demo esteve no arquivo `env keys api demo` e a captura `MD BOT/bybit api.png` mostrava o identificador de outra chave. O gitleaks não lê imagem | histórico do git | **resolvido** em 2026-10-01: as duas chaves foram excluídas na Bybit (retCode 10003 no Demo, na testnet e na produção) e os dois arquivos saíram do histórico |
 | C3 | Retomar a sessão paper a quebra: o contador de ordens volta a zero e o `orderLinkId` se repete (FR-106); o caixa volta ao `--capital` sem reconciliação (`comparar_saldo` não tem chamador); SIGINT/SIGTERM grava `ended_at` e a volta abre execução nova, recomeçando os 30 dias; a versão do código não é reconferida | `cmd_paper_rodar.rs`, `laco.rs`, `reconcile.rs`, `runs_repo.rs` | aberto |
 | C4 | Falha ao gravar a decisão de risco não impede a ordem: todo `audit.record` é `let _ =`, e o sink guarda até 500 eventos em memória | `guard.rs`, `laco.rs`, `audit_sink.rs` | aberto |
 | C5 | A retentativa do `RiskGuard` produz ordem órfã: ordem criada e ainda não preenchida vira `Timeout`, o guard reenvia com o mesmo `orderLinkId`, a Bybit recusa como duplicada e a posição local fica zerada. O retCode 170007 na criação também é tratado como transitório | `trade-paper/executor.rs`, `guard.rs`, `erros.rs` | aberto |
@@ -113,11 +113,11 @@ III: teste escrito e falhando antes.
 
 ### Ordem proposta
 
-1. **Dono:** revogar a chave de `3666f9d` e a da captura; emitir a de Demo só
-   spot, sem transferência e com restrição de IP.
+1. **Dono:** emitir a nova chave de Demo só spot, sem transferência e com
+   restrição de IP. As duas antigas já foram excluídas (2026-10-01).
 2. **Antes da T032:** C3 a C6, o prazo herdado e o zero que desliga freio.
-3. **Jev:** emenda da Porta 1; reescrita do histórico, agora incluindo a
-   imagem.
+3. **Jev:** emenda da Porta 1. A reescrita do histórico foi feita em
+   2026-10-01.
 4. **Depois:** o `serve`, o pre-commit e os médios restantes.
 
 ---
@@ -129,9 +129,10 @@ III: teste escrito e falhando antes.
 Passo a passo em https://claude.ai/artifact/HgMYW7mGtSSBM2XAPSiadS (privado).
 Tudo é ato na conta da Bybit ou na máquina do dono, e ninguém faz por ele:
 
-1. Revogar a chave de Demo de `3666f9d` (C2).
-2. Conferir e revogar a chave de `MD BOT/bybit api.png`, no Demo e na conta
-   principal (C2).
+1. ~~Revogar a chave de Demo do arquivo `env keys api demo` (C2).~~ Feito,
+   conferido em 2026-10-01.
+2. ~~Conferir e revogar a chave da captura `MD BOT/bybit api.png` (C2).~~
+   Feito, conferido em 2026-10-01.
 3. Conferir uso das duas desde 2026-09-21 22:47.
 4. Emitir a chave nova de Demo (T032): só Spot, sem derivativo, sem saque,
    sem transferência, com restrição de IP. Até o código recusar derivativo e
@@ -149,15 +150,13 @@ C3, C5 e C6, tirar a imagem do índice e corrigir a mensagem do
 
 ### A credencial de Demo Trading esteve versionada
 
-O arquivo `env keys api demo` entrou no commit `3666f9d`. Em 2026-09-22 ele
-saiu do índice (`67f0c6d`, com `/env*` no `.gitignore`) e o CI ganhou varredura
-de segredo com gitleaks (`0640d3f`) — decisão 046 do DsTrade. O dono avaliou
-que não houve vazamento, porque o repositório é privado, e não pediu revogação.
-A chave segue no histórico; o Princípio VI proíbe chave commitada em qualquer
-momento dele, então reescrever o histórico continua em aberto.
-
-A revisão de 2026-09-23 achou uma segunda exposição, fora do alcance do
-gitleaks: `MD BOT/bybit api.png` (`48c730c`), ainda rastreada — ver C2 acima.
+O arquivo `env keys api demo`, com a chave e o segredo de Demo Trading, e a
+captura `MD BOT/bybit api.png`, com o identificador de outra chave, chegaram ao
+histórico em 2026-09-21. Em 2026-10-01 as duas chaves foram excluídas na Bybit,
+conferido pela API (retCode 10003, "API key is invalid", no Demo, na testnet e
+na produção), e os dois arquivos saíram de todo o histórico com
+`git filter-repo`. Os hashes de commit citados nos documentos anteriores a essa
+data não existem mais. O gitleaks segue no CI, sem nenhuma exceção.
 
 ### Sete agentes em `.claude/agents/`
 

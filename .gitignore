@@ -17,8 +17,8 @@ release/
 *.key
 *.pem
 secrets/
-# E um nome sem ponto nenhum: `env keys api demo` foi commitado em 3666f9d
-# porque nenhum dos padrões acima casa com ele.
+# E um nome sem ponto nenhum, como `env keys api demo`: nenhum dos padrões
+# acima casa com ele.
 /env*
 
 # Editores e sistema
